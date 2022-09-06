@@ -1,0 +1,6 @@
+*.classes
+
+**/build/classes/
+**/build/*.jar
+
+.vscode/

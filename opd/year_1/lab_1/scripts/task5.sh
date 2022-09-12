@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/bash
 
 rm lab0/porygon7
 rm lab0/nincada6/voltorb

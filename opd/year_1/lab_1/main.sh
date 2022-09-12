@@ -1,6 +1,5 @@
-#!/bin/sh
+#!/usr/bin/bash
 
-rm -rf lab0
 mkdir lab0
 
 scripts/task1.sh

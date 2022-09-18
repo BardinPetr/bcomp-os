@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 rm -rf build/classes
 rm -f build/*.jar

@@ -13,7 +13,6 @@ public class Main {
 		int[] yValuesForArctan = new int[] {6, 8, 9, 10, 12, 15, 17}; 
 		// Values of y when formula #1 is used
 		int yValueForArcsin = 11; 
-
 		// Bounds for sequential int array
 		int yStartNumber = 5;
 		int yEndNumber = 18;
@@ -111,7 +110,7 @@ public class Main {
 		// Please refer to Main.inclusiveRandom for usage.
 		double rngInclusiveDelta = 1e-5; 
 		
-		double res = Math.random() * (high - low + 2 * + rngInclusiveDelta) + (low - rngInclusiveDelta);
+		double res = Math.random() * (high - low + 2 * rngInclusiveDelta) + (low - rngInclusiveDelta);
 		return Math.min(high, Math.max(low, res));
 	}
 

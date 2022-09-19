@@ -1,49 +1,40 @@
 package ru.bardinpetr.itmo.lab1;
 
-import java.util.Random;
-
-
 /**
  * ITMO programming laboratory work #1, variant #311902  
  * @author Bardin Petr
  */
 public class Main {
-	static final Random rnd = new Random();
-
-	// Defines how much will random distribution shifted to make inclusive range
-	// Please refer to Main.inclusiveRandom for usage.
-	static final double RNG_INCLUSIVE_DELTA = 1e-5; 
-
-	// Set of values of y when formula #2 is used
-	static final int[] Y_VALUES_FOR_ARCTAN = new int[] {6, 8, 9, 10, 12, 15, 17}; 
-	// Values of y when formula #1 is used
-	static final int Y_VALUE_FOR_ARCSIN = 11; 
-
-	// Bounds for sequential int array
-	static final int Y_START_NUMBER = 5;
-	static final int Y_END_NUMBER = 18;
-
-	// Bounds for random double array
-	static final double X_LOWER_LIMIT = -7.0;
-	static final double X_UPPER_LIMIT = 8.0;
-	static final int X_SIZE = 13;
-
 	/**
 	 * Generates a sequential array and a random array to produce 2d array according to formulas in the Task
 	 */
 	public static void main(String[] args) {
-		double[] x = generateRandomArray(X_LOWER_LIMIT, X_UPPER_LIMIT, X_SIZE);
+		// Set of values of y when formula #2 is used
+		int[] yValuesForArctan = new int[] {6, 8, 9, 10, 12, 15, 17}; 
+		// Values of y when formula #1 is used
+		int yValueForArcsin = 11; 
 
-		int[] y = generateSequentialArray(Y_START_NUMBER, Y_END_NUMBER);
+		// Bounds for sequential int array
+		int yStartNumber = 5;
+		int yEndNumber = 18;
+
+		// Bounds for random double array
+		double xLowerLimit = -7.0;
+		double xUpperLimit = 8.0;
+		int xSize = 13;
+
+		double[] x = generateRandomArray(xLowerLimit, xUpperLimit, xSize);
+
+		int[] y = generateSequentialArray(yStartNumber, yEndNumber);
 		int ySize = y.length;
 
-		double[][] r = new double[ySize][X_SIZE];
+		double[][] r = new double[ySize][xSize];
 
 		for(int i = 0; i < ySize; i++) {
-			for(int j = 0; j < X_SIZE; j++) {
-				if (y[i] == Y_VALUE_FOR_ARCSIN) {
+			for(int j = 0; j < xSize; j++) {
+				if (y[i] == yValueForArcsin) {
 					r[i][j] = calcFormulaWithArcsin(x[j]);
-				} else if (contains(Y_VALUES_FOR_ARCTAN, y[i])) {
+				} else if (contains(yValuesForArctan, y[i])) {
 					r[i][j] = calcFormulaWithArctan(x[j]);
 				} else {
 					r[i][j] = calcFormulaWithSquare(x[j]);
@@ -101,14 +92,18 @@ public class Main {
 
 	/**
 	 * Wrapper around Random.nextDouble to generate numbers in inclusive range [low, high] as original has [low, high).
-	 * Attention: this mehod slightly stretches the original distribution by RNG_INCLUSIVE_DELTA! 
+	 * Attention: this mehod slightly stretches the original distribution by rngInclusiveDelta! 
 	 * To prevent shifting of distribution also applying delta to lower bound.
-	 * Therefore [low-RNG_INCLUSIVE_DELTA, low] becomes low, and [high, high + RNG_INCLUSIVE_DELTA) becomes high.
+	 * Therefore [low-rngInclusiveDelta, low] becomes low, and [high, high + rngInclusiveDelta) becomes high.
 	 * @param low		Inclusive lower bound
 	 * @param high 	Inclusive higher bound
 	 */
 	public static double inclusiveRandom(double low, double high) {
-		double res = rnd.nextDouble(low - RNG_INCLUSIVE_DELTA, high + RNG_INCLUSIVE_DELTA);
+		// Defines how much will random distribution shifted to make inclusive range
+		// Please refer to Main.inclusiveRandom for usage.
+		double rngInclusiveDelta = 1e-5; 
+		
+		double res = Math.random() * (high - low + 2 * + rngInclusiveDelta) + (low - rngInclusiveDelta);
 		return Math.min(high, Math.max(low, res));
 	}
 

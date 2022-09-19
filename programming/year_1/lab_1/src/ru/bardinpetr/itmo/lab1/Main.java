@@ -23,6 +23,11 @@ public class Main {
 		double xUpperLimit = 8.0;
 		int xSize = 13;
 
+		if(xLowerLimit > xUpperLimit || xSize < 1) {
+			System.out.println("Invalid x limits");
+			return;
+		}
+
 		double[] x = generateRandomArray(xLowerLimit, xUpperLimit, xSize);
 
 		int[] y = generateSequentialArray(yStartNumber, yEndNumber);
@@ -97,8 +102,11 @@ public class Main {
 	 * Therefore [low-rngInclusiveDelta, low] becomes low, and [high, high + rngInclusiveDelta) becomes high.
 	 * @param low		Inclusive lower bound
 	 * @param high 	Inclusive higher bound
+	 * @return			random double or 0 if low > high 
 	 */
 	public static double inclusiveRandom(double low, double high) {
+		if(low > high) return 0;
+
 		// Defines how much will random distribution shifted to make inclusive range
 		// Please refer to Main.inclusiveRandom for usage.
 		double rngInclusiveDelta = 1e-5; 
@@ -161,6 +169,8 @@ public class Main {
 	 * @param	y			1d int labels array for rows (should have same dimension as first dim. of table)
 	 */
 	public static void displayTablePretty(double[][] table, double[] x, int[] y) {
+		if(table.length == 0 || y.length != table.length || table[0].length == 0 || x.length != table[0].length) return;
+
 		System.out.print("     |");
 		for(int j = 0; j < table[0].length; j++) {
 			System.out.printf(" x=%-9.2f|", x[j]);

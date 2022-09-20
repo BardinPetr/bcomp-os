@@ -9,6 +9,7 @@ chmod u+w lab0/toxicroak7
 chmod u+w lab0/toxicroak7/butterfreekoffi*
 rm lab0/toxicroak7/butterfreekoffi*
 chmod u-w lab0/toxicroak7
+chmod u-w lab0/koffing3 # It was altered with a hard link
 
 # Adding rwx permissions recursively to everythin as we have high level of nesting here to avoid modifying each file to w and directories to rwx
 chmod -R u+rwx lab0/servine0

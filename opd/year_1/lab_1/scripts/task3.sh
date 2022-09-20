@@ -39,7 +39,7 @@ ln -s $(pwd)/yanmega9 ./toxicroak7/sewaddleyanmega
 # Original command causes permission denied due to lacking read permission on source
 chmod u+r koffing3
 cp koffing3 servine0/typhlosion/
-# chmod u-r koffing3 # This permission is required in #5
+chmod u-r koffing3
 
 # #5
 

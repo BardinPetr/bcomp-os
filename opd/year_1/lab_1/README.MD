@@ -3,9 +3,9 @@
 ## Запуск
 
 ```
-./main.sh            # всё вместе + создание корня
+./main.sh            # всё вместе + создание lab0
 ./scripts/taskX.sh   # отдельная подзадача
-./scripts/clean.sh   # очистить lab0
+./scripts/clean.sh   # удалить lab0
 ```
 
 ## Задание

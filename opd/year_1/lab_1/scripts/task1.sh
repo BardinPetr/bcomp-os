@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+mkdir lab0
 cd lab0
 
 mkdir -p nincada6/carvanha nincada6/gligar servine0/typhlosion servine0/empoleon servine0/charmeleon toxicroak7

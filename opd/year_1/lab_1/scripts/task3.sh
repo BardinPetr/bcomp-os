@@ -56,3 +56,7 @@ cat toxicroak7/shelmet > koffing3_87
 cat toxicroak7/sewaddle >> koffing3_87
 
 cd ..
+
+
+echo "Result after task 3:"
+ls -lR lab0

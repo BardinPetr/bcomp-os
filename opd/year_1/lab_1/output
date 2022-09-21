@@ -1,0 +1,72 @@
+Result after task 3:
+total 4
+lrwxr-xr-x  1 s367079  studs   8 21 сент. 13:35 Copy_22 -> nincada6
+-------rw-  2 s367079  studs  81 21 сент. 13:35 koffing3
+-rw-r--r--  1 s367079  studs  72 21 сент. 13:35 koffing3_87
+drwx-wxrwx  4 s367079  studs   5 21 сент. 13:35 nincada6
+-rw--w----  1 s367079  studs  50 21 сент. 13:35 porygon7
+dr-x-w-r--  5 s367079  studs   6 21 сент. 13:35 servine0
+dr-xrwxrwx  2 s367079  studs   8 21 сент. 13:35 toxicroak7
+-r-----r--  1 s367079  studs  29 21 сент. 13:35 yanmega9
+
+lab0/nincada6:
+total 2
+drwx-wxrwx  2 s367079  studs   2 21 сент. 13:35 carvanha
+drwxr-x-w-  2 s367079  studs   2 21 сент. 13:35 gligar
+-rw-rw----  1 s367079  studs  36 21 сент. 13:35 voltorb
+
+lab0/nincada6/carvanha:
+total 0
+
+lab0/nincada6/gligar:
+total 0
+
+lab0/servine0:
+total 2
+drwxrwxrwx  2 s367079  studs   2 21 сент. 13:35 charmeleon
+dr-x--x-wx  2 s367079  studs   2 21 сент. 13:35 empoleon
+d-wxrw--wx  2 s367079  studs   3 21 сент. 13:35 typhlosion
+-rw-r-----  1 s367079  studs  21 21 сент. 13:35 zebstrika
+
+lab0/servine0/charmeleon:
+total 0
+
+lab0/servine0/empoleon:
+total 0
+
+lab0/servine0/typhlosion:
+total 0
+ls: lab0/servine0/typhlosion: Permission denied
+
+lab0/toxicroak7:
+total 3
+-------r--  1 s367079  studs  36 21 сент. 13:35 butterfree
+-------rw-  2 s367079  studs  81 21 сент. 13:35 butterfreekoffing
+-r--------  1 s367079  studs  20 21 сент. 13:35 sewaddle
+lrwxr-xr-x  1 s367079  studs  60 21 сент. 13:35 sewaddleyanmega -> /home/studs/s367079/itmo-labs/opd/year_1/lab_1/lab0/yanmega9
+-r--------  1 s367079  studs  52 21 сент. 13:35 shelmet
+-r-----r--  1 s367079  studs  29 21 сент. 13:35 shelmetyanmega
+Task #4/1
+wc: lab0/servine0/typhlosion: open: Permission denied
+wc: lab0/toxicroak7: read: Is a directory
+Task #4/1, file /tmp/wc_result:
+       0 total
+Task #4/2
+shelmetyanmega, shelmet, sewaddleyanmega, sewaddle, butterfreekoffing, butterfree
+Task #4/3
+weight=22.9 height=20.0 atk=3
+def=5
+Живет
+Task #4/4
+-------r--  1 s367079  studs  36 21 сент. 13:35 lab0/toxicroak7/butterfree
+-r--------  1 s367079  studs  20 21 сент. 13:35 lab0/toxicroak7/sewaddle
+Task #4/5
+lrwxr-xr-x  1 s367079  studs  60 21 сент. 13:35 lab0/toxicroak7/sewaddleyanmega -> /home/studs/s367079/itmo-labs/opd/year_1/lab_1/lab0/yanmega9
+-r--------  1 s367079  studs  52 21 сент. 13:35 lab0/toxicroak7/shelmet
+-r-----r--  1 s367079  studs  29 21 сент. 13:35 lab0/toxicroak7/shelmetyanmega
+-r--------  1 s367079  studs  20 21 сент. 13:35 lab0/toxicroak7/sewaddle
+Task #4/6
+     1  Развитые способности  Analytic
+     1  Способности  Swarm Hydration Shell
+     2  Armor
+     3  satk=4 sdef=6 spd=4

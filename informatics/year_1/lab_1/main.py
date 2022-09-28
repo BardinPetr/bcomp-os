@@ -5,7 +5,8 @@ from tools import *
 
 
 def convert_from_fib(num: str) -> [str, dict]:
-    if not verify_cs(num, FIB, N2L):
+    """Convert fibonacci to NS10"""
+    if not verify_cs(num, FIB, L2N):
         raise ValueError("Not a Fibonacci")
 
     fib_numbers = [(i[0] + 1) for i in enumerate(num[::-1]) if i[1] == '1']
@@ -26,7 +27,10 @@ def convert_from_fib(num: str) -> [str, dict]:
 
 
 def convert_to_fib(num: str) -> [str, dict]:
-    res = ''
+    """Convert NS10 to fibonacci"""
+    if not verify_cs(num, 10, L2N):
+        raise ValueError("Not a NS10")
+
     num = float(num)
 
     fibs = [1]
@@ -58,6 +62,10 @@ def convert_to_fib(num: str) -> [str, dict]:
 
 
 def convert_to_10(src_num: str, from_s: Union[int, FIB]) -> [str, dict]:
+    """Convert classic/negapositional/fibonacci to NS10"""
+    if not verify_cs(src_num, from_s, L2N):
+        raise ValueError("Invalid NS")
+
     logs = {
         "mode":  LOG_MODE_TO_10,
         "in":    src_num,
@@ -98,6 +106,11 @@ def convert_from_10(num: str,
                     to_s: Union[int, FIB],
                     dest_precision: int = 5,
                     is_zero_precision=1e-8) -> [str, dict]:
+    print(num, to_s)
+    """Convert NS10 to classic/negapositional/fibonacci"""
+    if not verify_cs(num, 10, L2N):
+        raise ValueError("Not a NS10")
+
     logs = {
         "mode":  LOG_MODE_FROM_10,
         "in":    num,
@@ -145,6 +158,10 @@ def convert_from_10(num: str,
 
 
 def convert_powers(source_num: str, from_s: int, to_s: int, is_zero_precision: float = 1e-9) -> [str, dict]:
+    """Simplified conversion between systems one of which is a power of another"""
+    if not verify_cs(source_num, from_s, L2N):
+        raise ValueError("Invalid NS")
+
     if from_s == FIB or to_s == FIB:
         raise InvalidSystem("Cant use fibonacci here")
 
@@ -158,7 +175,7 @@ def convert_powers(source_num: str, from_s: int, to_s: int, is_zero_precision: f
     is_downscale = check_exp(from_s, to_s)
 
     if not is_upscale and not is_downscale:
-        raise InvalidSystem("Seems that there is no exponential connection between arguments")
+        raise InvalidSystem("Seems that there is no power connection between arguments")
 
     logs = {
         "mode":  LOG_MODE_DIRECT_POWER,
@@ -252,7 +269,7 @@ if __name__ == "__main__":
             ['14,67', '8', '2'], ['0,001101', '2', '16'], ['0,001011', '2', '10'], ['1B,08', '16', '10'],
             ['42', '10', FIB], ['147', '-10', '10'], ['1000010101', FIB, '10'], ['1678', '-10', '10']]
 
-    # run(*data[5])
+    # run(*data[13])
     # exit(0)
 
     for i in range(1, 14):

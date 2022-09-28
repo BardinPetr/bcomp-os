@@ -26,7 +26,7 @@ SEP = '.'
 def verify_cs(number: str, cs: Union[int, FIB], alphabet: dict[str, int]):
     if cs == FIB:
         return all(map(lambda x: x.isdigit(), number)) and ('11' not in number)
-    return all(map(lambda x: x in '.,' or (x in alphabet) and alphabet[x] < abs(cs), number))
+    return all(map(lambda x: x in '.,-' or (x in alphabet) and alphabet[x] < abs(cs), number))
 
 
 def join_number(dec, frac):

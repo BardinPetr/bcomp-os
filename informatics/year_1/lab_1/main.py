@@ -43,7 +43,7 @@ def convert_to_fib(num: str) -> [str, dict]:
 
     cur = num
     for i, val in enumerate(fibs):
-        if val <= cur:
+        if val <= cur and (res == '' or res[-1] == '0'):
             cur -= val
             res += '1'
         else:
@@ -269,8 +269,8 @@ if __name__ == "__main__":
             ['14,67', '8', '2'], ['0,001101', '2', '16'], ['0,001011', '2', '10'], ['1B,08', '16', '10'],
             ['42', '10', FIB], ['147', '-10', '10'], ['1000010101', FIB, '10'], ['1678', '-10', '10']]
 
-    # run(*data[13])
-    # exit(0)
+    run(*data[10])
+    exit(0)
 
     for i in range(1, 14):
         print("\n\n", i)

@@ -1,0 +1,34 @@
+{% macro applyEffect(target) %}
+    @Override
+    protected void apply{{ target }}Effects(Pokemon pokemon) {
+        super.apply{{ target }}Effects(pokemon);
+        {{ caller() }}
+    }
+{%- endmacro %}
+
+{% macro doubleNormConst(existsIf, name, value) %}
+    {% if existsIf is true %}
+    private static final double {{ name }} = {{ value / 100 }};
+    {% endif %}
+{% endmacro %}
+
+{% macro applyAilment(chance, ailment) %}
+    {% if ailment is not none %}
+        if ({{ chance }} > Math.random())
+            Effect.{{ ailment }}(pokemon);
+    {% endif %}
+{%- endmacro %}
+
+{% macro applyStats(chance, changes) %}
+    {% if changes|length > 0 %}
+        pokemon.addEffect(
+            new Effect()
+                    .chance({{ chance }})
+                    {%- for name, val in changes.items() %}
+                    .stat(Stat.{{ name|upper_format }}, {{ val }})
+                    {%- endfor %}
+        );
+    {% endif %}
+{%- endmacro %}
+
+

@@ -1,21 +1,19 @@
-package ru.bardinpetr.itmo.lab_2.moves;
+package ru.bardinpetr.itmo.lab_2.moves.status;
 
-import ru.ifmo.se.pokemon.Effect;
-import ru.ifmo.se.pokemon.Pokemon;
-import ru.ifmo.se.pokemon.Stat;
-import ru.ifmo.se.pokemon.StatusMove;
-import ru.ifmo.se.pokemon.Type;
+import ru.ifmo.se.pokemon.*;
 
 /**
  * Raises the user's evasion by one stage.
+ *
  * @author Bardin Petr
+ * @see <a href="https://pokemondb.net/move/double-team">PokemonDB/Double Team</a>
  */
 public class DoubleTeam extends StatusMove {
 
     private static final double STATS_CHANCE = 1.0;
 
     public DoubleTeam() {
-        super(Type.NORMAL, 0.0, 1.0, 0, 1);
+        super(Type.NORMAL, 0.0, 1.0);
     }
 
     @Override

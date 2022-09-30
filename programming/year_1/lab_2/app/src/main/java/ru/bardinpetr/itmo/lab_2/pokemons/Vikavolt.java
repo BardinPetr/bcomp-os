@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_2.pokemons;
 
-import ru.bardinpetr.itmo.lab_2.moves.PoisonJab;
+import ru.bardinpetr.itmo.lab_2.moves.physical.PoisonJab;
 
 public class Vikavolt extends Charjabug {
 

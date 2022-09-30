@@ -1,8 +1,8 @@
 package ru.bardinpetr.itmo.lab_2.pokemons;
 
-import ru.bardinpetr.itmo.lab_2.moves.DoubleTeam;
-import ru.bardinpetr.itmo.lab_2.moves.Rest;
-import ru.bardinpetr.itmo.lab_2.moves.Tackle;
+import ru.bardinpetr.itmo.lab_2.moves.physical.Tackle;
+import ru.bardinpetr.itmo.lab_2.moves.status.DoubleTeam;
+import ru.bardinpetr.itmo.lab_2.moves.status.Rest;
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Type;
 

@@ -1,21 +1,19 @@
-package ru.bardinpetr.itmo.lab_2.moves;
+package ru.bardinpetr.itmo.lab_2.moves.special;
 
-import ru.ifmo.se.pokemon.Effect;
-import ru.ifmo.se.pokemon.Pokemon;
-import ru.ifmo.se.pokemon.SpecialMove;
-import ru.ifmo.se.pokemon.Stat;
-import ru.ifmo.se.pokemon.Type;
+import ru.ifmo.se.pokemon.*;
 
 /**
  * Inflicts regular damage.  Has a 10% chance to lower the target's Special Defense by one stage.
+ *
  * @author Bardin Petr
+ * @see <a href="https://pokemondb.net/move/energy-ball">PokemonDB/Energy Ball</a>
  */
 public class EnergyBall extends SpecialMove {
 
     private static final double STATS_CHANCE = 0.1;
 
     public EnergyBall() {
-        super(Type.GRASS, 0.9, 1.0, 0, 1);
+        super(Type.GRASS, 0.9, 1.0);
     }
 
     @Override

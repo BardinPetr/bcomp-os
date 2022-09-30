@@ -1,20 +1,19 @@
-package ru.bardinpetr.itmo.lab_2.moves;
+package ru.bardinpetr.itmo.lab_2.moves.status;
 
 import ru.ifmo.se.pokemon.*;
-
-// #prevent_autogen
 
 /**
  * Raises the user's Special Attack and Special Defense by one stage each.
  *
  * @author Bardin Petr
+ * @see <a href="https://pokemondb.net/move/calm-mind">PokemonDB/Calm Mind</a>
  */
 public class CalmMind extends StatusMove {
 
     private static final double STATS_CHANCE = 1.0;
 
     public CalmMind() {
-        super(Type.PSYCHIC, 0.0, 1.0, 0, 1);
+        super(Type.PSYCHIC, 0.0, 1.0);
     }
 
     @Override

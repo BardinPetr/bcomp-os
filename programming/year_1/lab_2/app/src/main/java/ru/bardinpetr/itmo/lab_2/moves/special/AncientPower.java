@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_2.moves;
+package ru.bardinpetr.itmo.lab_2.moves.special;
 
 import ru.ifmo.se.pokemon.*;
 
@@ -8,13 +8,14 @@ import ru.ifmo.se.pokemon.*;
  * Inflicts regular damage. Has a 10% chance to raise all of the user's stats one stage.
  *
  * @author Bardin Petr
+ * @see <a href="https://pokemondb.net/move/ancient-power">PokemonDB/Ancient Power</a>
  */
 public class AncientPower extends SpecialMove {
 
     private static final double STATS_CHANCE = 0.1;
 
     public AncientPower() {
-        super(Type.ROCK, 0.6, 1.0, 0, 1);
+        super(Type.ROCK, 0.6, 1.0);
     }
 
     @Override

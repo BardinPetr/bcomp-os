@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_2.pokemons;
 
-import ru.bardinpetr.itmo.lab_2.moves.EnergyBall;
+import ru.bardinpetr.itmo.lab_2.moves.special.EnergyBall;
 import ru.ifmo.se.pokemon.Type;
 
 public class Leafeon extends Eevee {

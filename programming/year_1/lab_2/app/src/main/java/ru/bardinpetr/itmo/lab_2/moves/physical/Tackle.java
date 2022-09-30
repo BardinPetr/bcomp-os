@@ -1,18 +1,18 @@
-package ru.bardinpetr.itmo.lab_2.moves;
+package ru.bardinpetr.itmo.lab_2.moves.physical;
 
 import ru.ifmo.se.pokemon.PhysicalMove;
 import ru.ifmo.se.pokemon.Type;
 
-// #prevent_autogen
-
 /**
  * Inflicts regular damage.
+ *
  * @author Bardin Petr
+ * @see <a href="https://pokemondb.net/move/tackle">PokemonDB/Tackle</a>
  */
-public class ViceGrip extends PhysicalMove {
+public class Tackle extends PhysicalMove {
 
-    public ViceGrip() {
-        super(Type.NORMAL, 0.55, 1.0, 0, 1);
+    public Tackle() {
+        super(Type.NORMAL, 0.4, 1.0);
     }
 
     @Override

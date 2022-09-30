@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_2.pokemons;
 
-import ru.bardinpetr.itmo.lab_2.moves.Discharge;
+import ru.bardinpetr.itmo.lab_2.moves.special.Discharge;
 import ru.ifmo.se.pokemon.Type;
 
 public class Charjabug extends Grubbin {

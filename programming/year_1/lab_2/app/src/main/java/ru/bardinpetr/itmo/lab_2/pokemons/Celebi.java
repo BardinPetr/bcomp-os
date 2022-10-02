@@ -12,11 +12,10 @@ public class Celebi extends Pokemon {
     public Celebi(String name, int level) {
         super(name, level);
         setStats(100, 100, 100, 100, 100, 100);
-        addType(Type.PSYCHIC);
-        addType(Type.GRASS);
+        setType(Type.PSYCHIC, Type.GRASS);
         addMove(new DoubleTeam());
-        addMove(new AncientPower());
         addMove(new CalmMind());
+        addMove(new AncientPower());
         addMove(new Psychic());
     }
 }

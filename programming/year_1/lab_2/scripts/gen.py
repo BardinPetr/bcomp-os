@@ -135,12 +135,19 @@ def gen_attack(name):
     move = pb.APIResource('move', '-'.join(name.lower().split()))
     damage_class = move.damage_class.name
     ATTACK_TYPES[name] = damage_class
+
     texts = [(i.effect, i.short_effect)
              for i in move.effect_entries
              if i.language.name == "en"]
     texts = [i.replace("\n", " ")
              .replace("$effect_chance", str(move.effect_chance))
              for i in texts[0]]
+
+    action_text = [i.flavor_text
+                   for i in move.flavor_text_entries
+                   if i.language.name == "en"][0]
+    action_text = action_text.replace("\n", " ")
+
     att_superclass = f"{class_format(damage_class)}Move"
     ailment = ailment_translation(move.meta.ailment.name)
     stats = {i.stat.name: i.change for i in move.stat_changes}
@@ -162,6 +169,7 @@ def gen_attack(name):
                 att_superclass=att_superclass,
                 effect=effect,
                 full_desc=texts[0],
+                action_text=action_text,
                 desc=texts[1])
     return render, f"{damage_class.lower()}/{class_format(name)}.java"
 

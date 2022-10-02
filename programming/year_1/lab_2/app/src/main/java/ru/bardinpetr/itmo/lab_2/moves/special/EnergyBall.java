@@ -18,7 +18,7 @@ public class EnergyBall extends SpecialMove {
 
     @Override
     protected String describe() {
-        return "Has a 10% chance to lower the target's Special Defense by one stage.";
+        return "uses Energy Ball";
     }
 
     @Override
@@ -26,7 +26,7 @@ public class EnergyBall extends SpecialMove {
         super.applyOppEffects(pokemon);
 
         pokemon.addEffect(
-            new Effect().chance(STATS_CHANCE).stat(Stat.SPECIAL_DEFENSE, -1)
+                new Effect().chance(STATS_CHANCE).stat(Stat.SPECIAL_DEFENSE, -1)
         );
     }
 }

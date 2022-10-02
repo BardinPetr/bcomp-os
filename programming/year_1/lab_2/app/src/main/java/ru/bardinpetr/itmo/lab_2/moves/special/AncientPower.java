@@ -20,7 +20,7 @@ public class AncientPower extends SpecialMove {
 
     @Override
     protected String describe() {
-        return "Has a 10% chance to raise all of the user's stats by one stage.";
+        return "uses Ancient Power";
     }
 
     @Override

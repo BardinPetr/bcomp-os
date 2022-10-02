@@ -21,7 +21,7 @@ public class Discharge extends SpecialMove {
 
     @Override
     protected String describe() {
-        return "Has a 30% chance to paralyze the target.";
+        return "uses Discharge";
     }
 
     @Override

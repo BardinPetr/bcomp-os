@@ -18,7 +18,7 @@ public class DoubleTeam extends StatusMove {
 
     @Override
     protected String describe() {
-        return "Raises the user's evasion by one stage.";
+        return "uses Double Team";
     }
 
     @Override
@@ -31,7 +31,7 @@ public class DoubleTeam extends StatusMove {
         super.applySelfEffects(pokemon);
 
         pokemon.addEffect(
-            new Effect().chance(STATS_CHANCE).stat(Stat.EVASION, 1)
+                new Effect().chance(STATS_CHANCE).stat(Stat.EVASION, 1)
         );
     }
 }

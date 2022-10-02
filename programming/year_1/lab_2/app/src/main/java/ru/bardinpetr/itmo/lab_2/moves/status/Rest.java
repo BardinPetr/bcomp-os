@@ -18,7 +18,7 @@ public class Rest extends StatusMove {
 
     @Override
     protected String describe() {
-        return "User sleeps for two turns, completely healing itself.";
+        return "uses Rest";
     }
 
     @Override

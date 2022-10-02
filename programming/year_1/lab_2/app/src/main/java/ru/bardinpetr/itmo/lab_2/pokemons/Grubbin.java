@@ -11,7 +11,7 @@ public class Grubbin extends Pokemon {
         super(name, level);
         setStats(47, 62, 45, 55, 45, 46);
         addType(Type.BUG);
-        addMove(new ViceGrip());
         addMove(new Rest());
+        addMove(new ViceGrip());
     }
 }

@@ -21,7 +21,7 @@ public class PoisonJab extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "Has a 30% chance to poison the target.";
+        return "uses Poison Jab";
     }
 
     @Override

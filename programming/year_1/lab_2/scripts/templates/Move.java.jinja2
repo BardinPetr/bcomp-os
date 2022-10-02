@@ -31,7 +31,7 @@ super(Type.{{ m.type.name|upper_format }}, {{ m.power|default(0, true) / 100 }},
 
 @Override
 protected String describe() {
-return "{{ desc }}";
+return "uses {{ name }}";
 }
 
 {% if m.accuracy is none %}

@@ -17,6 +17,6 @@ public class Tackle extends PhysicalMove {
 
     @Override
     protected String describe() {
-        return "Inflicts regular damage with no additional effect.";
+        return "uses Tackle";
     }
 }

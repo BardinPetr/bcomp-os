@@ -18,7 +18,7 @@ public class CalmMind extends StatusMove {
 
     @Override
     protected String describe() {
-        return "Raises the user's Special Attack and Special Defense by one stage.";
+        return "uses Calm Mind";
     }
 
     @Override

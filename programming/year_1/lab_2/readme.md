@@ -6,6 +6,8 @@
 ./gradlew run
 ```
 
+[![asciicast](https://asciinema.org/a/6QEbnZqWr53a0o8wHR09uTC8n.svg)](https://asciinema.org/a/6QEbnZqWr53a0o8wHR09uTC8n)
+
 ## Описание
 
 - На основе базового класса Pokemon написать свои классы для заданных видов покемонов.

@@ -111,8 +111,9 @@ def gen_explanatory_table(data: list[int], corr_cnt: int) -> str:
 
     n = len(data)
     poss = [list(_get_data_pos_for_corr(i, n)) for i in range(corr_cnt)]
+    i_cnt, r_cnt = 0, 0
     res = f"№ {''.join(map(fmt, range(n)))}\n" \
-          f"T {''.join('{:>4s}'.format(('i' if i & (i + 1) else 'r') + txt_sub(i)) for i in range(n))}\n" \
+          f"T {''.join('{:>4s}'.format(('i' + txt_sub(i_cnt := i_cnt + 1) if i & (i + 1) else 'r' + txt_sub(r_cnt := r_cnt + 1))) for i in range(n))}\n" \
           f"A {''.join(map(fmt, data))}\n"
     res += '\n'.join(
         f"S{txt_sub(row_n)}{''.join('   ' + ('X' if i in row else ' ') for i in range(n))}"

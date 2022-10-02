@@ -5,6 +5,8 @@ import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.SpecialMove;
 import ru.ifmo.se.pokemon.Type;
 
+// #prevent_autogen
+
 /**
  * Inflicts regular damage.  Has a 30% chance to paralyze the target.
  *
@@ -28,6 +30,7 @@ public class Discharge extends SpecialMove {
     protected void applyOppEffects(Pokemon pokemon) {
         super.applyOppEffects(pokemon);
 
-        if (AILMENT_CHANCE > Math.random()) Effect.paralyze(pokemon);
+        if (AILMENT_CHANCE > Math.random() && !pokemon.hasType(Type.ELECTRIC))
+            Effect.paralyze(pokemon);
     }
 }

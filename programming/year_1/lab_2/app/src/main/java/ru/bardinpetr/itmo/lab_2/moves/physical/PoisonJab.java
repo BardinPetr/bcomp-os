@@ -5,6 +5,8 @@ import ru.ifmo.se.pokemon.PhysicalMove;
 import ru.ifmo.se.pokemon.Pokemon;
 import ru.ifmo.se.pokemon.Type;
 
+// #prevent_autogen
+
 /**
  * Inflicts regular damage.  Has a 30% chance to poison the target.
  *
@@ -28,6 +30,7 @@ public class PoisonJab extends PhysicalMove {
     protected void applyOppEffects(Pokemon pokemon) {
         super.applyOppEffects(pokemon);
 
-        if (AILMENT_CHANCE > Math.random()) Effect.poison(pokemon);
+        if (AILMENT_CHANCE > Math.random() && !pokemon.hasType(Type.POISON) && !pokemon.hasType(Type.STEEL))
+            Effect.poison(pokemon);
     }
 }

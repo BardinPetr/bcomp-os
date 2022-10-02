@@ -12,6 +12,11 @@ application {
 
 tasks.jar {
     manifest {
-        attributes(mapOf("Main-Class" to "ru.bardinpetr.itmo.lab_2.App"))
+        attributes(
+            mapOf(
+                "Main-Class" to "ru.bardinpetr.itmo.lab_2.App",
+                "Class-Path" to "pokemon.jar"
+            )
+        )
     }
 }

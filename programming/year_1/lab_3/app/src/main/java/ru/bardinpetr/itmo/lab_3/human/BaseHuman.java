@@ -5,9 +5,10 @@ import ru.bardinpetr.itmo.lab_3.human.interfaces.Heightable;
 import ru.bardinpetr.itmo.lab_3.human.interfaces.NameSettable;
 import ru.bardinpetr.itmo.lab_3.human.interfaces.Nameable;
 
-import static ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter.joinNullableStrings;
+import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+import ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter;
 
-abstract public class BaseHuman implements Nameable, NameSettable, Heightable, Describable {
+abstract public class BaseHuman extends PhysicalObject implements Nameable, NameSettable, Heightable, Describable {
     private String firstname = "";
     private String lastname = "";
     private String patronymic = "";
@@ -28,7 +29,7 @@ abstract public class BaseHuman implements Nameable, NameSettable, Heightable, D
 
     @Override
     public String getFullName() {
-        return joinNullableStrings(" ", firstname, patronymic, lastname);
+        return SpecialFormatter.joinNullableStrings(" ", firstname, patronymic, lastname);
     }
 
     @Override

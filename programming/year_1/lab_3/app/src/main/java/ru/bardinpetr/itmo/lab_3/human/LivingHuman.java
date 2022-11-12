@@ -4,15 +4,12 @@ package ru.bardinpetr.itmo.lab_3.human;
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Able;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_3.properties.Modifier;
-import ru.bardinpetr.itmo.lab_3.properties.interfaces.Modifiable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LivingHuman extends BaseHuman implements Able, Modifiable {
+public class LivingHuman extends BaseHuman implements Able {
     private final List<Ability> abilities = new ArrayList<>();
-    private final List<Modifier> properties = new ArrayList<>();
 
     public LivingHuman(String name, String patronymic, String surname) {
         super(name, patronymic, surname);
@@ -47,13 +44,4 @@ public class LivingHuman extends BaseHuman implements Able, Modifiable {
         return sb.toString();
     }
 
-    @Override
-    public void applyModifier(Modifier mod) {
-        properties.add(mod);
-    }
-
-    @Override
-    public List<Modifier> getModifiers() {
-        return properties;
-    }
 }

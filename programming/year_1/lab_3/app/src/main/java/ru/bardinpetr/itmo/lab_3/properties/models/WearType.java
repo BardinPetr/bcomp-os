@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_3.things.wear;
+package ru.bardinpetr.itmo.lab_3.properties.models;
 
 public enum WearType {
     MEDICAL_GOWN("халат"), CAP("колпак"), HAT("шляпа"), TROUSERS("штаны"), SHIRT("рубашка"), TIE("галстук");

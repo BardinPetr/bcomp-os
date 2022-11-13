@@ -20,7 +20,7 @@ import ru.bardinpetr.itmo.lab_3.things.place.House;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
 import ru.bardinpetr.itmo.lab_3.things.tool.Weapon;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
-import ru.bardinpetr.itmo.lab_3.things.wear.WearType;
+import ru.bardinpetr.itmo.lab_3.properties.models.WearType;
 
 public class App {
     public static void main(String[] args) {

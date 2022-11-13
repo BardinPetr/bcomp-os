@@ -1,5 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.scenarios;
 
+import ru.bardinpetr.itmo.lab_3.properties.models.LogicOperator;
 import ru.bardinpetr.itmo.lab_3.scenarios.interfaces.IScenarioAction;
 
 public class Scenario {

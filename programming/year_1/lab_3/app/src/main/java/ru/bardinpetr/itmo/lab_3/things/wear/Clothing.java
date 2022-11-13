@@ -1,5 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.things.wear;
 
+import ru.bardinpetr.itmo.lab_3.properties.models.WearType;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
 import java.util.Objects;

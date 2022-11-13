@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_3.scenarios;
+package ru.bardinpetr.itmo.lab_3.properties.models;
 
 public enum LogicOperator {
     AND("и"), OR("или");

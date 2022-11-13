@@ -1,6 +1,5 @@
 package ru.bardinpetr.itmo.lab_3.creatures.humans.professions;
 
-import ru.bardinpetr.itmo.lab_3.abilities.actions.DoMechanicsAction;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.SongAction;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.ProfessionHuman;
 
@@ -19,7 +18,12 @@ public class Musician extends ProfessionHuman {
         return "музыкант";
     }
 
-    public String draw() {
+    public String play() {
         return "музыка написана и сыграна";
+    }
+
+    @Override
+    public String toString() {
+        return "Musician{%s}".formatted(super.toString());
     }
 }

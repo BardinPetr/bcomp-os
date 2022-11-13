@@ -10,6 +10,7 @@ import ru.bardinpetr.itmo.lab_3.things.place.Place;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HumanGroup extends PhysicalObject implements Describable, IPerforming, Scriptable {
     private final List<Ability> abilities = new ArrayList<>();
@@ -94,5 +95,30 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
         globalScenario = scenario;
         for (int i = 0; i < group.size(); i++)
             group.get(i).addScenario(globalScenario);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        HumanGroup that = (HumanGroup) o;
+
+        if (!abilities.equals(that.abilities)) return false;
+        if (!group.equals(that.group)) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        return Objects.equals(globalScenario, that.globalScenario);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), abilities, group, name, globalScenario);
+    }
+
+    @Override
+    public String toString() {
+        return "HumanGroup{abilities=%s, group=%s, name='%s', globalScenario=%s} %s"
+                .formatted(abilities, group, name, globalScenario, super.toString());
     }
 }

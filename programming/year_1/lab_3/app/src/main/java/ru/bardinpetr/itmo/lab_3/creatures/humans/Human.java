@@ -20,6 +20,7 @@ import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Human extends Creature implements IPerforming, Scriptable, ICommonHumanAbilities, Friendable {
     private final List<Ability> abilities = new ArrayList<>();
@@ -104,4 +105,35 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     public void addScenario(Scenario newScenario) {
         scenario.append(newScenario);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Human human = (Human) o;
+
+        if (abilities != null ? !abilities.equals(human.abilities) : human.abilities != null) return false;
+        if (wearAbility != null ? !wearAbility.equals(human.wearAbility) : human.wearAbility != null) return false;
+        return scenario != null ? scenario.equals(human.scenario) : human.scenario == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), abilities, wearAbility, scenario);
+    }
+
+    @Override
+    public String toString() {
+        return "Human{abilities=%s, wearAbility=%s, scenario=%s, %s}"
+                .formatted(
+                        abilities,
+                        wearAbility.toString(),
+                        scenario.print(),
+                        super.toString()
+                );
+    }
+
+
 }

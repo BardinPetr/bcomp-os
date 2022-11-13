@@ -18,4 +18,9 @@ public class LookLikeAction extends Ability {
     protected String getObjectPreposition() {
         return "как";
     }
+
+    @Override
+    public String toString() {
+        return "LookLikeAction{} %s".formatted(super.toString());
+    }
 }

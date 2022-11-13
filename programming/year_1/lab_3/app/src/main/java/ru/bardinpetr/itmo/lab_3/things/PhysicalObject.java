@@ -30,4 +30,24 @@ public abstract class PhysicalObject implements Modifiable, Describable {
     public List<IModifier> getModifiers() {
         return modifiers;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PhysicalObject that = (PhysicalObject) o;
+
+        return modifiers.equals(that.modifiers);
+    }
+
+    @Override
+    public int hashCode() {
+        return modifiers.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "PhysicalObject{modifiers=%s}".formatted(modifiers);
+    }
 }

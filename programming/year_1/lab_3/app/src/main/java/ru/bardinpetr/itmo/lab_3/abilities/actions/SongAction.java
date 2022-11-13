@@ -13,4 +13,9 @@ public class SongAction extends Ability {
     public String getVerb() {
         return "писать песни";
     }
+
+    @Override
+    public String toString() {
+        return "SongAction{} %s".formatted(super.toString());
+    }
 }

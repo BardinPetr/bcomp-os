@@ -23,4 +23,9 @@ public class Helper extends ProfessionHuman {
     public String getProfessionName() {
         return "помощник";
     }
+
+    @Override
+    public String toString() {
+        return "Helper{%s}".formatted(super.toString());
+    }
 }

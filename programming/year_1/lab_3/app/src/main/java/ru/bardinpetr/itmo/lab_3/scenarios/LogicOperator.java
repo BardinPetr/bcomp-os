@@ -13,4 +13,6 @@ public enum LogicOperator {
     public String toString() {
         return text;
     }
+
+
 }

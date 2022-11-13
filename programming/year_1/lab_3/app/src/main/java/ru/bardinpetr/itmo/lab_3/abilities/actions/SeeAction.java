@@ -13,4 +13,9 @@ public class SeeAction extends Ability {
     public String getVerb() {
         return "видеть";
     }
+
+    @Override
+    public String toString() {
+        return "SeeAction{} %s".formatted(super.toString());
+    }
 }

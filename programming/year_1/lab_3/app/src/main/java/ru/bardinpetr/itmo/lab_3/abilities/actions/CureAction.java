@@ -5,6 +5,7 @@ import ru.bardinpetr.itmo.lab_3.properties.models.Illness;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CureAction extends Ability {
     public static final String TYPE = "cure";
@@ -30,5 +31,26 @@ public class CureAction extends Ability {
         for (int i = 0; i < cureFrom.size(); i++)
             stringBuilder.append("%s, ".formatted(cureFrom.get(i).toString()));
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CureAction that = (CureAction) o;
+
+        return cureFrom != null ? cureFrom.equals(that.cureFrom) : that.cureFrom == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), cureFrom);
+    }
+
+    @Override
+    public String toString() {
+        return "CureAction{cureFrom=%s} %s".formatted(cureFrom, super.toString());
     }
 }

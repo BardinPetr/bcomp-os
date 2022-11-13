@@ -16,4 +16,9 @@ public class Doctor extends ProfessionHuman {
     public String getProfessionName() {
         return "доктор";
     }
+
+    @Override
+    public String toString() {
+        return "Doctor{%s}".formatted(super.toString());
+    }
 }

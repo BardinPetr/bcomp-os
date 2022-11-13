@@ -8,6 +8,7 @@ import ru.bardinpetr.itmo.lab_3.things.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Ability implements Modifiable, Describable {
     private final List<IModifier> modifiers = new ArrayList<>();
@@ -82,5 +83,22 @@ public abstract class Ability implements Modifiable, Describable {
 
     public void setAbilityName(String abilityName) {
         this.abilityName = abilityName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ability ability = (Ability) o;
+
+        if (!modifiers.equals(ability.modifiers)) return false;
+        if (!Objects.equals(abilityType, ability.abilityType)) return false;
+        return Objects.equals(abilityName, ability.abilityName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modifiers, abilityName, abilityType);
     }
 }

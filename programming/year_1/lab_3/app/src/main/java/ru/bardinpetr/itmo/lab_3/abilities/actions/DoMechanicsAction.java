@@ -13,4 +13,9 @@ public class DoMechanicsAction extends Ability {
     public String getVerb() {
         return "работать механиком";
     }
+
+    @Override
+    public String toString() {
+        return "DoMechanicsAction{} %s".formatted(super.toString());
+    }
 }

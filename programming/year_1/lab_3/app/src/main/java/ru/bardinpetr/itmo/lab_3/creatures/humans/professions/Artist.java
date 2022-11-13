@@ -1,6 +1,5 @@
 package ru.bardinpetr.itmo.lab_3.creatures.humans.professions;
 
-import ru.bardinpetr.itmo.lab_3.abilities.actions.DoMechanicsAction;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.DrawAction;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.ProfessionHuman;
 
@@ -21,5 +20,10 @@ public class Artist extends ProfessionHuman {
 
     public String draw() {
         return "картина нарисована";
+    }
+
+    @Override
+    public String toString() {
+        return "Artist{%s}".formatted(super.toString());
     }
 }

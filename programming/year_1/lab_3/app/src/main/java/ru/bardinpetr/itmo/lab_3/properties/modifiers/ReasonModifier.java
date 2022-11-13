@@ -2,6 +2,8 @@ package ru.bardinpetr.itmo.lab_3.properties.modifiers;
 
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
+import java.util.Objects;
+
 public class ReasonModifier implements IModifier {
     private final IModifier modifier;
 
@@ -25,4 +27,28 @@ public class ReasonModifier implements IModifier {
     public String getReason() {
         return reason;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ReasonModifier that = (ReasonModifier) o;
+
+        if (!Objects.equals(modifier, that.modifier)) return false;
+        return Objects.equals(reason, that.reason);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modifier, reason);
+    }
+
+    @Override
+    public String toString() {
+        return "ReasonModifier{modifier=%s, reason='%s'}".formatted(modifier.describe(), reason);
+    }
+
+
 }

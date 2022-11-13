@@ -9,7 +9,7 @@ public interface Modifiable {
 
     default String describeMods() {
         List<IModifier> mods = getModifiers();
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mods.size(); i++) {
             sb.append(mods.get(i).describe());
             if (i != mods.size() - 1) sb.append(";; ");

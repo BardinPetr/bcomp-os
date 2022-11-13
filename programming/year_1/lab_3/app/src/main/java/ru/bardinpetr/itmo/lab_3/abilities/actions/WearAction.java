@@ -5,6 +5,7 @@ import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class WearAction extends Ability {
     public static final String TYPE = "wear";
@@ -34,5 +35,26 @@ public class WearAction extends Ability {
 
     public List<Clothing> getWearing() {
         return wearing;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        WearAction that = (WearAction) o;
+
+        return wearing.equals(that.wearing);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), wearing);
+    }
+
+    @Override
+    public String toString() {
+        return "WearAction{wearing=%s} %s".formatted(wearing, super.toString());
     }
 }

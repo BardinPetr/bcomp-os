@@ -23,26 +23,6 @@ public class Place extends PhysicalObject {
     }
 
     @Override
-    public String toString() {
-        return "Place{name='%s', coordinates=%s}".formatted(name, Arrays.toString(coordinates));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Place place = (Place) o;
-
-        if (!Objects.equals(name, place.name)) return false;
-        return Arrays.equals(coordinates, place.coordinates);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, Arrays.hashCode(coordinates));
-    }
-
-    @Override
     public String describe() {
         return "%s (at %.3f %.3f)".formatted(getName(), getCoordinates()[0], getCoordinates()[1]);
     }
@@ -51,4 +31,29 @@ public class Place extends PhysicalObject {
     public String getPhysicalObjectName() {
         return getName();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Place place = (Place) o;
+
+        if (!Objects.equals(name, place.name)) return false;
+        return Arrays.equals(coordinates, place.coordinates);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, coordinates);
+    }
+
+    @Override
+    public String toString() {
+        return "Place{name='%s', coordinates=%s, %s}".formatted(name, Arrays.toString(coordinates), super.toString());
+    }
+
+
 }

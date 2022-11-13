@@ -2,6 +2,8 @@ package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 
+import java.util.Objects;
+
 public class TurnAction extends Ability {
     public static final String TYPE = "поворачивать";
 
@@ -20,5 +22,27 @@ public class TurnAction extends Ability {
     @Override
     protected String getDescription() {
         return dir;
+    }
+
+    @Override
+    public String toString() {
+        return "TurnAction{dir='%s'} %s".formatted(dir, super.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        TurnAction that = (TurnAction) o;
+
+        return Objects.equals(dir, that.dir);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), dir);
     }
 }

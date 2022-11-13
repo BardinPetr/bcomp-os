@@ -13,4 +13,9 @@ public class OffendAction extends Ability {
     public String getVerb() {
         return "обижать";
     }
+
+    @Override
+    public String toString() {
+        return "OffendAction{} %s".formatted(super.toString());
+    }
 }

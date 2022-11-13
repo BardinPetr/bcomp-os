@@ -18,4 +18,9 @@ public class HuntAction extends Ability {
     protected String getObjectPreposition() {
         return "на";
     }
+
+    @Override
+    public String toString() {
+        return "HuntAction{} %s".formatted(super.toString());
+    }
 }

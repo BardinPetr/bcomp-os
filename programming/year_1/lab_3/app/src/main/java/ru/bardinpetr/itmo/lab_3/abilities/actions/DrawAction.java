@@ -13,4 +13,9 @@ public class DrawAction extends Ability {
     public String getVerb() {
         return "рисовать";
     }
+
+    @Override
+    public String toString() {
+        return "DrawAction{} %s".formatted(super.toString());
+    }
 }

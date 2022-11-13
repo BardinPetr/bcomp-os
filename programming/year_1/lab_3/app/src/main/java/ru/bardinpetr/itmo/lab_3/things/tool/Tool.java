@@ -9,4 +9,9 @@ public abstract class Tool extends Thing {
     }
 
     public abstract String apply(PhysicalObject target);
+
+    @Override
+    public String toString() {
+        return "Tool{%s}".formatted(super.toString());
+    }
 }

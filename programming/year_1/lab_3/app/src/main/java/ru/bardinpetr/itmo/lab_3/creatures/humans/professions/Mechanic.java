@@ -17,4 +17,9 @@ public class Mechanic extends ProfessionHuman {
     public String getProfessionName() {
         return "механик";
     }
+
+    @Override
+    public String toString() {
+        return "Mechanic{%s}".formatted(super.toString());
+    }
 }

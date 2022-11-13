@@ -5,6 +5,8 @@ import ru.bardinpetr.itmo.lab_3.creatures.humans.ProfessionHuman;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.tool.Weapon;
 
+import java.util.Objects;
+
 public class Hunter extends ProfessionHuman {
     private final Weapon mainWeapon;
 
@@ -27,4 +29,26 @@ public class Hunter extends ProfessionHuman {
     public String getProfessionName() {
         return "охотник";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Hunter hunter = (Hunter) o;
+
+        return Objects.equals(mainWeapon, hunter.mainWeapon);
+    }
+
+    @Override
+    public int hashCode() {
+        return mainWeapon != null ? mainWeapon.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Hunter{mainWeapon=%s, %s}".formatted(mainWeapon, super.toString());
+    }
+
+
 }

@@ -6,6 +6,8 @@ import ru.bardinpetr.itmo.lab_3.creatures.interfaces.NameSettable;
 import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Nameable;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
+import java.util.Objects;
+
 abstract public class Creature extends PhysicalObject implements Nameable, NameSettable, Heightable, Describable {
     private String firstname = "";
     private String lastname = "";
@@ -54,5 +56,24 @@ abstract public class Creature extends PhysicalObject implements Nameable, NameS
     @Override
     public String getPhysicalObjectName() {
         return getFullName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Creature creature = (Creature) o;
+
+        if (Double.compare(creature.height, height) != 0) return false;
+        if (!Objects.equals(firstname, creature.firstname)) return false;
+        if (!Objects.equals(lastname, creature.lastname)) return false;
+        return Objects.equals(patronymic, creature.patronymic);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), firstname, lastname, patronymic, height);
     }
 }

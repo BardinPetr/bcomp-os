@@ -1,6 +1,7 @@
-package ru.bardinpetr.itmo.lab_3.things.place;
+package ru.bardinpetr.itmo.lab_3.properties.modifiers;
 
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
+import ru.bardinpetr.itmo.lab_3.things.place.Place;
 
 public class PlaceModifier implements IModifier {
 

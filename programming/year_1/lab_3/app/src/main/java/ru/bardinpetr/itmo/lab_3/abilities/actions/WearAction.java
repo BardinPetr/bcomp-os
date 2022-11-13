@@ -22,7 +22,7 @@ public class WearAction extends Ability {
 
     @Override
     public String perform() {
-        StringBuilder stringBuilder = new StringBuilder("лечит от ");
+        StringBuilder stringBuilder = new StringBuilder("носит ");
         for (int i = 0; i < wearing.size(); i++)
             stringBuilder.append("%s, ".formatted(wearing.get(i).describe()));
         return stringBuilder.toString();

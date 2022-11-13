@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_3.human.interfaces;
+package ru.bardinpetr.itmo.lab_3.creatures.interfaces;
 
 public interface NameSettable {
     default void setName(String firstname) {

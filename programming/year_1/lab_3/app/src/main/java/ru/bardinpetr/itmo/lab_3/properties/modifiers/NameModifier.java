@@ -1,14 +1,15 @@
 package ru.bardinpetr.itmo.lab_3.properties.modifiers;
 
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
-public class HasModifier implements IModifier {
-    public static final String TYPE = "has";
-    private final PhysicalObject thing;
+public class NameModifier implements IModifier {
 
-    public HasModifier(PhysicalObject thing) {
-        this.thing = thing;
+    public static final String TYPE = "имя";
+
+    private final String name;
+
+    public NameModifier(String name) {
+        this.name = name;
     }
 
     @Override
@@ -23,6 +24,6 @@ public class HasModifier implements IModifier {
 
     @Override
     public String getValue() {
-        return thing.describe();
+        return name;
     }
 }

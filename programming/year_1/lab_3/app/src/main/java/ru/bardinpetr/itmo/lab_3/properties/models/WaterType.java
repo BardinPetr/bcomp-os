@@ -2,12 +2,17 @@ package ru.bardinpetr.itmo.lab_3.properties.models;
 
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
-public enum Popularity implements IModifier {
-    POPULAR, UNPOPULAR;
+public enum WaterType implements IModifier {
+    STILL, SODA;
+
+    @Override
+    public String getPreposition() {
+        return "";
+    }
 
     @Override
     public String getType() {
-        return "имеет популярность";
+        return "вид воды";
     }
 
     @Override

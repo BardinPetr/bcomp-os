@@ -1,24 +1,23 @@
-package ru.bardinpetr.itmo.lab_3.human;
+package ru.bardinpetr.itmo.lab_3.creatures;
 
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_3.human.interfaces.Heightable;
-import ru.bardinpetr.itmo.lab_3.human.interfaces.NameSettable;
-import ru.bardinpetr.itmo.lab_3.human.interfaces.Nameable;
-
+import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Heightable;
+import ru.bardinpetr.itmo.lab_3.creatures.interfaces.NameSettable;
+import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Nameable;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter;
 
-abstract public class BaseHuman extends PhysicalObject implements Nameable, NameSettable, Heightable, Describable {
+abstract public class Creature extends PhysicalObject implements Nameable, NameSettable, Heightable, Describable {
     private String firstname = "";
     private String lastname = "";
     private String patronymic = "";
     private double height;
 
-    public BaseHuman(String name, String patronymic, String surname) {
+    public Creature(String name, String patronymic, String surname) {
         setName(name, patronymic, surname);
     }
 
-    public BaseHuman(String name) {
+    public Creature(String name) {
         setName(name);
     }
 
@@ -48,6 +47,7 @@ abstract public class BaseHuman extends PhysicalObject implements Nameable, Name
     public void setHeight(double newHeight) {
         height = newHeight;
     }
+
     @Override
     public String getPhysicalObjectName() {
         return getFullName();

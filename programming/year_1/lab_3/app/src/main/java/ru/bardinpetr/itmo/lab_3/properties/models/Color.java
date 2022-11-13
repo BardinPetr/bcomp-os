@@ -1,5 +1,17 @@
 package ru.bardinpetr.itmo.lab_3.properties.models;
 
-public enum Color {
-    WHITE, CYAN, YELLOW, CANARY, ORANGE
+import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
+
+public enum Color implements IModifier {
+    WHITE, CYAN, YELLOW_CANARY, ORANGE, GREEN;
+
+    @Override
+    public String getType() {
+        return "цвет";
+    }
+
+    @Override
+    public String getValue() {
+        return name();
+    }
 }

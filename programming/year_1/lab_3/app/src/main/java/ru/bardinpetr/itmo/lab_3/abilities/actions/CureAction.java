@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_3.abilities.actions.cure;
+package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.properties.models.Illness;

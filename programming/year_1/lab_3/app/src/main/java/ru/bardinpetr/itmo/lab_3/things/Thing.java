@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.things;
 
-public class Thing extends PhysicalObject{
+public class Thing extends PhysicalObject {
     private final String name;
 
     public Thing(String name) {

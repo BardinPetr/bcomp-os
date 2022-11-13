@@ -1,8 +1,8 @@
 package ru.bardinpetr.itmo.lab_3.things;
 
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_3.properties.interfaces.Modifiable;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
+import ru.bardinpetr.itmo.lab_3.properties.interfaces.Modifiable;
 
 import java.util.ArrayList;
 import java.util.List;

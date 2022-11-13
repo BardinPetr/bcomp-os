@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_3.human.interfaces;
+package ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 

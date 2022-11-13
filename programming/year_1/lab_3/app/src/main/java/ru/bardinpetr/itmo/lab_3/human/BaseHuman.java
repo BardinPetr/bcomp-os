@@ -48,4 +48,8 @@ abstract public class BaseHuman extends PhysicalObject implements Nameable, Name
     public void setHeight(double newHeight) {
         height = newHeight;
     }
+    @Override
+    public String getPhysicalObjectName() {
+        return getFullName();
+    }
 }

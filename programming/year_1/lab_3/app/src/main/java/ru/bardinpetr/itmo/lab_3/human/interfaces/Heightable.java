@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.human.interfaces;
 
-import ru.bardinpetr.itmo.lab_3.properties.HeightSpecies;
+import ru.bardinpetr.itmo.lab_3.properties.models.HeightSpecies;
 
 public interface Heightable {
     double DISCRIMINATION_THRESHOLD = 150;

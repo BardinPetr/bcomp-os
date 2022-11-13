@@ -2,7 +2,7 @@ package ru.bardinpetr.itmo.lab_3.things.wear;
 
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
-public class Clothing extends PhysicalObject implements Wearable {
+public class Clothing extends PhysicalObject {
     private final WearType type;
     private final int size;
 
@@ -11,23 +11,25 @@ public class Clothing extends PhysicalObject implements Wearable {
         this.size = size;
     }
 
-    @Override
     public WearType getType() {
         return type;
     }
 
-    @Override
     public int getSize() {
         return size;
     }
 
-    @Override
-    public void wear() {
-
+    public String wear() {
+        return "";
     }
 
     @Override
     public String describe() {
         return null;
+    }
+
+    @Override
+    public String getPhysicalObjectName() {
+        return "%s (размер %d)".formatted(getType().name(), size);
     }
 }

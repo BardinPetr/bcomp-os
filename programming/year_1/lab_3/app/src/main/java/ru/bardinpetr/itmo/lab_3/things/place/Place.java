@@ -1,9 +1,11 @@
 package ru.bardinpetr.itmo.lab_3.things.place;
 
+import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Place {
+public class Place extends PhysicalObject {
     private final String name;
     private final double[] coordinates;
 
@@ -38,5 +40,15 @@ public class Place {
     @Override
     public int hashCode() {
         return Objects.hash(name, Arrays.hashCode(coordinates));
+    }
+
+    @Override
+    public String describe() {
+        return "%s (at %.3f %.3f)".formatted(getName(), getCoordinates()[0], getCoordinates()[1]);
+    }
+
+    @Override
+    public String getPhysicalObjectName() {
+        return getName();
     }
 }

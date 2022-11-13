@@ -1,43 +1,44 @@
 package ru.bardinpetr.itmo.lab_3.abilities;
 
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Performable;
-import ru.bardinpetr.itmo.lab_3.properties.Modifier;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.Modifiable;
+import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
+import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Ability implements Modifiable, Describable, Performable {
-    private final List<Modifier> modifiers = new ArrayList<>();
-    private final AbilityType type;
+public abstract class Ability implements Modifiable, Describable {
+    private final List<IModifier> modifiers = new ArrayList<>();
+    private final String abilityType;
 
-    public Ability(AbilityType type) {
-        this.type = type;
+    protected Ability(String abilityType) {
+        this.abilityType = abilityType;
+    }
+
+    abstract public String perform();
+
+    public String performOn(PhysicalObject object) {
+        return "%s %s".formatted(perform(), object.getPhysicalObjectName());
     }
 
     @Override
     public String describe() {
-        return "%s %s".formatted(getType().perform(), describeMods());
+        return "%s %s".formatted(getAbilityType(), describeMods());
     }
 
     @Override
-    public String perform() {
-        return "%s %s".formatted(getType().perform(), describeMods());
-    }
-
-    @Override
-    public Modifiable applyModifier(Modifier mod) {
+    public Modifiable applyModifier(IModifier mod) {
         modifiers.add(mod);
         return this;
     }
 
     @Override
-    public List<Modifier> getModifiers() {
+    public List<IModifier> getModifiers() {
         return modifiers;
     }
 
-    public AbilityType getType() {
-        return type;
+    public String getAbilityType() {
+        return abilityType;
     }
 }

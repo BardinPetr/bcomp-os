@@ -1,36 +1,57 @@
 package ru.bardinpetr.itmo.lab_3;
 
-import ru.bardinpetr.itmo.lab_3.abilities.AbilityType;
-import ru.bardinpetr.itmo.lab_3.human.LivingHuman;
-import ru.bardinpetr.itmo.lab_3.properties.ModifierType;
+import ru.bardinpetr.itmo.lab_3.abilities.actions.cure.CureAction;
+import ru.bardinpetr.itmo.lab_3.properties.models.Illness;
+import ru.bardinpetr.itmo.lab_3.human.professions.Doctor;
+import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
+import ru.bardinpetr.itmo.lab_3.properties.models.Color;
+import ru.bardinpetr.itmo.lab_3.properties.models.Popularity;
+import ru.bardinpetr.itmo.lab_3.properties.modifiers.ColorModifier;
+import ru.bardinpetr.itmo.lab_3.properties.modifiers.HasModifier;
+import ru.bardinpetr.itmo.lab_3.properties.modifiers.PopularityModifier;
+import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+import ru.bardinpetr.itmo.lab_3.things.Thing;
 import ru.bardinpetr.itmo.lab_3.things.place.House;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 import ru.bardinpetr.itmo.lab_3.things.wear.WearType;
-import ru.bardinpetr.itmo.lab_3.things.wear.Wearable;
 
 public class App {
     public static void main(String[] args) {
-
         Place house = new House("домик", new double[]{1.1, 2.2}, 100);
 
-        LivingHuman pilulkin = new LivingHuman("Пилюлькин");
-        pilulkin.addAbility(AbilityType.LIVE)
-                .applyModifier(ModifierType.PLACE, house);
+        // Doctor Pilulkin
+        Doctor pilulkin = new Doctor("Пилюлькин");
 
-        Wearable coat = new Clothing(WearType.MEDICAL_GOWN, 55);
-        pilulkin.addAbility(AbilityType.WEAR)
-                .applyModifier(ModifierType.WHAT, coat);
+        ((CureAction) pilulkin.getProfessionalAbility())
+                .addCuredIllness(Illness.ANY);
 
-        pilulkin.addAbility(AbilityType.CURE)
-                .applyModifier(ModifierType.FROM, "все болезни");
+        pilulkin.live(house);
+
+        pilulkin.applyModifier(new PopularityModifier(Popularity.POPULAR));
+
+        IModifier white = new ColorModifier(Color.WHITE);
+
+        Clothing coat = new Clothing(WearType.MEDICAL_GOWN, 42);
+        coat.applyModifier(white);
+
+        Clothing cap = new Clothing(WearType.CAP, 42);
+        PhysicalObject brush = new Thing("кисточка");
+        cap.applyModifier(new HasModifier(brush));
+        cap.applyModifier(white);
+
+        pilulkin.wear(coat);
+        pilulkin.wear(cap);
+
+        //        pilulkin.getAbility(Cure.TYPE).performOn(group);
 
         System.out.println(pilulkin.describe());
+
 /*
 В этом же домике жил известный доктор Пилюлькин, который лечил коротышек от всех болезней.
-
++
 Он всегда ходил в белом халате, а на голове носил белый колпак с кисточкой.
-
++
 Жил здесь [домик] также знаменитый механик Винтик со своим помощником Шпунтиком;
 
 жил [домик] Сахарин Сахариныч Сиропчик, который прославился тем, что очень любил газированную воду с сиропом.

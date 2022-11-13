@@ -2,8 +2,12 @@ package ru.bardinpetr.itmo.lab_3.human;
 
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
+import ru.bardinpetr.itmo.lab_3.abilities.actions.LiveAction;
+import ru.bardinpetr.itmo.lab_3.abilities.actions.WearAction;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Able;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
+import ru.bardinpetr.itmo.lab_3.things.place.Place;
+import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +15,15 @@ import java.util.List;
 public class LivingHuman extends BaseHuman implements Able {
     private final List<Ability> abilities = new ArrayList<>();
 
+    private final WearAction wearAbility = new WearAction();
+
     public LivingHuman(String name, String patronymic, String surname) {
         super(name, patronymic, surname);
+        addAbility(wearAbility);
     }
 
     public LivingHuman(String name) {
-        super(name);
+        this(name, "", "");
     }
 
     @Override
@@ -44,4 +51,11 @@ public class LivingHuman extends BaseHuman implements Able {
         return sb.toString();
     }
 
+    public void live(Place place) {
+        addAbility(new LiveAction(place));
+    }
+
+    public void wear(Clothing thing) {
+        wearAbility.putOn(thing);
+    }
 }

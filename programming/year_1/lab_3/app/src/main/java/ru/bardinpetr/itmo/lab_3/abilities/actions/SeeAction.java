@@ -3,15 +3,15 @@ package ru.bardinpetr.itmo.lab_3.abilities.actions;
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
-public class OffendAction extends Ability {
-    public static final String TYPE = "обижать";
+public class SeeAction extends Ability {
+    public static final String TYPE = "видеть";
 
-    public OffendAction() {
+    public SeeAction() {
         super(TYPE);
     }
 
     @Override
     public String perform() {
-        return "обижать";
+        return "видеть";
     }
 }

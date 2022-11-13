@@ -19,11 +19,6 @@ public class LiveAction extends Ability {
         return "живет в %s".formatted(place.getName());
     }
 
-    @Override
-    public String performOn(PhysicalObject object) {
-        return "заставляет %s жить в %s".formatted(object.getPhysicalObjectName(), place.getName());
-    }
-
     public Place getPlace() {
         return place;
     }

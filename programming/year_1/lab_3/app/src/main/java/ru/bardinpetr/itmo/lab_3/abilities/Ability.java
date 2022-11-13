@@ -12,23 +12,30 @@ import java.util.List;
 public abstract class Ability implements Modifiable, Describable {
     private final List<IModifier> modifiers = new ArrayList<>();
     private final String abilityType;
+    private String abilityName;
+
+    protected Ability(String abilityType, String abilityName) {
+        this.abilityType = abilityType;
+        this.abilityName = abilityName;
+    }
 
     protected Ability(String abilityType) {
         this.abilityType = abilityType;
+        this.abilityName = abilityType;
     }
 
     abstract public String perform();
 
-    public String performWith(Tool tool) {
-        return "при помощи %s %s".formatted(tool.getPhysicalObjectName(), perform());
-    }
-
-    public String performOn(PhysicalObject object) {
-        return "%s %s".formatted(perform(), object.getPhysicalObjectName());
-    }
-
-    public String performOnWith(Tool tool, PhysicalObject object) {
-        return "при помощи %s %s".formatted(tool.describe(), tool.apply(object));
+    public String performWithOn(Tool tool, PhysicalObject object) {
+        StringBuilder sb = new StringBuilder();
+        if (tool != null)
+            sb.append("при помощи %s".formatted(tool.describe()));
+        else
+            sb.append(perform());
+        sb.append(" ");
+        if (object != null)
+            sb.append(object.getPhysicalObjectName());
+        return sb.toString();
     }
 
     @Override
@@ -49,5 +56,13 @@ public abstract class Ability implements Modifiable, Describable {
 
     public String getAbilityType() {
         return abilityType;
+    }
+
+    public String getAbilityName() {
+        return abilityName;
+    }
+
+    public void setAbilityName(String abilityName) {
+        this.abilityName = abilityName;
     }
 }

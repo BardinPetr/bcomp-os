@@ -1,17 +1,22 @@
 package ru.bardinpetr.itmo.lab_3.creatures.humans;
 
+import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IPerforming;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IScriptable;
+import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
-import ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HumanGroup extends PhysicalObject implements Describable {
-    private final List<Human> group = new ArrayList<>();
+public class HumanGroup extends PhysicalObject implements Describable, IPerforming, IScriptable {
+    private final List<Ability> abilities = new ArrayList<>();
 
+    private final List<Human> group = new ArrayList<>();
     private final String name;
+    private Scenario globalScenario = null;
 
     public HumanGroup(String name) {
         this.name = name;
@@ -27,7 +32,21 @@ public class HumanGroup extends PhysicalObject implements Describable {
 
     @Override
     public String describe() {
-        return SpecialFormatter.format(group);
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Группа %s:\n".formatted(getName()));
+
+        sb.append("- Групповые возможности:\n");
+        for (Ability ability : abilities)
+            sb.append("%s;  ".formatted(ability.describe()));
+
+        sb.append("\n- Групповой сценарий:\n%s\n".formatted(getScenario()));
+
+        sb.append("- Содержимое группы:\n");
+        for (Human human : group)
+            sb.append("-- %s\n".formatted(human.describe()));
+
+        return sb.toString();
     }
 
     @Override
@@ -49,5 +68,29 @@ public class HumanGroup extends PhysicalObject implements Describable {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void addAbility(Ability ability) {
+        abilities.add(ability);
+        for (int i = 0; i < group.size(); i++)
+            group.get(i).addAbility(ability);
+    }
+
+    @Override
+    public List<Ability> getAbilities() {
+        return abilities;
+    }
+
+    @Override
+    public String getScenario() {
+        return (globalScenario == null ? "no global scenario" : globalScenario.print());
+    }
+
+    @Override
+    public void addScenario(Scenario scenario) {
+        globalScenario = scenario;
+        for (int i = 0; i < group.size(); i++)
+            group.get(i).addScenario(globalScenario);
     }
 }

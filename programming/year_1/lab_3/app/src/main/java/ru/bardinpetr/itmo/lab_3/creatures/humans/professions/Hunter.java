@@ -20,7 +20,7 @@ public class Hunter extends ProfessionHuman {
 
     public String goHunt(PhysicalObject object) {
         HuntAction action = (HuntAction) getProfessionalAbility();
-        return action.performOnWith(mainWeapon, object);
+        return action.performWithOn(mainWeapon, object);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package ru.bardinpetr.itmo.lab_3.properties.interfaces;
 
-import ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter;
-
 import java.util.List;
 
 public interface Modifiable {
@@ -10,7 +8,13 @@ public interface Modifiable {
     List<IModifier> getModifiers();
 
     default String describeMods() {
-        return SpecialFormatter.format(getModifiers());
+        StringBuilder sb = new StringBuilder();
+        List<IModifier> mods = getModifiers();
+        for (int i = 0; i < mods.size(); i++) {
+            sb.append(mods.get(i).describe());
+            if (i != mods.size() - 1) sb.append(", ");
+        }
+        return sb.toString();
     }
 
     default IModifier getModifier(String modifierType) {

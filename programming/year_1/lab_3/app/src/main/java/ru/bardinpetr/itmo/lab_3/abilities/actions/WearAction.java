@@ -27,9 +27,4 @@ public class WearAction extends Ability {
             stringBuilder.append("%s, ".formatted(wearing.get(i).describe()));
         return stringBuilder.toString();
     }
-
-    @Override
-    public String performOn(PhysicalObject object) {
-        return "";
-    }
 }

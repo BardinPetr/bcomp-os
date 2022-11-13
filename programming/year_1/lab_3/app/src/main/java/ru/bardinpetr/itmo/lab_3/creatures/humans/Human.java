@@ -4,24 +4,32 @@ package ru.bardinpetr.itmo.lab_3.creatures.humans;
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.LiveAction;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.WearAction;
-import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Able;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
+import ru.bardinpetr.itmo.lab_3.abilities.interfaces.IAble;
 import ru.bardinpetr.itmo.lab_3.creatures.Creature;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.Friendable;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.ICommonHumanAbilities;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IPerforming;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IScriptable;
 import ru.bardinpetr.itmo.lab_3.properties.modifiers.BrotherModifier;
 import ru.bardinpetr.itmo.lab_3.properties.modifiers.FriendModifier;
 import ru.bardinpetr.itmo.lab_3.properties.modifiers.HasModifier;
+import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
+import ru.bardinpetr.itmo.lab_3.scenarios.interfaces.IScenarioAction;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+import ru.bardinpetr.itmo.lab_3.things.Tool;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Human extends Creature implements Able {
+public class Human extends Creature implements IPerforming, IScriptable, ICommonHumanAbilities, Friendable {
     private final List<Ability> abilities = new ArrayList<>();
 
     private final WearAction wearAbility = new WearAction();
 
+    private final Scenario scenario = new Scenario();
 
     public Human(String name, String patronymic, String surname) {
         super(name, patronymic, surname);
@@ -54,6 +62,10 @@ public class Human extends Creature implements Able {
         sb.append(describeMods());
         sb.append("\n");
 
+        sb.append("Имеет следующий сценарий: \n");
+        sb.append(getScenario());
+        sb.append("\n\n");
+
         return sb.toString();
     }
 
@@ -80,5 +92,13 @@ public class Human extends Creature implements Able {
 
     public void addFriend(Human other) {
         applyModifier(new FriendModifier(other));
+    }
+
+    public String getScenario() {
+        return scenario.print();
+    }
+
+    public void addScenario(Scenario newScenario) {
+        scenario.append(newScenario);
     }
 }

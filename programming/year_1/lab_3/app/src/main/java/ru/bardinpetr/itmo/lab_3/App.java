@@ -1,18 +1,18 @@
 package ru.bardinpetr.itmo.lab_3;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
-import ru.bardinpetr.itmo.lab_3.abilities.actions.CureAction;
-import ru.bardinpetr.itmo.lab_3.abilities.actions.HelpAction;
-import ru.bardinpetr.itmo.lab_3.abilities.actions.LikeAction;
-import ru.bardinpetr.itmo.lab_3.abilities.actions.TalkAction;
+import ru.bardinpetr.itmo.lab_3.abilities.actions.*;
+import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_3.creatures.Creature;
 import ru.bardinpetr.itmo.lab_3.creatures.animals.Dog;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.ProfessionHuman;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.professions.*;
+import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_3.properties.models.*;
 import ru.bardinpetr.itmo.lab_3.properties.modifiers.*;
+import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.Thing;
 import ru.bardinpetr.itmo.lab_3.things.Weapon;
@@ -23,13 +23,15 @@ import ru.bardinpetr.itmo.lab_3.things.wear.WearType;
 
 public class App {
     public static void main(String[] args) {
-        HumanGroup malyshi = new HumanGroup("Малыши");
+        HumanGroup allGroup = new HumanGroup("Малыши");
+        HumanGroup girlsGroup = new HumanGroup("Малышки");
 
+        Place city = new Place("город", new double[]{0, 0});
         Place house = new House("домик", new double[]{1.1, 2.2}, 100);
 
         // Doctor Pilulkin
         ProfessionHuman pilulkin = new Doctor("Пилюлькин");
-        malyshi.add(pilulkin);
+        allGroup.add(pilulkin);
 
         ((CureAction) pilulkin.getProfessionalAbility()).addCuredIllness(Illness.ANY);
 
@@ -50,22 +52,41 @@ public class App {
 
         // Mechanics
         ProfessionHuman vintik = new Mechanic("Винтик");
-        malyshi.add(vintik);
+        allGroup.add(vintik);
 
         vintik.applyModifier(Popularity.POPULAR);
 
         ProfessionHuman shpuntik = new Helper("Шпунтик");
-        malyshi.add(shpuntik);
+        allGroup.add(shpuntik);
 
         ((HelpAction) shpuntik.getProfessionalAbility()).setMaster(vintik);
 
 
         // Syropchik
         Human siropchik = new Human("Сахарин", "Сахариныч", "Сиропчик");
-        malyshi.add(siropchik);
-
+        allGroup.add(siropchik);
 
         siropchik.applyModifier(Politeness.POLITE);
+
+        Describable dummyAction = () -> "";
+
+        Ability syrLikeAbility = new LikeAction(dummyAction);
+        syrLikeAbility.setAbilityName("like naming");
+        siropchik.addAbility(syrLikeAbility);
+
+        Ability syrDislikeAbility = new LikeAction(dummyAction, false);
+        syrDislikeAbility.setAbilityName("dislike naming");
+        siropchik.addAbility(syrDislikeAbility);
+
+        Scenario syrScenario =
+                new Scenario()
+                        .newSentence()
+                        .addIf("называть его по имени и отчеству")
+                        .addThen(siropchik.performByName("like naming"))
+                        .addElse()
+                        .addThen(siropchik.performByName("dislike naming"));
+
+        siropchik.addScenario(syrScenario);
 
         // soda-related
         Thing water = new Thing("вода");
@@ -85,7 +106,7 @@ public class App {
         Weapon gun = new Weapon("ружье", bullet);
 
         Hunter pulka = new Hunter("Пулька", gun);
-        malyshi.add(pulka);
+        allGroup.add(pulka);
 
         Creature bulka = new Dog("Булька");
         bulka.applyModifier(Size.SMALL);
@@ -97,9 +118,9 @@ public class App {
 
         Human neznaika = new Human("Незнайка");
 
-        malyshi.add(neznaika);
+        allGroup.add(neznaika);
 
-        neznaika.applyModifier(new MostOfModifier(Popularity.POPULAR, malyshi));
+        neznaika.applyModifier(new MostOfModifier(Popularity.POPULAR, allGroup));
 
         Thing paints = new Thing("краски");
         paints.applyModifier(Brightness.BRIGHT);
@@ -108,27 +129,63 @@ public class App {
         neznaika.applyModifier(new ReasonModifier(new NameModifier("Незнайка"), "он ничего не знал"));
 
         // neznaika's wear
-        Clothing hat = new Clothing(WearType.HAT, 42);
-        hat.applyModifier(Color.CYAN);
-        neznaika.wear(hat);
+        Clothing neznaikaHat = new Clothing(WearType.HAT, 42);
+        neznaikaHat.applyModifier(Color.CYAN);
+        neznaika.wear(neznaikaHat);
 
-        Clothing trousers = new Clothing(WearType.TROUSERS, 42);
-        trousers.applyModifier(Color.YELLOW_CANARY);
-        neznaika.wear(trousers);
+        Clothing neznaikaTrousers = new Clothing(WearType.TROUSERS, 42);
+        neznaikaTrousers.applyModifier(Color.YELLOW_CANARY);
+        neznaika.wear(neznaikaTrousers);
 
-        Clothing shirt = new Clothing(WearType.SHIRT, 42);
-        shirt.applyModifier(Color.ORANGE);
+        Clothing neznaikaShirt = new Clothing(WearType.SHIRT, 42);
+        neznaikaShirt.applyModifier(Color.ORANGE);
 
-        Clothing tie = new Clothing(WearType.TIE, 24);
-        tie.applyModifier(Color.GREEN);
-        shirt.applyModifier(new HasModifier(tie));
+        Clothing neznaikaTie = new Clothing(WearType.TIE, 24);
+        neznaikaTie.applyModifier(Color.GREEN);
+        neznaikaShirt.applyModifier(new HasModifier(neznaikaTie));
 
-        neznaika.wear(shirt);
+        neznaika.wear(neznaikaShirt);
+
+
+        // neznaika actions;
+
+        neznaika.addAbility(new LookLikeAction("попугай"));
+
+        Ability neznaikaWalk = new WalkAction(city);
+        neznaikaWalk.setAbilityName("neznaika walk");
+        neznaikaWalk.applyModifier(new TimeModifier("целыми днями"));
+        neznaika.addAbility(neznaikaWalk);
+
+        Ability createNebilitsa = new ThinkAction("сочинение небылиц");
+        createNebilitsa.setAbilityName("create nebilitsa");
+        neznaika.addAbility(createNebilitsa);
+
+        Ability talkOfNebilitsa = new SayAction("небылицы");
+        talkOfNebilitsa.setAbilityName("speak nebilitsa");
+        talkOfNebilitsa.applyModifier(new TargetModifier("всем"));
+        neznaika.addAbility(talkOfNebilitsa);
+
+        neznaika.addAbility(new OffendAction());
+        neznaika.getAbility(OffendAction.TYPE)
+                .applyModifier(new TimeModifier("постоянно"));
+
+        Scenario neznaikaInCityScenario =
+                new Scenario()
+                        .newSentence()
+                        .addIf(neznaika.performByType(WearAction.TYPE))
+                        .addThen(neznaika.performByType(LookLikeAction.TYPE))
+                        .addThen(neznaika.performByName(neznaikaWalk.getAbilityName()))
+                        .addThen(neznaika.performByName(createNebilitsa.getAbilityName()))
+                        .addThen(neznaika.performByName(talkOfNebilitsa.getAbilityName()))
+                        .newSentence()
+                        .addThen(neznaika.performByTypeWithOn(OffendAction.TYPE, null, girlsGroup));
+
+        neznaika.addScenario(neznaikaInCityScenario);
 
         // Gunka
 
         Human gunka = new Human("Гунька");
-        malyshi.add(gunka);
+        allGroup.add(gunka);
 
         neznaika.addFriend(gunka);
         gunka.addFriend(neznaika);
@@ -136,32 +193,76 @@ public class App {
         gunka.live(new Place("ул. Маргариток", new double[]{1.1, 2.1}));
 
         Ability ngTalk = new TalkAction();
+        ngTalk.setAbilityName("ngTalk");
         ngTalk.applyModifier(new TimeModifier("часами"));
 
         neznaika.addAbility(ngTalk);
-//        neznaika.getAbility(TalkAction.TYPE).performOn(gunka);
+        gunka.addAbility(ngTalk);
+
+        IModifier countPerDay = new CountModifier(20);
+
+        Ability quarrelOn = new QuarrelAction(QuarrelState.IN_QUARREL);
+        quarrelOn.setAbilityName("quarrelOn");
+        quarrelOn.applyModifier(countPerDay);
+        neznaika.addAbility(quarrelOn);
+        gunka.addAbility(quarrelOn);
+
+        Ability quarrelOff = new QuarrelAction(QuarrelState.NORMAL);
+        quarrelOn.applyModifier(countPerDay);
+        quarrelOff.setAbilityName("quarrelOff");
+        neznaika.addAbility(quarrelOff);
+        gunka.addAbility(quarrelOff);
+
+        Scenario ngScenario = new Scenario()
+                .newSentence()
+                .addThen(neznaika.performByNameWithOn("ngTalk", null, gunka))
+                .addThen(gunka.performByNameWithOn("ngTalk", null, neznaika))
+                .newSentence()
+                .addThen(neznaika.performByNameWithOn("quarrelOn", null, gunka))
+                .addThen(gunka.performByNameWithOn("quarrelOn", null, neznaika))
+                .addThen(neznaika.performByNameWithOn("quarrelOff", null, gunka))
+                .addThen(gunka.performByNameWithOn("quarrelOff", null, neznaika));
 
 
-        // Malyshki
-        HumanGroup malyshki = new HumanGroup("Малышки");
-        neznaika
+        neznaika.addScenario(ngScenario);
 
+        System.out.println(neznaika.describe());
 
         // Many others
-
         String[] names = new String[]{"Торопыжка", "Ворчун", "Молчун", "Пончик", "Растеряйка", "Авоська", "Небоська"};
         for (int i = 0; i < names.length; i++)
-            malyshi.add(new Human(names[i]));
+            allGroup.add(new Human(names[i]));
 
         ProfessionHuman tubik = new Artist("Тюбик");
-        malyshi.add(tubik);
+        allGroup.add(tubik);
 
         ProfessionHuman guslya = new Musician("Гусля");
-        malyshi.add(guslya);
+        allGroup.add(guslya);
 
-        malyshi.getByName("Авоська").addBrother(malyshi.getByName("Небоська"));
+        allGroup.getByName("Авоська").addBrother(allGroup.getByName("Небоська"));
 
-        malyshi.live(house);
+        allGroup.live(house);
+
+
+        // malyshki
+        girlsGroup.addAbility(new SeeAction());
+
+        Ability malyshkiTurn = new TurnAction("обратно");
+        malyshkiTurn.applyModifier(new TimeModifier("сейчас же"));
+        girlsGroup.addAbility(malyshkiTurn);
+
+        girlsGroup.addAbility(new HideAction(house));
+
+        Scenario malyshkiWithNeznaika =
+                new Scenario()
+                        .newSentence()
+                        .addIf(girlsGroup.performByTypeWithOn(SeeAction.TYPE, null, neznaikaShirt))
+                        .addThen(girlsGroup.performByType(TurnAction.TYPE))
+                        .addThen(girlsGroup.performByType(HideAction.TYPE));
+
+        girlsGroup.addScenario(malyshkiWithNeznaika);
+
+        System.out.println(girlsGroup.describe());
 
 
 
@@ -178,7 +279,7 @@ public class App {
 Он [Сиропчик] был очень вежливый.
 +
 Ему [Сиропчик] нравилось, когда его называли по имени и отчеству, и не нравилось, когда кто-нибудь называл его просто Сиропчиком.
-!!!!
++
 Жил еще в этом доме охотник Пулька. У него была маленькая собачка Булька и еще было ружье, которое стреляло пробками.
 +
 Жил художник Тюбик, музыкант Гусля и другие малыши: Торопыжка, Ворчун, Молчун, Пончик, Растеряйка, два брата -- Авоська и Небоська.
@@ -192,17 +293,17 @@ public class App {
 Он вообще любил яркие краски.
 +
 Нарядившись таким попугаем, Незнайка по целым дням слонялся по городу, сочинял разные небылицы и всем рассказывал.
-
++
 Кроме того, он постоянно обижал малышек.
-
++
 Поэтому малышки, завидев издали его оранжевую рубашку, сейчас же поворачивали в обратную сторону и прятались по домам.
-
++
 У Незнайки был друг, по имени Гунька, который жил на улице Маргариток.
 +
 С Гунькой Незнайка мог болтать по целым часам.
 +
 Они двадцать раз на день ссорились между собой и двадцать раз на день мирились.
-
++
  */
     }
 }

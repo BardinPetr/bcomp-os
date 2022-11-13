@@ -2,8 +2,9 @@ package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+import ru.bardinpetr.itmo.lab_3.things.Tool;
 
-public class NameAction extends SayAction {
+public class NameAction extends Ability {
     public static final String TYPE = "называть";
 
     private final String text;
@@ -19,7 +20,7 @@ public class NameAction extends SayAction {
     }
 
     @Override
-    public String performOn(PhysicalObject object) {
+    public String performWithOn(Tool tool, PhysicalObject object) {
         return "называть %s %s".formatted(object.getPhysicalObjectName(), text);
     }
 }

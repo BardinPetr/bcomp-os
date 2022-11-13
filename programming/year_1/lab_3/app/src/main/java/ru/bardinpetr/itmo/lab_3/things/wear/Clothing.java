@@ -24,12 +24,7 @@ public class Clothing extends PhysicalObject {
     }
 
     @Override
-    public String describe() {
-        return null;
-    }
-
-    @Override
     public String getPhysicalObjectName() {
-        return "%s (размер %d)".formatted(getType().name(), size);
+        return getType().toString();
     }
 }

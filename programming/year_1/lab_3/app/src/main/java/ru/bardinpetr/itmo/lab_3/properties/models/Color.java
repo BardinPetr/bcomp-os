@@ -3,15 +3,20 @@ package ru.bardinpetr.itmo.lab_3.properties.models;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
 public enum Color implements IModifier {
-    WHITE, CYAN, YELLOW_CANARY, ORANGE, GREEN;
+    WHITE("белый"), CYAN("голубой"), YELLOW_CANARY("желто-канареечный"), ORANGE("оранжевый"), GREEN("зеленый");
 
-    @Override
+    private final String text;
+
+    Color(String text) {
+        this.text = text;
+    }
+
     public String getType() {
         return "цвет";
     }
 
     @Override
     public String getValue() {
-        return name();
+        return text;
     }
 }

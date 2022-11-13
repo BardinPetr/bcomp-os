@@ -4,7 +4,7 @@ import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.Modifiable;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Tool;
+import ru.bardinpetr.itmo.lab_3.things.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +24,41 @@ public abstract class Ability implements Modifiable, Describable {
         this.abilityName = abilityType;
     }
 
-    abstract public String perform();
+    abstract protected String getVerb();
+
+    protected String getDescription() {
+        return "";
+    }
+
+    protected String getObjectPreposition() {
+        return "";
+    }
+
+    public String perform() {
+        return performWithOn(null, null);
+    }
 
     public String performWithOn(Tool tool, PhysicalObject object) {
         StringBuilder sb = new StringBuilder();
-        if (tool != null)
-            sb.append("при помощи %s".formatted(tool.describe()));
-        else
-            sb.append(perform());
-        sb.append(" ");
-        if (object != null)
-            sb.append(object.getPhysicalObjectName());
+
+        if (tool != null) sb.append("при помощи %s ".formatted(tool.apply(object)));
+
+        sb.append("%s ".formatted(getVerb()));
+
+        if (getModifiers().size() > 0)
+            sb.append("(%s) ".formatted(describeMods()));
+
+        sb.append(getDescription());
+
+        if (object != null) sb.append("%s %s".formatted(getObjectPreposition(), object.getPhysicalObjectName()));
+
+
         return sb.toString();
     }
 
     @Override
     public String describe() {
-        return "%s %s".formatted(getAbilityType(), describeMods());
+        return performWithOn(null, null);
     }
 
     @Override

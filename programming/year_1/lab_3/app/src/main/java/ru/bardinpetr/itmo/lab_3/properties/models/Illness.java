@@ -12,4 +12,9 @@ public enum Illness {
     Illness() {
         this.commonName = name();
     }
+
+    @Override
+    public String toString() {
+        return commonName;
+    }
 }

@@ -3,15 +3,20 @@ package ru.bardinpetr.itmo.lab_3.properties.models;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
 public enum Popularity implements IModifier {
-    POPULAR, UNPOPULAR;
+    POPULAR("известный"), UNPOPULAR("неизвестный");
 
-    @Override
+    private final String text;
+
+    Popularity(String text) {
+        this.text = text;
+    }
+
     public String getType() {
-        return "имеет популярность";
+        return "популярность";
     }
 
     @Override
     public String getValue() {
-        return name();
+        return text;
     }
 }

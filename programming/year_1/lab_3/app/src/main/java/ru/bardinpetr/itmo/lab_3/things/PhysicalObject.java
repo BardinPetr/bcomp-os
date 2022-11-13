@@ -12,7 +12,10 @@ public abstract class PhysicalObject implements Modifiable, Describable {
 
     @Override
     public String describe() {
-        return getPhysicalObjectName();
+        StringBuilder sb = new StringBuilder(getPhysicalObjectName());
+        if (getModifiers().size() > 0)
+            sb.append(" (со свойствами: %s)".formatted(describeMods()));
+        return sb.toString();
     }
 
     public abstract String getPhysicalObjectName();

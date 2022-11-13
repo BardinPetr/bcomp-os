@@ -8,20 +8,12 @@ public interface Modifiable {
     List<IModifier> getModifiers();
 
     default String describeMods() {
-        StringBuilder sb = new StringBuilder();
         List<IModifier> mods = getModifiers();
+        StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < mods.size(); i++) {
             sb.append(mods.get(i).describe());
-            if (i != mods.size() - 1) sb.append(", ");
+            if (i != mods.size() - 1) sb.append(";; ");
         }
         return sb.toString();
-    }
-
-    default IModifier getModifier(String modifierType) {
-        for (IModifier modifier : getModifiers()) {
-            if (modifier.getType().equals(modifierType))
-                return modifier;
-        }
-        return null;
     }
 }

@@ -19,12 +19,7 @@ public class ReasonModifier implements IModifier {
 
     @Override
     public String getValue() {
-        return reason;
-    }
-
-    @Override
-    public String describe() {
-        return "%s %s имелись свойства: %s".formatted(getType(), getValue(), modifier.describe());
+        return "\"%s\" имелись свойства: (%s)".formatted(reason, modifier.describe());
     }
 
     public String getReason() {

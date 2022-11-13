@@ -4,8 +4,6 @@ import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
 public class NameModifier implements IModifier {
 
-    public static final String TYPE = "имя";
-
     private final String name;
 
     public NameModifier(String name) {
@@ -13,13 +11,8 @@ public class NameModifier implements IModifier {
     }
 
     @Override
-    public String getPreposition() {
-        return "имеет";
-    }
-
-    @Override
     public String getType() {
-        return TYPE;
+        return "имя";
     }
 
     @Override

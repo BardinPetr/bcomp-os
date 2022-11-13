@@ -1,8 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Tool;
 
 public class ThinkAction extends Ability {
     public static final String TYPE = "думать";
@@ -15,7 +13,12 @@ public class ThinkAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "думать о %s".formatted(text);
+    public String getVerb() {
+        return "думать";
+    }
+
+    @Override
+    protected String getDescription() {
+        return "о %s".formatted(text);
     }
 }

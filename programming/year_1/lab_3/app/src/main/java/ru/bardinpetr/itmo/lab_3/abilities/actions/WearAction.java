@@ -1,7 +1,6 @@
 package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 
 import java.util.ArrayList;
@@ -21,10 +20,19 @@ public class WearAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        StringBuilder stringBuilder = new StringBuilder("носит ");
+    public String getVerb() {
+        return "носить";
+    }
+
+    @Override
+    public String getDescription() {
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < wearing.size(); i++)
             stringBuilder.append("%s, ".formatted(wearing.get(i).describe()));
         return stringBuilder.toString();
+    }
+
+    public List<Clothing> getWearing() {
+        return wearing;
     }
 }

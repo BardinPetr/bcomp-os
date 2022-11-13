@@ -3,7 +3,7 @@ package ru.bardinpetr.itmo.lab_3.creatures.humans;
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IPerforming;
-import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.IScriptable;
+import ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
@@ -11,7 +11,7 @@ import ru.bardinpetr.itmo.lab_3.things.place.Place;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HumanGroup extends PhysicalObject implements Describable, IPerforming, IScriptable {
+public class HumanGroup extends PhysicalObject implements Describable, IPerforming, Scriptable {
     private final List<Ability> abilities = new ArrayList<>();
 
     private final List<Human> group = new ArrayList<>();
@@ -36,9 +36,11 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
         sb.append("Группа %s:\n".formatted(getName()));
 
-        sb.append("- Групповые возможности:\n");
-        for (Ability ability : abilities)
-            sb.append("%s;  ".formatted(ability.describe()));
+        if (abilities.size() > 0) {
+            sb.append("- Групповые возможности:\n");
+            for (Ability ability : abilities)
+                sb.append("%s;  ".formatted(ability.describe()));
+        }
 
         sb.append("\n- Групповой сценарий:\n%s\n".formatted(getScenario()));
 

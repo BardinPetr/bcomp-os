@@ -1,7 +1,5 @@
 package ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces;
 
-import ru.bardinpetr.itmo.lab_3.creatures.humans.Human;
-import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;

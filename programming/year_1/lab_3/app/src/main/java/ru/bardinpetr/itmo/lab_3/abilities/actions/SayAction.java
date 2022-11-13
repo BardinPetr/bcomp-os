@@ -13,7 +13,12 @@ public class SayAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "говорит %s".formatted(text);
+    public String getVerb() {
+        return "говорит";
+    }
+
+    @Override
+    protected String getDescription() {
+        return text;
     }
 }

@@ -2,10 +2,9 @@ package ru.bardinpetr.itmo.lab_3.creatures.humans.interfaces;
 
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.IAble;
 import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Nameable;
-import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.scenarios.interfaces.IScenarioAction;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Tool;
+import ru.bardinpetr.itmo.lab_3.things.tool.Tool;
 
 public interface IPerforming extends IAble, Nameable {
     default IScenarioAction performByName(String name) {

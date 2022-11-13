@@ -1,12 +1,10 @@
 package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
 
 public class LiveAction extends Ability {
     public static final String TYPE = "LIVE";
-
     private Place place;
 
     public LiveAction(Place place) {
@@ -15,8 +13,13 @@ public class LiveAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "живет в %s".formatted(place.getName());
+    public String getVerb() {
+        return "живет";
+    }
+
+    @Override
+    public String getDescription() {
+        return "в %s".formatted(place.getName());
     }
 
     public Place getPlace() {

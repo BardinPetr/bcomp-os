@@ -3,15 +3,20 @@ package ru.bardinpetr.itmo.lab_3.properties.models;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
 public enum Brightness implements IModifier {
-    DARK, BRIGHT;
+    DARK("темный"), BRIGHT("светлый");
 
-    @Override
+    private final String text;
+
+    Brightness(String text) {
+        this.text = text;
+    }
+
     public String getType() {
         return "яркость";
     }
 
     @Override
     public String getValue() {
-        return name();
+        return text;
     }
 }

@@ -12,13 +12,12 @@ public class MostOfModifier implements IModifier {
         this.group = group;
     }
 
-    @Override
     public String getType() {
         return "наиболее";
     }
 
     @Override
     public String getValue() {
-        return "%s из %s".formatted(modifier.getType(), group.getName());
+        return "%s из группы %s".formatted(modifier.getValue(), group.getName());
     }
 }

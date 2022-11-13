@@ -13,7 +13,12 @@ public class TurnAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "поворачивать %s %s".formatted(describeMods(), dir);
+    public String getVerb() {
+        return "поворачивать";
+    }
+
+    @Override
+    protected String getDescription() {
+        return dir;
     }
 }

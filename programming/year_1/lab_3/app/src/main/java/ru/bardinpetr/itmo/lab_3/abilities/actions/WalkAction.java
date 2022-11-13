@@ -14,7 +14,12 @@ public class WalkAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "перемещаться %s %s".formatted(describeMods(), place.getName());
+    public String getVerb() {
+        return "перемещаться";
+    }
+
+    @Override
+    protected String getDescription() {
+        return place.getName();
     }
 }

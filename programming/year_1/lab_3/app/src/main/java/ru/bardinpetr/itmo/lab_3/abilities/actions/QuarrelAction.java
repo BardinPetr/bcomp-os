@@ -2,8 +2,6 @@ package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.properties.models.QuarrelState;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Tool;
 
 public class QuarrelAction extends Ability {
     public static final String TYPE = "ссориться";
@@ -16,12 +14,12 @@ public class QuarrelAction extends Ability {
     }
 
     @Override
-    public String perform() {
+    public String getVerb() {
         return (state == QuarrelState.IN_QUARREL ? "ссориться" : "мириться");
     }
 
     @Override
-    public String performWithOn(Tool tool, PhysicalObject object) {
-        return "%s с %s".formatted(perform(), object.getPhysicalObjectName());
+    protected String getObjectPreposition() {
+        return "с";
     }
 }

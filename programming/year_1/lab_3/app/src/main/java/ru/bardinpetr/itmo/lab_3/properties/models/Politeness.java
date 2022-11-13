@@ -3,15 +3,19 @@ package ru.bardinpetr.itmo.lab_3.properties.models;
 import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 
 public enum Politeness implements IModifier {
-    POLITE, IMPOLITE;
+    POLITE("вежливый"), IMPOLITE("не вежливый");
+    private final String text;
 
-    @Override
+    Politeness(String text) {
+        this.text = text;
+    }
+
     public String getType() {
-        return "имеет вежливость";
+        return "вежливость";
     }
 
     @Override
     public String getValue() {
-        return name();
+        return text;
     }
 }

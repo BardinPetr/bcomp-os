@@ -4,6 +4,7 @@ import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.*;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_3.creatures.Creature;
+import ru.bardinpetr.itmo.lab_3.creatures.animals.Animal;
 import ru.bardinpetr.itmo.lab_3.creatures.animals.Dog;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.HumanGroup;
@@ -15,9 +16,9 @@ import ru.bardinpetr.itmo.lab_3.properties.modifiers.*;
 import ru.bardinpetr.itmo.lab_3.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_3.things.Thing;
-import ru.bardinpetr.itmo.lab_3.things.Weapon;
 import ru.bardinpetr.itmo.lab_3.things.place.House;
 import ru.bardinpetr.itmo.lab_3.things.place.Place;
+import ru.bardinpetr.itmo.lab_3.things.tool.Weapon;
 import ru.bardinpetr.itmo.lab_3.things.wear.Clothing;
 import ru.bardinpetr.itmo.lab_3.things.wear.WearType;
 
@@ -48,7 +49,6 @@ public class App {
         pilulkin.wear(coat);
         pilulkin.wear(cap);
 
-//        pilulkin.doProfession();
 
         // Mechanics
         ProfessionHuman vintik = new Mechanic("Винтик");
@@ -68,7 +68,7 @@ public class App {
 
         siropchik.applyModifier(Politeness.POLITE);
 
-        Describable dummyAction = () -> "";
+        Describable dummyAction = () -> "происходящее";
 
         Ability syrLikeAbility = new LikeAction(dummyAction);
         syrLikeAbility.setAbilityName("like naming");
@@ -96,6 +96,7 @@ public class App {
         water.applyModifier(new HasModifier(syrop));
 
         Ability likeSoda = new LikeAction(water);
+        likeSoda.applyModifier(Degree.VERY);
         siropchik.addAbility(likeSoda);
 
         siropchik.applyModifier(new KnownForModifier(likeSoda));
@@ -149,7 +150,8 @@ public class App {
 
         // neznaika actions;
 
-        neznaika.addAbility(new LookLikeAction("попугай"));
+        neznaika.addAbility(new LookLikeAction());
+        PhysicalObject parrot = new Animal("попугай");
 
         Ability neznaikaWalk = new WalkAction(city);
         neznaikaWalk.setAbilityName("neznaika walk");
@@ -173,7 +175,7 @@ public class App {
                 new Scenario()
                         .newSentence()
                         .addIf(neznaika.performByType(WearAction.TYPE))
-                        .addThen(neznaika.performByType(LookLikeAction.TYPE))
+                        .addThen(neznaika.performByTypeWithOn(LookLikeAction.TYPE, null, parrot))
                         .addThen(neznaika.performByName(neznaikaWalk.getAbilityName()))
                         .addThen(neznaika.performByName(createNebilitsa.getAbilityName()))
                         .addThen(neznaika.performByName(talkOfNebilitsa.getAbilityName()))
@@ -208,25 +210,24 @@ public class App {
         gunka.addAbility(quarrelOn);
 
         Ability quarrelOff = new QuarrelAction(QuarrelState.NORMAL);
-        quarrelOn.applyModifier(countPerDay);
+        quarrelOff.applyModifier(countPerDay);
         quarrelOff.setAbilityName("quarrelOff");
         neznaika.addAbility(quarrelOff);
         gunka.addAbility(quarrelOff);
 
-        Scenario ngScenario = new Scenario()
+        neznaika.addScenario(new Scenario()
                 .newSentence()
                 .addThen(neznaika.performByNameWithOn("ngTalk", null, gunka))
-                .addThen(gunka.performByNameWithOn("ngTalk", null, neznaika))
                 .newSentence()
                 .addThen(neznaika.performByNameWithOn("quarrelOn", null, gunka))
+                .addThen(neznaika.performByNameWithOn("quarrelOff", null, gunka)));
+
+        gunka.addScenario(new Scenario()
+                .newSentence()
+                .addThen(gunka.performByNameWithOn("ngTalk", null, neznaika))
+                .newSentence()
                 .addThen(gunka.performByNameWithOn("quarrelOn", null, neznaika))
-                .addThen(neznaika.performByNameWithOn("quarrelOff", null, gunka))
-                .addThen(gunka.performByNameWithOn("quarrelOff", null, neznaika));
-
-
-        neznaika.addScenario(ngScenario);
-
-        System.out.println(neznaika.describe());
+                .addThen(gunka.performByNameWithOn("quarrelOff", null, neznaika)));
 
         // Many others
         String[] names = new String[]{"Торопыжка", "Ворчун", "Молчун", "Пончик", "Растеряйка", "Авоська", "Небоська"};
@@ -256,54 +257,36 @@ public class App {
         Scenario malyshkiWithNeznaika =
                 new Scenario()
                         .newSentence()
-                        .addIf(girlsGroup.performByTypeWithOn(SeeAction.TYPE, null, neznaikaShirt))
+                        .addIf(girlsGroup.performByTypeWithOn(SeeAction.TYPE, null, neznaika))
                         .addThen(girlsGroup.performByType(TurnAction.TYPE))
                         .addThen(girlsGroup.performByType(HideAction.TYPE));
 
         girlsGroup.addScenario(malyshkiWithNeznaika);
 
+        // Presentation
+        System.out.println(allGroup.describe());
         System.out.println(girlsGroup.describe());
-
-
-
-
-/*
-В этом же домике жил известный доктор Пилюлькин, который лечил коротышек от всех болезней.
-+
-Он всегда ходил в белом халате, а на голове носил белый колпак с кисточкой.
-+
-Жил здесь [домик] также знаменитый механик Винтик со своим помощником Шпунтиком;
-+
-жил [домик] Сахарин Сахариныч Сиропчик, который прославился тем, что очень любил газированную воду с сиропом.
-+
-Он [Сиропчик] был очень вежливый.
-+
-Ему [Сиропчик] нравилось, когда его называли по имени и отчеству, и не нравилось, когда кто-нибудь называл его просто Сиропчиком.
-+
-Жил еще в этом доме охотник Пулька. У него была маленькая собачка Булька и еще было ружье, которое стреляло пробками.
-+
-Жил художник Тюбик, музыкант Гусля и другие малыши: Торопыжка, Ворчун, Молчун, Пончик, Растеряйка, два брата -- Авоська и Небоська.
-+
-Но самым известным среди них был малыш, по имени Незнайка.
-+
-Его прозвали Незнайкой за то, что он ничего не знал.
-+
-Этот Незнайка носил яркую голубую шляпу, желтые, канареечные, брюки и оранжевую рубашку с зеленым галстуком.
-+
-Он вообще любил яркие краски.
-+
-Нарядившись таким попугаем, Незнайка по целым дням слонялся по городу, сочинял разные небылицы и всем рассказывал.
-+
-Кроме того, он постоянно обижал малышек.
-+
-Поэтому малышки, завидев издали его оранжевую рубашку, сейчас же поворачивали в обратную сторону и прятались по домам.
-+
-У Незнайки был друг, по имени Гунька, который жил на улице Маргариток.
-+
-С Гунькой Незнайка мог болтать по целым часам.
-+
-Они двадцать раз на день ссорились между собой и двадцать раз на день мирились.
-+
- */
     }
 }
+
+/*
+    Исходный текст
+        В этом же домике жил известный доктор Пилюлькин, который лечил коротышек от всех болезней.
+        Он всегда ходил в белом халате, а на голове носил белый колпак с кисточкой.
+        Жил здесь [домик] также знаменитый механик Винтик со своим помощником Шпунтиком;
+        жил [в домик] Сахарин Сахариныч Сиропчик, который прославился тем, что очень любил газированную воду с сиропом.
+        Он [Сиропчик] был очень вежливый.
+        Ему [Сиропчик] нравилось, когда его называли по имени и отчеству, и не нравилось, когда кто-нибудь называл его просто Сиропчиком.
+        Жил еще в этом доме охотник Пулька. У него была маленькая собачка Булька и еще было ружье, которое стреляло пробками.
+        Жил художник Тюбик, музыкант Гусля и другие малыши: Торопыжка, Ворчун, Молчун, Пончик, Растеряйка, два брата -- Авоська и Небоська.
+        Но самым известным среди них был малыш, по имени Незнайка.
+        Его прозвали Незнайкой за то, что он ничего не знал.
+        Этот Незнайка носил яркую голубую шляпу, желтые, канареечные, брюки и оранжевую рубашку с зеленым галстуком.
+        Он вообще любил яркие краски.
+        Нарядившись таким попугаем, Незнайка по целым дням слонялся по городу, сочинял разные небылицы и всем рассказывал.
+        Кроме того, он постоянно обижал малышек.
+        Поэтому малышки, завидев издали его оранжевую рубашку, сейчас же поворачивали в обратную сторону и прятались по домам.
+        У Незнайки был друг, по имени Гунька, который жил на улице Маргариток.
+        С Гунькой Незнайка мог болтать по целым часам.
+        Они двадцать раз на день ссорились между собой и двадцать раз на день мирились.
+*/

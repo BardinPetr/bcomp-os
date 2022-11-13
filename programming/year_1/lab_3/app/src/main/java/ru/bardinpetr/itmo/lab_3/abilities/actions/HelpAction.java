@@ -21,7 +21,12 @@ public class HelpAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "помогает %s".formatted(master.getName());
+    public String getVerb() {
+        return "помогать";
+    }
+
+    @Override
+    public String getDescription() {
+        return master.getName();
     }
 }

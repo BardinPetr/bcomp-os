@@ -9,13 +9,12 @@ public class CountModifier implements IModifier {
         this.count = count;
     }
 
-    @Override
     public String getType() {
-        return "количество раз";
+        return "количество";
     }
 
     @Override
     public String getValue() {
-        return String.valueOf(count);
+        return "%d раз".formatted(count);
     }
 }

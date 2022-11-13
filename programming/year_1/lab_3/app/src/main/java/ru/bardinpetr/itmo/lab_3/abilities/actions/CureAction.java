@@ -20,10 +20,15 @@ public class CureAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        StringBuilder stringBuilder = new StringBuilder("лечит от ");
+    public String getVerb() {
+        return "лечит";
+    }
+
+    @Override
+    public String getDescription() {
+        StringBuilder stringBuilder = new StringBuilder(" от ");
         for (int i = 0; i < cureFrom.size(); i++)
-            stringBuilder.append("%s, ".formatted(cureFrom.get(i).name()));
+            stringBuilder.append("%s, ".formatted(cureFrom.get(i).toString()));
         return stringBuilder.toString();
     }
 }

@@ -5,7 +5,6 @@ import ru.bardinpetr.itmo.lab_3.things.place.Place;
 
 public class HideAction extends Ability {
     public static final String TYPE = "прятаться";
-
     private final Place place;
 
     public HideAction(Place place) {
@@ -14,7 +13,12 @@ public class HideAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "прятаться %s %s".formatted(describeMods(), place.getName());
+    public String getVerb() {
+        return "прятаться";
+    }
+
+    @Override
+    public String getDescription() {
+        return place.getName();
     }
 }

@@ -4,21 +4,14 @@ import ru.bardinpetr.itmo.lab_3.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
 
 public class HasModifier implements IModifier {
-    public static final String TYPE = "has";
     private final PhysicalObject thing;
 
     public HasModifier(PhysicalObject thing) {
         this.thing = thing;
     }
 
-    @Override
-    public String getPreposition() {
-        return "имеет";
-    }
-
-    @Override
     public String getType() {
-        return TYPE;
+        return "имеет";
     }
 
     @Override

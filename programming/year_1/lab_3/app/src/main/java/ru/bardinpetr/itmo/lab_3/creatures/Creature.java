@@ -5,7 +5,6 @@ import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Heightable;
 import ru.bardinpetr.itmo.lab_3.creatures.interfaces.NameSettable;
 import ru.bardinpetr.itmo.lab_3.creatures.interfaces.Nameable;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.tools.SpecialFormatter;
 
 abstract public class Creature extends PhysicalObject implements Nameable, NameSettable, Heightable, Describable {
     private String firstname = "";
@@ -28,7 +27,11 @@ abstract public class Creature extends PhysicalObject implements Nameable, NameS
 
     @Override
     public String getFullName() {
-        return SpecialFormatter.joinNullableStrings(" ", firstname, patronymic, lastname);
+        StringBuilder sb = new StringBuilder();
+        if (!firstname.equals("")) sb.append("%s ".formatted(firstname));
+        if (!patronymic.equals("")) sb.append("%s ".formatted(patronymic));
+        if (!lastname.equals("")) sb.append("%s ".formatted(lastname));
+        return sb.toString().strip();
     }
 
     @Override

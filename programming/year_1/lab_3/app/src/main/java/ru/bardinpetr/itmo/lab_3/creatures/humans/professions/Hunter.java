@@ -3,7 +3,7 @@ package ru.bardinpetr.itmo.lab_3.creatures.humans.professions;
 import ru.bardinpetr.itmo.lab_3.abilities.actions.HuntAction;
 import ru.bardinpetr.itmo.lab_3.creatures.humans.ProfessionHuman;
 import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Weapon;
+import ru.bardinpetr.itmo.lab_3.things.tool.Weapon;
 
 public class Hunter extends ProfessionHuman {
     private final Weapon mainWeapon;

@@ -1,12 +1,9 @@
 package ru.bardinpetr.itmo.lab_3.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_3.abilities.Ability;
-import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
-import ru.bardinpetr.itmo.lab_3.things.Tool;
 
 public class NameAction extends Ability {
     public static final String TYPE = "называть";
-
     private final String text;
 
     public NameAction(String text) {
@@ -15,12 +12,12 @@ public class NameAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "называть %s".formatted(text);
+    public String getVerb() {
+        return "называть";
     }
 
     @Override
-    public String performWithOn(Tool tool, PhysicalObject object) {
-        return "называть %s %s".formatted(object.getPhysicalObjectName(), text);
+    protected String getDescription() {
+        return text;
     }
 }

@@ -1,4 +1,7 @@
-package ru.bardinpetr.itmo.lab_3.things;
+package ru.bardinpetr.itmo.lab_3.things.tool;
+
+import ru.bardinpetr.itmo.lab_3.things.PhysicalObject;
+import ru.bardinpetr.itmo.lab_3.things.Thing;
 
 public abstract class Tool extends Thing {
     public Tool(String name) {

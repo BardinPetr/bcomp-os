@@ -4,8 +4,7 @@ import ru.bardinpetr.itmo.lab_3.abilities.Ability;
 import ru.bardinpetr.itmo.lab_3.abilities.interfaces.Describable;
 
 public class LikeAction extends Ability {
-    public static final String TYPE = "любить";
-
+    public static final String TYPE = "like";
     private final Describable describable;
     private final boolean isLike;
 
@@ -22,7 +21,12 @@ public class LikeAction extends Ability {
     }
 
     @Override
-    public String perform() {
-        return "%sлюбит %s".formatted(isLike ? "" : "не ", describable.describe());
+    public String getVerb() {
+        return "%sлюбит".formatted(isLike ? "" : "не ");
+    }
+
+    @Override
+    public String getDescription() {
+        return describable.describe();
     }
 }

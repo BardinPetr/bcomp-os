@@ -743,9 +743,9 @@ Ability                ..>  PhysicalObject
 Ability                ..>  Tool
 Animal                 ..>  PhysicalObject
 Artist                 "1" *-- "1" DrawAction
-BrotherModifier        ..>  Creature
+BrotherModifier        ..>  Human
 Doctor                 "1" *-- "1"  CureAction
-FriendModifier         ..>  Creature
+FriendModifier         ..>  Human
 Friendable             ..>  Human
 Heightable             ..>  HeightSpecies
 HelpAction             "1" o-- "master\n0..1"  Human
@@ -792,6 +792,9 @@ HideAction             "1" o-- "1" Place
 LikeAction             "1" o-- "1" Describable
 LiveAction             "1" o-- "1" Place
 WalkAction             "1" o-- "1" Place
+
+BrotherModifier       "1" o-- "1" Human
+FriendModifier        "1" o-- "1" Human
 
 Brightness             ..^  IModifier
 Color                  ..^  IModifier

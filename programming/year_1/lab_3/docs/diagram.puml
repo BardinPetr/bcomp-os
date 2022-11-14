@@ -4,8 +4,19 @@
 top to bottom direction
 skinparam linetype ortho
 skinparam classAttributeIconSize 0
-skinparam CircledCharacterFontSize 0
-skinparam CircledCharacterRadius 0
+'skinparam CircledCharacterFontSize 0
+'skinparam CircledCharacterRadius 0
+hide circle
+
+<style>
+classDiagram {
+  class {
+      header {
+        FontStyle bold
+      }
+  }
+}
+</style>
 
 
 class Musician {
@@ -152,10 +163,10 @@ class SongAction {
 + String getVerb()
 + String toString()
 }
-interface Professionable {
+interface Professionable << interface >> {
 ~ Ability getProfessionalAbility()
 }
-interface Scriptable {
+interface Scriptable << interface >> {
 ~ String getScenario()
 ~ void addScenario(Scenario)
 }
@@ -242,7 +253,7 @@ class Human {
 + int hashCode()
 + String toString()
 }
-interface Describable {
+interface Describable << interface >> {
 ~ String describe()
 }
 class House {
@@ -260,7 +271,7 @@ class Helper {
 + String getProfessionName()
 + String toString()
 }
-interface Modifiable {
+interface Modifiable << interface >> {
 ~ Modifiable applyModifier(IModifier)
 ~ List<IModifier> getModifiers()
 ~ String describeMods()
@@ -315,7 +326,7 @@ class SayAction {
 + int hashCode()
 + String toString()
 }
-interface IModifier {
+interface IModifier << interface >> {
 ~ String getType()
 ~ String getValue()
 ~ String describe()
@@ -353,7 +364,7 @@ class LikeAction {
 + int hashCode()
 + String toString()
 }
-interface IPerforming {
+interface IPerforming << interface >> {
 ~ IScenarioAction performByName(String)
 ~ IScenarioAction performByType(String)
 ~ IScenarioAction performByNameWithOn(String,Tool,PhysicalObject)
@@ -367,14 +378,14 @@ enum WaterType {
 + String getType()
 + String getValue()
 }
-interface IScenarioAction {
+interface IScenarioAction << interface >> {
 ~ String perform()
 }
-interface Nameable {
+interface Nameable << interface >> {
 ~ String getName()
 ~ String getFullName()
 }
-interface NameSettable {
+interface NameSettable << interface >> {
 ~ void setName(String)
 ~ void setName(String,String,String)
 }
@@ -465,7 +476,7 @@ class Weapon {
 + int hashCode()
 + String toString()
 }
-interface ICommonHumanAbilities {
+interface ICommonHumanAbilities << interface >> {
 ~ void live(Place)
 ~ void wear(Clothing)
 ~ void have(PhysicalObject)
@@ -588,7 +599,7 @@ enum HeightSpecies {
 +  NORMAL
 +  SHORT
 }
-interface Heightable {
+interface Heightable << interface >> {
 ~ double DISCRIMINATION_THRESHOLD
 ~ double getHeight()
 ~ void setHeight(double)
@@ -618,7 +629,7 @@ class LiveAction {
 + int hashCode()
 + String toString()
 }
-interface Friendable {
+interface Friendable << interface >> {
 ~ void addFriend(Human)
 ~ void addBrother(Human)
 }
@@ -646,7 +657,7 @@ class KnownForModifier {
 + int hashCode()
 + String toString()
 }
-interface IAble {
+interface IAble << interface >> {
 ~ void addAbility(Ability)
 ~ List<Ability> getAbilities()
 ~ Ability getAbility(String)

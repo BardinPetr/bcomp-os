@@ -10,14 +10,16 @@ public interface IAble {
     List<Ability> getAbilities();
 
     default Ability getAbility(String type) {
-        for (Ability ability : getAbilities())
-            if (ability.getAbilityType().equals(type)) return ability;
+        List<Ability> abilities = getAbilities();
+        for (int i = 0; i < abilities.size(); i++)
+            if (abilities.get(i).getAbilityType().equals(type)) return abilities.get(i);
         return null;
     }
 
     default Ability getAbilityByName(String name) {
-        for (Ability ability : getAbilities())
-            if (ability.getAbilityName().equals(name)) return ability;
+        List<Ability> abilities = getAbilities();
+        for (int i = 0; i < abilities.size(); i++)
+            if (abilities.get(i).getAbilityName().equals(name)) return abilities.get(i);
         return null;
     }
 }

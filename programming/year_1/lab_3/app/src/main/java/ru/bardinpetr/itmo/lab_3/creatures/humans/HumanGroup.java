@@ -39,15 +39,15 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
         if (abilities.size() > 0) {
             sb.append("- Групповые возможности:\n");
-            for (Ability ability : abilities)
-                sb.append("%s;  ".formatted(ability.describe()));
+            for (int i = 0; i < abilities.size(); i++)
+                sb.append("%s;  ".formatted(abilities.get(i).describe()));
         }
 
         sb.append("\n- Групповой сценарий:\n%s\n".formatted(getScenario()));
 
         sb.append("- Содержимое группы:\n");
-        for (Human human : group)
-            sb.append("-- %s\n".formatted(human.describe()));
+        for (int i = 0; i < group.size(); i++)
+            sb.append("-- %s\n".formatted(group.get(i).describe()));
 
         return sb.toString();
     }
@@ -118,7 +118,6 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
     @Override
     public String toString() {
-        return "HumanGroup{abilities=%s, group=%s, name='%s', globalScenario=%s} %s"
-                .formatted(abilities, group, name, globalScenario, super.toString());
+        return "HumanGroup{abilities=%s, group=%s, name='%s', globalScenario=%s} %s".formatted(abilities, group, name, globalScenario, super.toString());
     }
 }

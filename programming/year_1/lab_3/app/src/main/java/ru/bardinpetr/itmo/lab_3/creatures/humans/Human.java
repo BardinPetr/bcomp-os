@@ -52,8 +52,8 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
         StringBuilder sb = new StringBuilder();
 
         sb.append("%s\n* умеет: \n".formatted(getFullName()));
-        for (Describable i : getAbilities())
-            sb.append("%s\n".formatted(i.describe()));
+        for (int i = 0; i < abilities.size(); i++)
+            sb.append("%s\n".formatted(abilities.get(i).describe()));
 
         if (getModifiers().size() > 0) {
             sb.append("* обладает свойствами: \n");

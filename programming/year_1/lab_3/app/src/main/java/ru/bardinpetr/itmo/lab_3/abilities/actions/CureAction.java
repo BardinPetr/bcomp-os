@@ -41,7 +41,7 @@ public class CureAction extends Ability {
 
         CureAction that = (CureAction) o;
 
-        return cureFrom != null ? cureFrom.equals(that.cureFrom) : that.cureFrom == null;
+        return cureFrom.equals(that.cureFrom);
     }
 
     @Override

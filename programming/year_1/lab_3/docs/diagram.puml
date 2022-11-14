@@ -728,39 +728,23 @@ Ability <|-- WalkAction
 IModifier <|.. KnownForModifier
 ProfessionHuman <|-- Mechanic
 
-'Ability                ..>  Ability
 Ability                ..>  PhysicalObject
 Ability                ..>  Tool
 Animal                 ..>  PhysicalObject
-'Artist                 ..>  Artist
-Artist                 ..>  DrawAction            : "«create»"
-'BrotherModifier        ..>  BrotherModifier
+Artist                 "1" *-- "1" DrawAction
 BrotherModifier        ..>  Creature
-'Clothing               ..>  Clothing
-'CountModifier          ..>  CountModifier
-'Creature               ..>  Creature
-'CureAction             ..>  CureAction
-Doctor                 ..>  CureAction            : "«create»"
-'Doctor                 ..>  Doctor
+Doctor                 "1" *-- "1"  CureAction
 FriendModifier         ..>  Creature
-'FriendModifier         ..>  FriendModifier
 Friendable             ..>  Human
-'HasModifier            ..>  HasModifier
 Heightable             ..>  HeightSpecies
-'Heightable             ..>  Heightable
-HelpAction             ..>  Creature
-'HelpAction             ..>  HelpAction
-Helper                 ..>  HelpAction            : "«create»"
-'Helper                 ..>  Helper
-Helper                 ..>  Human
-'HideAction             ..>  HideAction
-'House                  ..>  House
+HelpAction             "1" o-- "master\n0..1"  Human
+Helper                 "1" *-- "1"  HelpAction
+Helper                 "master\n1" *-- "1"  Human
 Human                  ..>  BrotherModifier       : "«create»"
 Human                  ..>  Clothing
 Human                  ..>  Describable
 Human                  ..>  FriendModifier        : "«create»"
 Human                  ..>  HasModifier           : "«create»"
-'Human                  ..>  Human
 Human                  ..>  LiveAction            : "«create»"
 Human                  ..>  Modifiable
 Human                  ..>  PhysicalObject
@@ -768,65 +752,40 @@ Human                  ..>  Place
 Human                  ..>  Scenario              : "«create»"
 Human                  ..>  WearAction            : "«create»"
 HumanGroup             ..>  Creature
-'HumanGroup             ..>  HumanGroup
 HumanGroup             ..>  Place
-Hunter                 ..>  Ability
-Hunter                 ..>  Human
-Hunter                 ..>  HuntAction            : "«create»"
-'Hunter                 ..>  Hunter
+Hunter                 "1" *-- "1"  HuntAction
+Hunter                 "mainWeapon\n1" *-- "1"  Weapon
 Hunter                 ..>  PhysicalObject
 IAble                  ..>  Ability
-'IAble                  ..>  IAble
 ICommonHumanAbilities  ..>  Clothing
 ICommonHumanAbilities  ..>  PhysicalObject
 ICommonHumanAbilities  ..>  Place
-'IModifier              ..>  IModifier
 IPerforming            ..>  Ability
 IPerforming            ..>  IScenarioAction
 IPerforming            ..>  PhysicalObject
 IPerforming            ..>  Tool
-'KnownForModifier       ..>  KnownForModifier
-'LikeAction             ..>  LikeAction
-'LiveAction             ..>  LiveAction
-Mechanic               ..>  DoMechanicsAction     : "«create»"
-'Mechanic               ..>  Mechanic
+Mechanic               "1" *-- "1"  DoMechanicsAction
 Modifiable             ..>  IModifier
 Modifiable             ..>  Modifiable
-'MostOfModifier         ..>  MostOfModifier
-'Musician               ..>  Musician
-Musician               ..>  SongAction            : "«create»"
-'NameModifier           ..>  NameModifier
-'NameSettable           ..>  NameSettable
-'Nameable               ..>  Nameable
-'PhysicalObject         ..>  PhysicalObject
-'Place                  ..>  Place
-'PlaceModifier          ..>  PlaceModifier
-'ProfessionHuman        ..>  ProfessionHuman
+Musician               "1" *-- "1"  SongAction
 Professionable         ..>  Ability
-'QuarrelAction          ..>  QuarrelAction
-'ReasonModifier         ..>  ReasonModifier
-'SayAction              ..>  SayAction
 Scenario               ..>  IScenarioAction
 Scenario               ..>  LogicOperator
-'Scenario               ..>  Scenario
 Scriptable             ..>  Scenario
-'TargetModifier         ..>  TargetModifier
-'Thing                  ..>  Thing
-'ThinkAction            ..>  ThinkAction
-'TimeModifier           ..>  TimeModifier
 Tool                   ..>  PhysicalObject
-'TurnAction             ..>  TurnAction
-'WalkAction             ..>  WalkAction
+Weapon                 "bullet\n1" *-- "1" Thing
 Weapon                 ..>  PhysicalObject
-Weapon                 ..>  Thing                 : "«create»"
-'Weapon                 ..>  Weapon
-WearAction             ..>  PhysicalObject
-'WearAction             ..>  WearAction
+
+WearAction             "1" o-- "wearing\n*"  Clothing
+HideAction             "1" o-- "1" Place
+LikeAction             "1" o-- "1" Describable
+LiveAction             "1" o-- "1" Place
+WalkAction             "1" o-- "1" Place
 
 Brightness             ..^  IModifier
 Color                  ..^  IModifier
 Degree                 ..^  IModifier
-CureAction            "1" *--> "cureFrom\n*" Illness
+CureAction            "1" o--> "cureFrom\n*" Illness
 Heightable             ..>  HeightSpecies
 Scenario               ..>  LogicOperator
 Politeness             ..^  IModifier
@@ -835,6 +794,16 @@ QuarrelAction         "1" *--> "state\n1" QuarrelState
 Size                   ..^  IModifier
 WaterType              ..^  IModifier
 Clothing              "1" *--> "type\n1" WearType
+
+Ability               "modifiers\n1" o-- "*" IModifier
+PhysicalObject        "modifiers\n1" o-- "*" IModifier
+Human                 "abilities\n1" o-- "*" Ability
+Human                 "scenario\n1" --> "0" Scenario
+Human                 "wearAbility\n1" --> "1" WearAction
+HumanGroup            "globalScenario\n1" --> "0..1" Scenario
+HumanGroup            "group\n1" o-- "*" Human
+HumanGroup            "abilities\n1" o-- "*" Ability
+ProfessionHuman       "professionalAbility\n1" --> "1" Ability
 
 
 @enduml

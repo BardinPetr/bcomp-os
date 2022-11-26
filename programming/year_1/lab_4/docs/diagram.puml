@@ -1,0 +1,823 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+'skinparam CircledCharacterFontSize 0
+'skinparam CircledCharacterRadius 0
+hide circle
+
+<style>
+classDiagram {
+  class {
+      header {
+        FontStyle bold
+      }
+  }
+}
+</style>
+
+
+class Musician {
++ <<Create>> Musician(String,String,String)
++ <<Create>> Musician(String)
++ String getProfessionName()
++ String play()
++ String toString()
+}
+class PlaceModifier {
+- Place place
++ <<Create>> PlaceModifier(Place)
++ Place getPlace()
++ void setPlace(Place)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class WearAction {
++ {static} String TYPE
+- List<Clothing> wearing
++ <<Create>> WearAction()
++ void putOn(Clothing)
++ String getVerb()
++ String getDescription()
++ List<Clothing> getWearing()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class TurnAction {
++ {static} String TYPE
+- String dir
++ <<Create>> TurnAction(String)
++ String getVerb()
+# String getDescription()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+class OffendAction {
++ {static} String TYPE
++ <<Create>> OffendAction()
++ String getVerb()
++ String toString()
+}
+class TalkAction {
++ {static} String TYPE
++ <<Create>> TalkAction()
++ String getVerb()
+# String getObjectPreposition()
++ String toString()
+}
+enum LogicOperator {
++  AND
++  OR
+- String text
+~ <<Create>> LogicOperator(String)
++ String toString()
+}
+class SeeAction {
++ {static} String TYPE
++ <<Create>> SeeAction()
++ String getVerb()
++ String toString()
+}
+abstract class Ability {
+- List<IModifier> modifiers
+- String abilityType
+- String abilityName
+# <<Create>> Ability(String,String)
+# <<Create>> Ability(String)
+# {abstract}String getVerb()
+# String getDescription()
+# String getObjectPreposition()
++ String perform()
++ String performWithOn(Tool,PhysicalObject)
++ String describe()
++ Modifiable applyModifier(IModifier)
++ List<IModifier> getModifiers()
++ String getAbilityType()
++ String getAbilityName()
++ void setAbilityName(String)
++ boolean equals(Object)
++ int hashCode()
+}
+class CountModifier {
+- int count
++ <<Create>> CountModifier(int)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class BrotherModifier {
+- Human other
++ <<Create>> BrotherModifier(Human)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Illness {
++  SOME_ILLNESS
++  ANY
+- String commonName
+~ <<Create>> Illness(String)
+~ <<Create>> Illness()
++ String toString()
+}
+class Artist {
++ <<Create>> Artist(String,String,String)
++ <<Create>> Artist(String)
++ String getProfessionName()
++ String draw()
++ String toString()
+}
+class Thing {
+- String name
++ <<Create>> Thing(String)
++ String getPhysicalObjectName()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Color {
++  WHITE
++  CYAN
++  YELLOW_CANARY
++  ORANGE
++  GREEN
+- String text
+~ <<Create>> Color(String)
++ String getType()
++ String getValue()
+}
+class SongAction {
++ {static} String TYPE
++ <<Create>> SongAction()
++ String getVerb()
++ String toString()
+}
+interface Professionable << interface >> {
+~ Ability getProfessionalAbility()
+}
+interface Scriptable << interface >> {
+~ String getScenario()
+~ void addScenario(Scenario)
+}
+class ReasonModifier {
+- IModifier modifier
+- String reason
++ <<Create>> ReasonModifier(IModifier,String)
++ String getType()
++ String getValue()
++ String getReason()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class FriendModifier {
+- Human other
++ <<Create>> FriendModifier(Human)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class Hunter {
+- Weapon mainWeapon
++ <<Create>> Hunter(String,String,String,Weapon)
++ <<Create>> Hunter(String,Weapon)
++ String goHunt(PhysicalObject)
++ String getProfessionName()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class NameModifier {
+- String name
++ <<Create>> NameModifier(String)
++ String getType()
++ String getValue()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+class ThinkAction {
++ {static} String TYPE
+- String text
++ <<Create>> ThinkAction(String)
++ String getVerb()
+# String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class HuntAction {
++ {static} String TYPE
++ <<Create>> HuntAction()
++ String getVerb()
+# String getObjectPreposition()
++ String toString()
+}
+class Doctor {
++ <<Create>> Doctor(String,String,String)
++ <<Create>> Doctor(String)
++ String getProfessionName()
++ String toString()
+}
+class Human {
+- List<Ability> abilities
+- WearAction wearAbility
+- Scenario scenario
++ <<Create>> Human(String,String,String)
++ <<Create>> Human(String)
++ void addAbility(Ability)
++ List<Ability> getAbilities()
++ String describe()
++ void live(Place)
++ void wear(Clothing)
++ void have(PhysicalObject)
+# void addBrotherReply(Human)
++ void addBrother(Human)
++ void addFriend(Human)
++ String getScenario()
++ void addScenario(Scenario)
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface Describable << interface >> {
+~ String describe()
+}
+class House {
+- int maxPeople
++ <<Create>> House(String,double[],int)
++ int getMaxPeople()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class Helper {
++ <<Create>> Helper(String,String,String)
++ <<Create>> Helper(String)
++ void setMaster(Human)
++ String getProfessionName()
++ String toString()
+}
+interface Modifiable << interface >> {
+~ Modifiable applyModifier(IModifier)
+~ List<IModifier> getModifiers()
+~ String describeMods()
+}
+class TimeModifier {
+- String time
++ <<Create>> TimeModifier(String)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class Place {
+- String name
+- double[] coordinates
++ <<Create>> Place(String,double[])
++ String getName()
++ double[] getCoordinates()
++ String describe()
++ String getPhysicalObjectName()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class Clothing {
+- WearType type
+- int size
++ <<Create>> Clothing(WearType,int)
++ WearType getType()
++ int getSize()
++ String wear()
++ String getPhysicalObjectName()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Degree {
++  VERY
+- String text
+~ <<Create>> Degree(String)
++ String getType()
++ String getValue()
+}
+class SayAction {
++ {static} String TYPE
+- String text
++ <<Create>> SayAction(String)
++ String getVerb()
+# String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface IModifier << interface >> {
+~ String getType()
+~ String getValue()
+~ String describe()
+}
+class DrawAction {
++ {static} String TYPE
++ <<Create>> DrawAction()
++ String getVerb()
++ String toString()
+}
+class CureAction {
++ {static} String TYPE
+- List<Illness> cureFrom
++ <<Create>> CureAction()
++ void addCuredIllness(Illness)
++ String getVerb()
++ String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum QuarrelState {
++  NORMAL
++  IN_QUARREL
+}
+class LikeAction {
++ {static} String TYPE
+- Describable describable
+- boolean isLike
++ <<Create>> LikeAction(Describable)
++ <<Create>> LikeAction(Describable,boolean)
++ String getVerb()
++ String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface IPerforming << interface >> {
+~ IScenarioAction performByName(String)
+~ IScenarioAction performByType(String)
+~ IScenarioAction performByNameWithOn(String,Tool,PhysicalObject)
+~ IScenarioAction performByTypeWithOn(String,Tool,PhysicalObject)
+}
+enum WaterType {
++  STILL
++  SODA
+- String text
+~ <<Create>> WaterType(String)
++ String getType()
++ String getValue()
+}
+interface IScenarioAction << interface >> {
+~ String perform()
+}
+interface Nameable << interface >> {
+~ String getName()
+~ String getFullName()
+}
+interface NameSettable << interface >> {
+~ void setName(String)
+~ void setName(String,String,String)
+}
+class HideAction {
++ {static} String TYPE
+- Place place
++ <<Create>> HideAction(Place)
++ String getVerb()
++ String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Popularity {
++  POPULAR
++  UNPOPULAR
+- String text
+~ <<Create>> Popularity(String)
++ String getType()
++ String getValue()
+}
+class MostOfModifier {
+- IModifier modifier
+- HumanGroup group
++ <<Create>> MostOfModifier(IModifier,HumanGroup)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class LookLikeAction {
++ {static} String TYPE
++ <<Create>> LookLikeAction()
++ String getVerb()
+# String getObjectPreposition()
++ String toString()
+}
+abstract class PhysicalObject {
+- List<IModifier> modifiers
++ String describe()
++ {abstract}String getPhysicalObjectName()
++ Modifiable applyModifier(IModifier)
++ List<IModifier> getModifiers()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Brightness {
++  DARK
++  BRIGHT
+- String text
+~ <<Create>> Brightness(String)
++ String getType()
++ String getValue()
+}
+enum WearType {
++  MEDICAL_GOWN
++  CAP
++  HAT
++  TROUSERS
++  SHIRT
++  TIE
+- String text
+~ <<Create>> WearType(String)
++ String toString()
+}
+class HasModifier {
+- PhysicalObject thing
++ <<Create>> HasModifier(PhysicalObject)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class Dog {
++ <<Create>> Dog(String)
++ String toString()
+}
+class Weapon {
+- Thing bullet
++ <<Create>> Weapon(String,Thing)
++ <<Create>> Weapon(String)
++ String describe()
++ String apply(PhysicalObject)
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface ICommonHumanAbilities << interface >> {
+~ void live(Place)
+~ void wear(Clothing)
+~ void have(PhysicalObject)
+}
+enum Size {
++  SMALL
++  LARGE
+- String text
+~ <<Create>> Size(String)
++ String getType()
++ String getValue()
+}
+abstract class Creature {
+- String firstname
+- String lastname
+- String patronymic
+- double height
++ <<Create>> Creature(String,String,String)
++ <<Create>> Creature(String)
++ String getName()
++ String getFullName()
++ void setName(String,String,String)
++ double getHeight()
++ void setHeight(double)
++ String getPhysicalObjectName()
++ boolean equals(Object)
++ int hashCode()
+}
+class Scenario {
+- StringBuilder scenario
+- int sentenceCount
+- int partsCount
+- boolean isIfSectionActive
++ Scenario addIf(IScenarioAction)
++ Scenario addIf(String)
++ Scenario addIf(LogicOperator,String)
++ Scenario addThen(IScenarioAction)
++ Scenario addThen(LogicOperator,IScenarioAction)
++ Scenario addElse()
++ Scenario newSentence()
++ void append(Scenario)
++ String print()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+class QuarrelAction {
++ {static} String TYPE
+- QuarrelState state
++ <<Create>> QuarrelAction(QuarrelState)
++ String getVerb()
+# String getObjectPreposition()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum Politeness {
++  POLITE
++  IMPOLITE
+- String text
+~ <<Create>> Politeness(String)
++ String getType()
++ String getValue()
+}
+class HelpAction {
++ {static} String TYPE
+- Human master
++ <<Create>> HelpAction()
++ Human getMaster()
++ void setMaster(Human)
++ String getVerb()
++ String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class TargetModifier {
+- String other
++ <<Create>> TargetModifier(String)
++ String getType()
++ String getValue()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class HumanGroup {
+- List<Ability> abilities
+- List<Human> group
+- String name
+- Scenario globalScenario
++ <<Create>> HumanGroup(String)
++ List<Human> getGroup()
++ void add(Human)
++ String describe()
++ String getPhysicalObjectName()
++ void live(Place)
++ Human getByName(String)
++ String getName()
++ void addAbility(Ability)
++ List<Ability> getAbilities()
++ String getScenario()
++ void addScenario(Scenario)
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+abstract class ProfessionHuman {
+- Ability professionalAbility
++ <<Create>> ProfessionHuman(String,String,String,Ability)
++ <<Create>> ProfessionHuman(String,Ability)
++ Ability getProfessionalAbility()
++ String doProfession()
++ {abstract}String getProfessionName()
++ String describe()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+enum HeightSpecies {
++  NORMAL
++  SHORT
+}
+interface Heightable << interface >> {
+~ double DISCRIMINATION_THRESHOLD
+~ double getHeight()
+~ void setHeight(double)
+~ void setHeightSpecies()
+~ HeightSpecies getHeightSpecies()
+}
+class DoMechanicsAction {
++ {static} String TYPE
++ <<Create>> DoMechanicsAction()
++ String getVerb()
++ String toString()
+}
+abstract class Tool {
++ <<Create>> Tool(String)
++ {abstract}String apply(PhysicalObject)
++ String toString()
+}
+class LiveAction {
++ {static} String TYPE
+- Place place
++ <<Create>> LiveAction(Place)
++ String getVerb()
++ String getDescription()
++ Place getPlace()
++ void setPlace(Place)
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface Friendable << interface >> {
+~ void addFriend(Human)
+~ void addBrother(Human)
+}
+class Animal {
++ <<Create>> Animal(String)
++ String toString()
+}
+class WalkAction {
++ {static} String TYPE
+- Place place
++ <<Create>> WalkAction(Place)
++ String getVerb()
+# String getDescription()
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+class KnownForModifier {
+- Describable describable
++ <<Create>> KnownForModifier(Describable)
++ String getType()
++ String getValue()
++ void setDescribable(Describable)
++ boolean equals(Object)
++ int hashCode()
++ String toString()
+}
+interface IAble << interface >> {
+~ void addAbility(Ability)
+~ List<Ability> getAbilities()
+~ Ability getAbility(String)
+~ Ability getAbilityByName(String)
+}
+class Mechanic {
++ <<Create>> Mechanic(String,String,String)
++ <<Create>> Mechanic(String)
++ String getProfessionName()
++ String toString()
+}
+
+
+ProfessionHuman <|-- Musician
+IModifier <|.. PlaceModifier
+Ability <|-- WearAction
+Ability <|-- TurnAction
+Ability <|-- OffendAction
+Ability <|-- TalkAction
+Ability <|-- SeeAction
+Modifiable <|.. Ability
+Describable <|.. Ability
+IModifier <|.. CountModifier
+IModifier <|.. BrotherModifier
+ProfessionHuman <|-- Artist
+PhysicalObject <|-- Thing
+Ability <|-- SongAction
+IModifier <|.. ReasonModifier
+IModifier <|.. FriendModifier
+ProfessionHuman <|-- Hunter
+IModifier <|.. NameModifier
+Ability <|-- ThinkAction
+Ability <|-- HuntAction
+ProfessionHuman <|-- Doctor
+IPerforming <|.. Human
+Scriptable <|.. Human
+ICommonHumanAbilities <|.. Human
+Friendable <|.. Human
+Creature <|-- Human
+Place <|-- House
+ProfessionHuman <|-- Helper
+IModifier <|.. TimeModifier
+PhysicalObject <|-- Place
+PhysicalObject <|-- Clothing
+Ability <|-- SayAction
+Describable <|-- IModifier
+Ability <|-- DrawAction
+Ability <|-- CureAction
+Ability <|-- LikeAction
+IAble <|-- IPerforming
+Nameable <|-- IPerforming
+Ability <|-- HideAction
+IModifier <|.. MostOfModifier
+Ability <|-- LookLikeAction
+Modifiable <|.. PhysicalObject
+Describable <|.. PhysicalObject
+IModifier <|.. HasModifier
+Animal <|-- Dog
+Tool <|-- Weapon
+Nameable <|.. Creature
+NameSettable <|.. Creature
+Heightable <|.. Creature
+Describable <|.. Creature
+PhysicalObject <|-- Creature
+Ability <|-- QuarrelAction
+Ability <|-- HelpAction
+IModifier <|.. TargetModifier
+Describable <|.. HumanGroup
+IPerforming <|.. HumanGroup
+Scriptable <|.. HumanGroup
+PhysicalObject <|-- HumanGroup
+Professionable <|.. ProfessionHuman
+Human <|-- ProfessionHuman
+Ability <|-- DoMechanicsAction
+Thing <|-- Tool
+Ability <|-- LiveAction
+Creature <|-- Animal
+Ability <|-- WalkAction
+IModifier <|.. KnownForModifier
+ProfessionHuman <|-- Mechanic
+
+Ability                ..>  PhysicalObject
+Ability                ..>  Tool
+Animal                 ..>  PhysicalObject
+Artist                 "1" *-- "1" DrawAction
+BrotherModifier        ..>  Human
+Doctor                 "1" *-- "1"  CureAction
+FriendModifier         ..>  Human
+Friendable             ..>  Human
+Heightable             ..>  HeightSpecies
+HelpAction             "1" o-- "master\n0..1"  Human
+Helper                 "1" *-- "1"  HelpAction
+Helper                 "master\n1" *-- "1"  Human
+Human                  ..>  BrotherModifier       : "«create»"
+Human                  ..>  Clothing
+Human                  ..>  Describable
+Human                  ..>  FriendModifier        : "«create»"
+Human                  ..>  HasModifier           : "«create»"
+Human                  ..>  LiveAction            : "«create»"
+Human                  ..>  Modifiable
+Human                  ..>  PhysicalObject
+Human                  ..>  Place
+Human                  ..>  Scenario              : "«create»"
+Human                  ..>  WearAction            : "«create»"
+HumanGroup             ..>  Creature
+HumanGroup             ..>  Place
+Hunter                 "1" *-- "1"  HuntAction
+Hunter                 "mainWeapon\n1" *-- "1"  Weapon
+Hunter                 ..>  PhysicalObject
+IAble                  ..>  Ability
+ICommonHumanAbilities  ..>  Clothing
+ICommonHumanAbilities  ..>  PhysicalObject
+ICommonHumanAbilities  ..>  Place
+IPerforming            ..>  Ability
+IPerforming            ..>  IScenarioAction
+IPerforming            ..>  PhysicalObject
+IPerforming            ..>  Tool
+Mechanic               "1" *-- "1"  DoMechanicsAction
+Modifiable             ..>  IModifier
+Modifiable             ..>  Modifiable
+Musician               "1" *-- "1"  SongAction
+Professionable         ..>  Ability
+Scenario               ..>  IScenarioAction
+Scenario               ..>  LogicOperator
+Scriptable             ..>  Scenario
+Tool                   ..>  PhysicalObject
+Weapon                 "bullet\n1" *-- "1" Thing
+Weapon                 ..>  PhysicalObject
+
+WearAction             "1" o-- "wearing\n*"  Clothing
+HideAction             "1" o-- "1" Place
+LikeAction             "1" o-- "1" Describable
+LiveAction             "1" o-- "1" Place
+WalkAction             "1" o-- "1" Place
+
+BrotherModifier       "1" o-- "1" Human
+FriendModifier        "1" o-- "1" Human
+
+Brightness             ..^  IModifier
+Color                  ..^  IModifier
+Degree                 ..^  IModifier
+CureAction            "1" o--> "cureFrom\n*" Illness
+Heightable             ..>  HeightSpecies
+Scenario               ..>  LogicOperator
+Politeness             ..^  IModifier
+Popularity             ..^  IModifier
+QuarrelAction         "1" *--> "state\n1" QuarrelState
+Size                   ..^  IModifier
+WaterType              ..^  IModifier
+Clothing              "1" *--> "type\n1" WearType
+
+Ability               "modifiers\n1" o-- "*" IModifier
+PhysicalObject        "modifiers\n1" o-- "*" IModifier
+Human                 "abilities\n1" o-- "*" Ability
+Human                 "scenario\n1" --> "0" Scenario
+Human                 "wearAbility\n1" --> "1" WearAction
+HumanGroup            "globalScenario\n1" --> "0..1" Scenario
+HumanGroup            "group\n1" o-- "*" Human
+HumanGroup            "abilities\n1" o-- "*" Ability
+ProfessionHuman       "professionalAbility\n1" --> "1" Ability
+
+
+@enduml

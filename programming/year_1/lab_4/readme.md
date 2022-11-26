@@ -16,6 +16,23 @@
 - В программе должны быть реализованы 2 собственных класса исключений (checked и unchecked), а также обработка исключений этих классов.
 - В программу необходимо добавить использование локальных, анонимных и вложенных классов (static и non-static).
 
+## Changelog
+- v1.0.0
+  - Final result of LAB3. [Link to project](https://github.com/BardinPetr/itmo-labs/tree/main/programming/year_1/lab_3)
+- v1.1.0
+  - `IAble`
+    - store pure abilities as collection of `Class`, and modified abilities in mapping to name
+  - `IPerforming`
+    - to execute an ability now `IScenarioAction perform(Ability, IAbilityConfigurationRunnable)` should be used.
+  - `Ability`
+    - Classes extending ability should not have state now except for modifiers 
+    - Subject of action, tool for usage, and other parameters should be set by mods via `IAbilityConfigurationRunnable` at `IPerforming.perform()`
+  - Deprecations:
+    - Name and type of `Ability` should not be used anymore. 
+    Alternatives are: for type - use reflection and Class; names are now only used to distinguish objects stored in object implementing `IAble` 
+
+## Задание
+
 > За рекой был лес.
 > Коротышки делали из березовой коры лодочки, переплывали через реку и ходили в лес за ягодами, за грибами, за орехами.
 > Собирать ягоды было трудно, потому что коротышки ведь были крошечные, а за орехами и вовсе приходилось лазить на высокий куст да еще тащить с собой пилу.

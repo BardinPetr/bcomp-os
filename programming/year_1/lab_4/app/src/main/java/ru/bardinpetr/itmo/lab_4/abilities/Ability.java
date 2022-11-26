@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Ability implements Modifiable, Describable {
-    private final List<IModifier> modifiers = new ArrayList<>();
+public abstract class Ability implements Modifiable, Describable, Cloneable {
+    private List<IModifier> modifiers = new ArrayList<>();
 
     private String abilityType = getClass().getName();
     private String abilityName = "";
@@ -43,21 +43,15 @@ public abstract class Ability implements Modifiable, Describable {
         return performWithOn(null, null);
     }
 
+    @Deprecated
     public String performWithOn(Tool tool, PhysicalObject object) {
         StringBuilder sb = new StringBuilder();
-
         if (tool != null) sb.append("при помощи %s ".formatted(tool.apply(object)));
-
         sb.append("%s ".formatted(getVerb()));
-
         if (getModifiers().size() > 0)
             sb.append("(%s) ".formatted(describeMods()));
-
         sb.append(getDescription());
-
         if (object != null) sb.append("%s %s".formatted(getObjectPreposition(), object.getPhysicalObjectName()));
-
-
         return sb.toString();
     }
 
@@ -105,13 +99,22 @@ public abstract class Ability implements Modifiable, Describable {
         if (o == null || getClass() != o.getClass()) return false;
 
         Ability ability = (Ability) o;
-
-        if (!modifiers.equals(ability.modifiers)) return false;
-        return Objects.equals(abilityName, ability.abilityName);
+        return modifiers.equals(ability.modifiers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modifiers, abilityName);
+        return Objects.hash(modifiers);
+    }
+
+    @Override
+    public Ability clone() {
+        try {
+            Ability clone = (Ability) super.clone();
+            clone.modifiers = new ArrayList<>(modifiers);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

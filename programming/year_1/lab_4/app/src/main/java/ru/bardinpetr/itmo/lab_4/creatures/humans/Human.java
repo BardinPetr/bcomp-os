@@ -9,22 +9,23 @@ import ru.bardinpetr.itmo.lab_4.creatures.Creature;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.Friendable;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.ICommonHumanAbilities;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.IPerforming;
-import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.properties.modifiers.BrotherModifier;
 import ru.bardinpetr.itmo.lab_4.properties.modifiers.FriendModifier;
 import ru.bardinpetr.itmo.lab_4.properties.modifiers.HasModifier;
 import ru.bardinpetr.itmo.lab_4.scenarios.Scenario;
+import ru.bardinpetr.itmo.lab_4.scenarios.StoryContext;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IAbilityConfigurationRunnable;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IScenarioAction;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.things.wear.Clothing;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Human extends Creature implements IPerforming, Scriptable, ICommonHumanAbilities, Friendable {
     private final Map<String, Ability> namedAbilities = new HashMap<>();
-    private final Map<Class, Ability> typedAbilities = new HashMap<>();
+    private final Set<Class> pureAbilities = new HashSet<>();
 
     private final WearAction wearAbility = new WearAction();
 
@@ -45,8 +46,8 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     }
 
     @Override
-    public Map<Class, Ability> getPureAbilities() {
-        return typedAbilities;
+    public Set<Class> getPureAbilities() {
+        return pureAbilities;
     }
 
     @Override
@@ -115,6 +116,24 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     }
 
     @Override
+    public IScenarioAction perform(Ability ability, IAbilityConfigurationRunnable conf) {
+        var ctx = new StoryContext();
+        return new IScenarioAction() {
+            @Override
+            public String execute() {
+                var configured = (Ability) conf.configure(ability.clone(), ctx);
+                var result = configured.perform();
+                return "%s сделал %s".formatted(getName(), result);
+            }
+
+            @Override
+            public String describe() {
+                return ability.describe();
+            }
+        };
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -142,6 +161,4 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
                         super.toString()
                 );
     }
-
-
 }

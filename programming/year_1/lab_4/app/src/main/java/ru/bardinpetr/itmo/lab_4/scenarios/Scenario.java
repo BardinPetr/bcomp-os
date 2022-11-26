@@ -11,7 +11,7 @@ public class Scenario {
     private boolean isIfSectionActive = true;
 
     public Scenario addIf(IScenarioAction action) {
-        return addIf(action.perform());
+        return addIf(action.execute());
     }
 
     public Scenario addIf(String text) {
@@ -41,7 +41,7 @@ public class Scenario {
         }
 
         String pre = partsCount == 0 ? "" : ", %s".formatted(operator);
-        scenario.append(" %s %s".formatted(pre, action.perform()));
+        scenario.append(" %s %s".formatted(pre, action.execute()));
 
         isIfSectionActive = false;
         partsCount++;

@@ -20,7 +20,6 @@ import ru.bardinpetr.itmo.lab_4.things.place.House;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.things.tool.Weapon;
 import ru.bardinpetr.itmo.lab_4.things.wear.Clothing;
-import ru.bardinpetr.itmo.lab_4.properties.models.WearType;
 
 public class App {
     public static void main(String[] args) {
@@ -226,6 +225,16 @@ public class App {
                 .newSentence()
                 .addThen(gunka.performByNameWithOn("quarrelOn", null, neznaika))
                 .addThen(gunka.performByNameWithOn("quarrelOff", null, neznaika)));
+
+//        h.perform(aid, (ability, ctx) -> ability.target(x).tool(y) )
+//                .run()
+//                .describe();
+//
+//        h.load(aid)
+//                .target(x)
+//                .tool(y)
+//                .exec()
+
 
         // Many others
         String[] names = new String[]{"Торопыжка", "Ворчун", "Молчун", "Пончик", "Растеряйка", "Авоська", "Небоська"};

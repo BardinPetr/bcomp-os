@@ -1,5 +1,12 @@
 package ru.bardinpetr.itmo.lab_4.scenarios.interfaces;
 
-public interface IScenarioAction {
-    String perform();
+import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
+
+public interface IScenarioAction extends Describable {
+    String execute();
+
+    @Override
+    default String describe() {
+        return execute();
+    }
 }

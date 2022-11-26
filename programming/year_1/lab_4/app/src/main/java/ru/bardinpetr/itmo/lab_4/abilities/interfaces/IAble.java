@@ -3,15 +3,18 @@ package ru.bardinpetr.itmo.lab_4.abilities.interfaces;
 import ru.bardinpetr.itmo.lab_4.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.abilities.errors.AbilityExistsException;
 import ru.bardinpetr.itmo.lab_4.abilities.errors.AbilityNotFoundException;
+import ru.bardinpetr.itmo.lab_4.abilities.errors.NotPureAbilityException;
+import ru.bardinpetr.itmo.lab_4.abilities.errors.PureAbilityInstantiationException;
+import ru.bardinpetr.itmo.lab_4.utils.AbilityHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface IAble {
     Map<String, Ability> getModifiedAbilities();
 
-    Map<Class, Ability> getPureAbilities();
+    Set<Class> getPureAbilities();
 
     /**
      * Adds an ability to pure group. Only one ability of each type can be added.
@@ -22,31 +25,37 @@ public interface IAble {
         // This part allows deprecated ability names to be used as earlier.
         // Should be removed when getAbilityName support is dropped.
         if (!ability.getAbilityName().isEmpty()) {
+            if (!ability.isPure())
+                throw new NotPureAbilityException(ability);
+
             addAbility(ability.getAbilityName(), ability);
             return;
         }
 
-        Ability res = getPureAbilities().putIfAbsent(ability.getClass(), ability);
-        if (res != null)
-            throw new AbilityExistsException(res);
+        addAbility(ability.getClass());
+    }
+
+    default void addAbility(Class abilityClass) {
+        var abilities = getPureAbilities();
+        if (abilities.contains(abilityClass))
+            throw new AbilityExistsException(abilityClass);
+
+        abilities.add(abilityClass);
     }
 
     default void addAbility(String name, Ability ability) {
         Ability res = getModifiedAbilities().putIfAbsent(name, ability);
         if (res != null)
-            throw new AbilityExistsException(res);
+            throw new AbilityExistsException(name, res);
     }
 
     /**
-     * Returns all abilities including pure and modified by concatenation
+     * Returns all named abilities
      *
      * @return all abilities as List
      */
     default List<Ability> getAbilities() {
-        List<Ability> res = new ArrayList<>();
-        res.addAll(getPureAbilities().values());
-        res.addAll(getModifiedAbilities().values());
-        return res;
+        return List.copyOf(getModifiedAbilities().values());
     }
 
     @Deprecated
@@ -69,10 +78,13 @@ public interface IAble {
         return res;
     }
 
-    default Ability getAbility(Class abilityClass) throws AbilityNotFoundException {
-        Ability res = getPureAbilities().get(abilityClass);
-        if (res == null)
+    default Ability getAbility(Class abilityClass) throws AbilityNotFoundException, PureAbilityInstantiationException {
+        if (!getPureAbilities().contains(abilityClass)) {
+            for (Ability ability : getAbilities())
+                if (ability.getClass() == abilityClass) return ability;
+
             throw new AbilityNotFoundException(AbilityNotFoundException.SearchType.TYPE, abilityClass.getName());
-        return res;
+        }
+        return AbilityHelper.instantiatePureAbility(abilityClass);
     }
 }

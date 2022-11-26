@@ -3,8 +3,10 @@ package ru.bardinpetr.itmo.lab_4.creatures.humans;
 import ru.bardinpetr.itmo.lab_4.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.IPerforming;
-import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.scenarios.Scenario;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IAbilityConfigurationRunnable;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IScenarioAction;
+import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 
@@ -13,7 +15,7 @@ import java.util.*;
 public class HumanGroup extends PhysicalObject implements Describable, IPerforming, Scriptable {
 
     private final Map<String, Ability> namedAbilities = new HashMap<>();
-    private final Map<Class, Ability> typedAbilities = new HashMap<>();
+    private final Set<Class> pureAbilities = new HashSet<>();
 
     private final List<Human> group = new ArrayList<>();
     private final String name;
@@ -54,6 +56,23 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
     }
 
     @Override
+    public IScenarioAction perform(Ability ability, IAbilityConfigurationRunnable conf) {
+        return new IScenarioAction() {
+            @Override
+            public String execute() {
+                var configured = (Ability) conf.configure(ability, null);
+                var result = configured.perform();
+                return "%s сделал %s".formatted(getName(), result);
+            }
+
+            @Override
+            public String describe() {
+                return ability.describe();
+            }
+        };
+    }
+
+    @Override
     public String getPhysicalObjectName() {
         return name;
     }
@@ -81,8 +100,8 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
     }
 
     @Override
-    public Map<Class, Ability> getPureAbilities() {
-        return typedAbilities;
+    public Set<Class> getPureAbilities() {
+        return pureAbilities;
     }
 
     @Override
@@ -105,8 +124,7 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
         HumanGroup that = (HumanGroup) o;
 
-        if (!namedAbilities.equals(that.namedAbilities)) return false;
-        if (!typedAbilities.equals(that.typedAbilities)) return false;
+        if (!getAbilities().equals(that.getAbilities())) return false;
         if (!group.equals(that.group)) return false;
         if (!Objects.equals(name, that.name)) return false;
         return Objects.equals(globalScenario, that.globalScenario);
@@ -114,7 +132,7 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), namedAbilities, typedAbilities, group, name, globalScenario);
+        return Objects.hash(super.hashCode(), getAbilities(), group, name, globalScenario);
     }
 
     @Override

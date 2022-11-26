@@ -4,7 +4,7 @@ package ru.bardinpetr.itmo.lab_4.creatures.humans;
 import ru.bardinpetr.itmo.lab_4.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.abilities.actions.LiveAction;
 import ru.bardinpetr.itmo.lab_4.abilities.actions.WearAction;
-import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
+import ru.bardinpetr.itmo.lab_4.abilities.errors.AbilityNotFoundException;
 import ru.bardinpetr.itmo.lab_4.creatures.Creature;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.Friendable;
 import ru.bardinpetr.itmo.lab_4.creatures.humans.interfaces.ICommonHumanAbilities;
@@ -18,12 +18,13 @@ import ru.bardinpetr.itmo.lab_4.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.things.wear.Clothing;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Human extends Creature implements IPerforming, Scriptable, ICommonHumanAbilities, Friendable {
-    private final List<Ability> abilities = new ArrayList<>();
+    private final Map<String, Ability> namedAbilities = new HashMap<>();
+    private final Map<Class, Ability> typedAbilities = new HashMap<>();
 
     private final WearAction wearAbility = new WearAction();
 
@@ -37,14 +38,15 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
         this(name, "", "");
     }
 
+
     @Override
-    public void addAbility(Ability ability) {
-        abilities.add(ability);
+    public Map<String, Ability> getModifiedAbilities() {
+        return namedAbilities;
     }
 
     @Override
-    public List<Ability> getAbilities() {
-        return abilities;
+    public Map<Class, Ability> getPureAbilities() {
+        return typedAbilities;
     }
 
     @Override
@@ -52,6 +54,7 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
         StringBuilder sb = new StringBuilder();
 
         sb.append("%s\n* умеет: \n".formatted(getFullName()));
+        var abilities = getAbilities();
         for (int i = 0; i < abilities.size(); i++)
             sb.append("%s\n".formatted(abilities.get(i).describe()));
 
@@ -72,7 +75,12 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     }
 
     public void live(Place place) {
-        addAbility(new LiveAction(place));
+        try {
+            ((LiveAction) getAbility(LiveAction.class))
+                    .setPlace(place);
+        } catch (AbilityNotFoundException ex) {
+            addAbility(new LiveAction(place));
+        }
     }
 
     public void wear(Clothing thing) {
@@ -114,21 +122,21 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
 
         Human human = (Human) o;
 
-        if (abilities != null ? !abilities.equals(human.abilities) : human.abilities != null) return false;
+        if (!getAbilities().equals(human.getAbilities())) return false;
         if (wearAbility != null ? !wearAbility.equals(human.wearAbility) : human.wearAbility != null) return false;
         return scenario != null ? scenario.equals(human.scenario) : human.scenario == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), abilities, wearAbility, scenario);
+        return Objects.hash(super.hashCode(), getAbilities(), wearAbility, scenario);
     }
 
     @Override
     public String toString() {
         return "Human{abilities=%s, wearAbility=%s, scenario=%s, %s}"
                 .formatted(
-                        abilities,
+                        getAbilities(),
                         wearAbility.toString(),
                         scenario.print(),
                         super.toString()

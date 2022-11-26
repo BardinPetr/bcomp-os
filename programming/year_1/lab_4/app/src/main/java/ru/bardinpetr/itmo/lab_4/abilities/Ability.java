@@ -12,18 +12,22 @@ import java.util.Objects;
 
 public abstract class Ability implements Modifiable, Describable {
     private final List<IModifier> modifiers = new ArrayList<>();
-    private final String abilityType;
-    private String abilityName;
 
+    private String abilityType = getClass().getName();
+    private String abilityName = "";
+
+    @Deprecated
     protected Ability(String abilityType, String abilityName) {
         this.abilityType = abilityType;
         this.abilityName = abilityName;
     }
 
+    @Deprecated
     protected Ability(String abilityType) {
         this.abilityType = abilityType;
-        this.abilityName = abilityType;
     }
+
+    protected Ability() {}
 
     abstract protected String getVerb();
 
@@ -68,19 +72,29 @@ public abstract class Ability implements Modifiable, Describable {
         return this;
     }
 
+    /**
+     * Check if ability was not modified
+     */
+    public boolean isPure() {
+        return getModifiers().size() == 0;
+    }
+
     @Override
     public List<IModifier> getModifiers() {
         return modifiers;
     }
 
+    @Deprecated
     public String getAbilityType() {
         return abilityType;
     }
 
+    @Deprecated
     public String getAbilityName() {
         return abilityName;
     }
 
+    @Deprecated
     public void setAbilityName(String abilityName) {
         this.abilityName = abilityName;
     }
@@ -93,12 +107,11 @@ public abstract class Ability implements Modifiable, Describable {
         Ability ability = (Ability) o;
 
         if (!modifiers.equals(ability.modifiers)) return false;
-        if (!Objects.equals(abilityType, ability.abilityType)) return false;
         return Objects.equals(abilityName, ability.abilityName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modifiers, abilityName, abilityType);
+        return Objects.hash(modifiers, abilityName);
     }
 }

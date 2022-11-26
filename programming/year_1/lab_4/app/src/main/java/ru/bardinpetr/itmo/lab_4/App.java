@@ -71,12 +71,10 @@ public class App {
         Describable dummyAction = () -> "происходящее";
 
         Ability syrLikeAbility = new LikeAction(dummyAction);
-        syrLikeAbility.setAbilityName("like naming");
-        siropchik.addAbility(syrLikeAbility);
+        siropchik.addAbility("like naming", syrLikeAbility);
 
         Ability syrDislikeAbility = new LikeAction(dummyAction, false);
-        syrDislikeAbility.setAbilityName("dislike naming");
-        siropchik.addAbility(syrDislikeAbility);
+        siropchik.addAbility("dislike naming", syrDislikeAbility);
 
         Scenario syrScenario =
                 new Scenario()

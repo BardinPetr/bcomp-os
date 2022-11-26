@@ -8,12 +8,12 @@ import ru.bardinpetr.itmo.lab_4.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class HumanGroup extends PhysicalObject implements Describable, IPerforming, Scriptable {
-    private final List<Ability> abilities = new ArrayList<>();
+
+    private final Map<String, Ability> namedAbilities = new HashMap<>();
+    private final Map<Class, Ability> typedAbilities = new HashMap<>();
 
     private final List<Human> group = new ArrayList<>();
     private final String name;
@@ -37,6 +37,7 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
         sb.append("Группа %s:\n".formatted(getName()));
 
+        var abilities = getAbilities();
         if (abilities.size() > 0) {
             sb.append("- Групповые возможности:\n");
             for (int i = 0; i < abilities.size(); i++)
@@ -73,16 +74,15 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
         return name;
     }
 
+
     @Override
-    public void addAbility(Ability ability) {
-        abilities.add(ability);
-        for (int i = 0; i < group.size(); i++)
-            group.get(i).addAbility(ability);
+    public Map<String, Ability> getModifiedAbilities() {
+        return namedAbilities;
     }
 
     @Override
-    public List<Ability> getAbilities() {
-        return abilities;
+    public Map<Class, Ability> getPureAbilities() {
+        return typedAbilities;
     }
 
     @Override
@@ -105,7 +105,8 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
         HumanGroup that = (HumanGroup) o;
 
-        if (!abilities.equals(that.abilities)) return false;
+        if (!namedAbilities.equals(that.namedAbilities)) return false;
+        if (!typedAbilities.equals(that.typedAbilities)) return false;
         if (!group.equals(that.group)) return false;
         if (!Objects.equals(name, that.name)) return false;
         return Objects.equals(globalScenario, that.globalScenario);
@@ -113,11 +114,11 @@ public class HumanGroup extends PhysicalObject implements Describable, IPerformi
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), abilities, group, name, globalScenario);
+        return Objects.hash(super.hashCode(), namedAbilities, typedAbilities, group, name, globalScenario);
     }
 
     @Override
     public String toString() {
-        return "HumanGroup{abilities=%s, group=%s, name='%s', globalScenario=%s} %s".formatted(abilities, group, name, globalScenario, super.toString());
+        return "HumanGroup{group=%s, name='%s', globalScenario=%s} %s".formatted(group, name, globalScenario, super.toString());
     }
 }

@@ -20,11 +20,15 @@ import ru.bardinpetr.itmo.lab_4.story.creatures.animals.Dog;
 import ru.bardinpetr.itmo.lab_4.story.creatures.humans.professions.*;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.models.*;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.*;
+import ru.bardinpetr.itmo.lab_4.story.stories.ForestStory;
 import ru.bardinpetr.itmo.lab_4.story.things.places.House;
 import ru.bardinpetr.itmo.lab_4.story.things.tools.Weapon;
 
 public class App {
     public static void main(String[] args) {
+        var fs = new ForestStory();
+        fs.compile();
+        fs.scenarioFindFood();
 //        HumanGroup allGroup = new HumanGroup("Малыши");
 //        HumanGroup girlsGroup = new HumanGroup("Малышки");
 //

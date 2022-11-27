@@ -1,6 +1,7 @@
 package ru.bardinpetr.itmo.lab_4.story.stories;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TooledAbility;
+import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.TextualScenario;
@@ -24,7 +25,7 @@ import ru.bardinpetr.itmo.lab_4.story.things.places.House;
 public class ForestStory extends Story {
 
     @StoryPlace
-    private final Place home = new House("домик", new double[] {1.2, 1.5}, 100);
+    private final Place home = new House("домик", new double[]{1.2, 1.5}, 100);
 
     @StoryPlace
     private final Place river = new Place("Река", new double[]{32.2, 234.2});
@@ -41,13 +42,17 @@ public class ForestStory extends Story {
     @Able(GoAction.class)
     private final HumanGroup littleManGroup = new HumanGroup("коротышки");
 
-    //    @Setup
-    void environmentSetup() {
+
+    public ForestStory() {
         forest.applyModifier(new PlaceModifier(PlaceModifier.PlaceRelation.IN_BEHIND, river));
     }
 
+    public void compile() {
+        Story.compile(this);
+    }
+
     @ScenarioFor("littleManGroup")
-    Scenario[] scenarioFindFood() {
+    public Scenario[] scenarioFindFood() {
         // Boat
         Thing bark = new Thing("birch bark");
         Tool boat = new Tool("лодка") {
@@ -57,6 +62,8 @@ public class ForestStory extends Story {
             }
         };
         boat.setModifier(MaterialModifier.class, bark);
+
+        Human h = new Human("a");
 
         // Food
         var berries = new Plant("ягоды");

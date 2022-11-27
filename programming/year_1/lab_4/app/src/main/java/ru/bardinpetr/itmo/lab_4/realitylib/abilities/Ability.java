@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class Ability implements AlteringModifiable, Describable, Cloneable {
-    private Map<Class, IAlteringModifier> modifiers = new HashMap<>();
+    private Map<Class, IModifier> modifiers = new HashMap<>();
 
     private String abilityType = getClass().getName();
     private String abilityName = "";
@@ -68,7 +68,7 @@ public abstract class Ability implements AlteringModifiable, Describable, Clonea
     }
 
     @Override
-    public Map<Class, IAlteringModifier> getModifierMapping() {
+    public Map<Class, IModifier> getModifierMapping() {
         return modifiers;
     }
 

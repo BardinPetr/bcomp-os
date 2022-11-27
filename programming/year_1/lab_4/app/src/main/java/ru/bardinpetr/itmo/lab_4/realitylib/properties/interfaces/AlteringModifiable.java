@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface AlteringModifiable extends Modifiable {
-    Map<Class, IAlteringModifier> getModifierMapping();
+    Map<Class, IModifier> getModifierMapping();
 
     @Override
     default List<IModifier> getModifiers() {
@@ -18,7 +18,8 @@ public interface AlteringModifiable extends Modifiable {
 
     @Override
     default AlteringModifiable applyModifier(IModifier mod) {
-        return setModifier(mod.getClass(), mod.getValue());
+        getModifierMapping().put(mod.getClass(), mod);
+        return this;
     }
 
     default AlteringModifiable setModifier(Class modClass, Object modValue) throws ModifierNotEditableException {
@@ -27,14 +28,14 @@ public interface AlteringModifiable extends Modifiable {
             throw new ModifierNotEditableException(modClass);
 
         if (!mods.containsKey(modClass)) {
-            getModifierMapping().put(modClass, (IAlteringModifier) InstantiationHelper.instantiateModifier(modClass));
+            getModifierMapping().put(modClass, InstantiationHelper.instantiateModifier(modClass));
         } else {
-            getModifier(modClass).setValue(modValue);
+            ((IAlteringModifier) getModifier(modClass)).setValue(modValue);
         }
         return this;
     }
 
-    default IAlteringModifier getModifier(Class modClass) {
+    default IModifier getModifier(Class modClass) {
         var mods = getModifierMapping();
         if (!mods.containsKey(modClass))
             throw new ModifierNotFoundException(modClass);

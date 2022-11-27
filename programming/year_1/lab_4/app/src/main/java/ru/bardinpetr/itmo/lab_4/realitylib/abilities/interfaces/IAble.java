@@ -35,7 +35,7 @@ public interface IAble {
         addAbility(ability.getClass());
     }
 
-    default void addAbility(Class abilityClass) {
+    default void addAbility(Class abilityClass) throws AbilityExistsException {
         var abilities = getPureAbilities();
         if (abilities.contains(abilityClass))
             throw new AbilityExistsException(abilityClass);
@@ -43,7 +43,7 @@ public interface IAble {
         abilities.add(abilityClass);
     }
 
-    default void addAbility(String name, Ability ability) {
+    default void addAbility(String name, Ability ability) throws AbilityExistsException {
         Ability res = getModifiedAbilities().putIfAbsent(name, ability);
         if (res != null)
             throw new AbilityExistsException(name, res);

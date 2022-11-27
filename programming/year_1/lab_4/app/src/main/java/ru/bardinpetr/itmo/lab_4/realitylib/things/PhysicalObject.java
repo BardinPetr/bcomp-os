@@ -3,12 +3,13 @@ package ru.bardinpetr.itmo.lab_4.realitylib.things;
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.AlteringModifiable;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class PhysicalObject implements AlteringModifiable, Describable {
-    private final Map<Class, IAlteringModifier> modifiers = new HashMap<>();
+    private final Map<Class, IModifier> modifiers = new HashMap<>();
 
     private double[] position = new double[]{0, 0};
 
@@ -23,7 +24,7 @@ public abstract class PhysicalObject implements AlteringModifiable, Describable 
     public abstract String getPhysicalObjectName();
 
     @Override
-    public Map<Class, IAlteringModifier> getModifierMapping() {
+    public Map<Class, IModifier> getModifierMapping() {
         return modifiers;
     }
 

@@ -1,12 +1,13 @@
 package ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.Thing;
 
 import java.util.Objects;
 
-public class MaterialModifier implements IModifier {
+public class MaterialModifier implements IAlteringModifier {
     private Thing material;
 
     public String getType() {
@@ -24,5 +25,10 @@ public class MaterialModifier implements IModifier {
 
     public void setMaterial(Thing material) {
         this.material = material;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        material = (Thing) value;
     }
 }

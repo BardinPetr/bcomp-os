@@ -2,6 +2,7 @@ package ru.bardinpetr.itmo.lab_4.realitylib.story;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.AbleProcessor;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.ScenarioForProcessor;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.Thing;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class Story {
 
     public static void compile(Story story) {
         AbleProcessor.process(story);
+        ScenarioForProcessor.process(story);
     }
 
 }

@@ -8,18 +8,16 @@ import ru.bardinpetr.itmo.lab_4.story.things.places.House;
 
 public class MainStory extends SubStory {
 
-    @StoryProvide(StoryProvide.ProvideType.GROUP)
+    @StoryProvide
     private final HumanGroup littleManGroup = new HumanGroup("коротышки");
 
-    @StoryProvide(StoryProvide.ProvideType.ENV)
+    @StoryProvide
     private final Place home = new House("домик", new double[]{1.2, 1.5}, 100);
 
-
-//    @StoryProvide(StoryProvide.ProvideType.ENV)
-//    private final SubStory forestStory = new ForestStory();
+    @StoryProvide
+    private final SubStory forestStory = new ForestStory();
 
     public MainStory() {
         super("MAIN");
     }
-
 }

@@ -9,9 +9,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface StoryProvide {
-    ProvideType value();
-
-    enum ProvideType {
-        ACTOR, GROUP, ENV, SCENARIO
-    }
 }

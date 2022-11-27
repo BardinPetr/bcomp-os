@@ -6,6 +6,7 @@ import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryProvide;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryAnnotationError;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryDIError;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 
 import java.lang.reflect.Field;
@@ -32,11 +33,19 @@ public class StoryItemProviderProcessor {
                         field);
             }
 
-            switch (annotation.value()) {
-                case ENV -> main.addEnvironment(fieldName, (PhysicalObject) data);
-                case ACTOR -> main.addActor(fieldName, (Human) data);
-                case GROUP -> main.addGroup(fieldName, (HumanGroup) data);
-                case SCENARIO -> main.addScenario(fieldName, (Scenario) data);
+            Class target = field.getType();
+            if (Human.class.isAssignableFrom(target)) {
+                main.addActor(fieldName, (Human) data);
+            } else if (HumanGroup.class.isAssignableFrom(target)) {
+                main.addGroup(fieldName, (HumanGroup) data);
+            } else if (Scenario.class.isAssignableFrom(target)) {
+                main.addScenario(fieldName, (Scenario) data);
+            } else if (SubStory.class == target) {
+                main.addSubStory(fieldName, (SubStory) data);
+            } else if (PhysicalObject.class.isAssignableFrom(target)) {
+                main.addEnvironment(fieldName, (PhysicalObject) data);
+            } else {
+                throw new StoryDIError(StoryProvide.class, field, "You annotated not supported field type");
             }
         }
     }

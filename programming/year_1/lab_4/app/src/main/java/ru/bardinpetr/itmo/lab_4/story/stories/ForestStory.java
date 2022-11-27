@@ -9,6 +9,7 @@ import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.Able;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.ScenarioFor;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryInject;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryProvide;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.Thing;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
@@ -22,8 +23,10 @@ import ru.bardinpetr.itmo.lab_4.story.things.food.Plant;
 
 public class ForestStory extends SubStory {
 
+    @StoryProvide
     private final Place river = new Place("Река", new double[]{32.2, 234.2});
 
+    @StoryProvide
     private final Place forest = new Place("Лес", new double[]{1.3, 2.2});
 
     @StoryInject

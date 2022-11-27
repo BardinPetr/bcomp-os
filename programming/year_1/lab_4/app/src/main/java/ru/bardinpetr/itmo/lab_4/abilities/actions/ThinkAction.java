@@ -42,6 +42,6 @@ public class ThinkAction extends Ability {
 
     @Override
     public String toString() {
-        return "ThinkAction{text='%s'} %s".formatted(text, super.toString());
+        return "ThinkAction{resultText='%s'} %s".formatted(text, super.toString());
     }
 }

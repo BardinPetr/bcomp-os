@@ -6,9 +6,10 @@ import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
 import java.util.Objects;
 
 public class LikeAction extends Ability {
+
     public static final String TYPE = "like";
     private final Describable describable;
-    private final boolean isLike;
+    private boolean isLike;
 
     public LikeAction(Describable describable) {
         super(TYPE);
@@ -20,6 +21,10 @@ public class LikeAction extends Ability {
         super(TYPE);
         this.describable = describable;
         this.isLike = isLike;
+    }
+
+    public Describable getDescribable() {
+        return describable;
     }
 
     @Override

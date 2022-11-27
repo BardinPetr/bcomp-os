@@ -5,5 +5,5 @@ import ru.bardinpetr.itmo.lab_4.properties.interfaces.Modifiable;
 import ru.bardinpetr.itmo.lab_4.scenarios.StoryContext;
 
 public interface IAbilityConfigurationRunnable {
-    Modifiable configure(Ability ability, StoryContext ctx);
+    Ability configure(Ability ability, StoryContext ctx);
 }

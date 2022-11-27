@@ -42,7 +42,7 @@ public class SayAction extends Ability {
 
     @Override
     public String toString() {
-        return "SayAction{text='%s'} %s".formatted(text, super.toString());
+        return "SayAction{resultText='%s'} %s".formatted(text, super.toString());
     }
 }
 

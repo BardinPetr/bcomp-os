@@ -1,14 +1,16 @@
 package ru.bardinpetr.itmo.lab_4.things;
 
 import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_4.properties.interfaces.IModifier;
-import ru.bardinpetr.itmo.lab_4.properties.interfaces.Modifiable;
+import ru.bardinpetr.itmo.lab_4.properties.interfaces.AlteringModifiable;
+import ru.bardinpetr.itmo.lab_4.properties.interfaces.IAlteringModifier;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class PhysicalObject implements Modifiable, Describable {
-    private final List<IModifier> modifiers = new ArrayList<>();
+public abstract class PhysicalObject implements AlteringModifiable, Describable {
+    private final Map<Class, IAlteringModifier> modifiers = new HashMap<>();
+
+    private double[] position = new double[]{0, 0};
 
     @Override
     public String describe() {
@@ -21,13 +23,7 @@ public abstract class PhysicalObject implements Modifiable, Describable {
     public abstract String getPhysicalObjectName();
 
     @Override
-    public Modifiable applyModifier(IModifier mod) {
-        modifiers.add(mod);
-        return this;
-    }
-
-    @Override
-    public List<IModifier> getModifiers() {
+    public Map<Class, IAlteringModifier> getModifierMapping() {
         return modifiers;
     }
 
@@ -49,5 +45,13 @@ public abstract class PhysicalObject implements Modifiable, Describable {
     @Override
     public String toString() {
         return "PhysicalObject{modifiers=%s}".formatted(modifiers);
+    }
+
+    public double[] getPosition() {
+        return position;
+    }
+
+    public void setPosition(double[] position) {
+        this.position = position;
     }
 }

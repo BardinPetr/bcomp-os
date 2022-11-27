@@ -4,8 +4,8 @@ import ru.bardinpetr.itmo.lab_4.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.abilities.errors.AbilityExistsException;
 import ru.bardinpetr.itmo.lab_4.abilities.errors.AbilityNotFoundException;
 import ru.bardinpetr.itmo.lab_4.abilities.errors.NotPureAbilityException;
-import ru.bardinpetr.itmo.lab_4.abilities.errors.PureAbilityInstantiationException;
-import ru.bardinpetr.itmo.lab_4.utils.AbilityHelper;
+import ru.bardinpetr.itmo.lab_4.utils.InstantiationException;
+import ru.bardinpetr.itmo.lab_4.utils.InstantiationHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -78,13 +78,13 @@ public interface IAble {
         return res;
     }
 
-    default Ability getAbility(Class abilityClass) throws AbilityNotFoundException, PureAbilityInstantiationException {
+    default Ability getAbility(Class abilityClass) throws AbilityNotFoundException, InstantiationException {
         if (!getPureAbilities().contains(abilityClass)) {
             for (Ability ability : getAbilities())
                 if (ability.getClass() == abilityClass) return ability;
 
             throw new AbilityNotFoundException(AbilityNotFoundException.SearchType.TYPE, abilityClass.getName());
         }
-        return AbilityHelper.instantiatePureAbility(abilityClass);
+        return InstantiationHelper.instantiatePureAbility(abilityClass);
     }
 }

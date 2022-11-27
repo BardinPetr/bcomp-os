@@ -1,20 +1,14 @@
 package ru.bardinpetr.itmo.lab_4.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_4.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.abilities.AbilityResult;
+import ru.bardinpetr.itmo.lab_4.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.things.place.Place;
 
 import java.util.Objects;
 
 public class WalkAction extends Ability {
-    public static final String TYPE = "перемещаться";
-
-    private final Place place;
-
-    public WalkAction(Place place) {
-        super(TYPE);
-        this.place = place;
-    }
-
+    private Place place;
     @Override
     public String getVerb() {
         return "перемещаться";
@@ -25,6 +19,20 @@ public class WalkAction extends Ability {
         return place.getName();
     }
 
+    public Place getPlace() {
+        return place;
+    }
+
+    public WalkAction setPlace(Place place) {
+        this.place = place;
+        return this;
+    }
+
+    @Override
+    public AbilityResult execute(Human self) {
+        self.setPosition(place.getPosition());
+        return new AbilityResult("успешно");
+    }
 
     @Override
     public boolean equals(Object o) {

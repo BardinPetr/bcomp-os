@@ -1,17 +1,19 @@
 package ru.bardinpetr.itmo.lab_4.abilities;
 
 import ru.bardinpetr.itmo.lab_4.abilities.interfaces.Describable;
+import ru.bardinpetr.itmo.lab_4.creatures.humans.Human;
+import ru.bardinpetr.itmo.lab_4.properties.interfaces.AlteringModifiable;
+import ru.bardinpetr.itmo.lab_4.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.properties.interfaces.IModifier;
-import ru.bardinpetr.itmo.lab_4.properties.interfaces.Modifiable;
 import ru.bardinpetr.itmo.lab_4.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.things.tool.Tool;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
-public abstract class Ability implements Modifiable, Describable, Cloneable {
-    private List<IModifier> modifiers = new ArrayList<>();
+public abstract class Ability implements AlteringModifiable, Describable, Cloneable {
+    private Map<Class, IAlteringModifier> modifiers = new HashMap<>();
 
     private String abilityType = getClass().getName();
     private String abilityName = "";
@@ -27,7 +29,8 @@ public abstract class Ability implements Modifiable, Describable, Cloneable {
         this.abilityType = abilityType;
     }
 
-    protected Ability() {}
+    protected Ability() {
+    }
 
     abstract protected String getVerb();
 
@@ -39,30 +42,45 @@ public abstract class Ability implements Modifiable, Describable, Cloneable {
         return "";
     }
 
-    public String perform() {
-        return performWithOn(null, null);
-    }
-
-    @Deprecated
-    public String performWithOn(Tool tool, PhysicalObject object) {
-        StringBuilder sb = new StringBuilder();
-        if (tool != null) sb.append("при помощи %s ".formatted(tool.apply(object)));
-        sb.append("%s ".formatted(getVerb()));
-        if (getModifiers().size() > 0)
-            sb.append("(%s) ".formatted(describeMods()));
-        sb.append(getDescription());
-        if (object != null) sb.append("%s %s".formatted(getObjectPreposition(), object.getPhysicalObjectName()));
-        return sb.toString();
+    public AbilityResult execute(Human self) {
+        return new AbilityResult("done");
     }
 
     @Override
     public String describe() {
-        return performWithOn(null, null);
+        return "%s %s".formatted(getVerb(), getDescription());
+    }
+
+    public String perform() {
+        return getVerb();
+    }
+
+    @Deprecated
+    public String performWithOn(Tool tool, PhysicalObject object) {
+//        StringBuilder sb = new StringBuilder();
+//        if (tool != null) sb.append("при помощи %s ".formatted(tool.apply(object)));
+//        sb.append("%s ".formatted(getVerb()));
+//        if (getModifiers().size() > 0)
+//            sb.append("(%s) ".formatted(describeMods()));
+//        sb.append(getDescription());
+//        if (object != null) sb.append("%s %s".formatted(getObjectPreposition(), object.getPhysicalObjectName()));
+        return getVerb();
     }
 
     @Override
-    public Modifiable applyModifier(IModifier mod) {
-        modifiers.add(mod);
+    public Map<Class, IAlteringModifier> getModifierMapping() {
+        return modifiers;
+    }
+
+    @Override
+    public Ability setModifier(Class modClass, Object modValue) {
+        AlteringModifiable.super.setModifier(modClass, modValue);
+        return this;
+    }
+
+    @Override
+    public Ability applyModifier(IModifier mod) {
+        AlteringModifiable.super.applyModifier(mod);
         return this;
     }
 
@@ -71,11 +89,6 @@ public abstract class Ability implements Modifiable, Describable, Cloneable {
      */
     public boolean isPure() {
         return getModifiers().size() == 0;
-    }
-
-    @Override
-    public List<IModifier> getModifiers() {
-        return modifiers;
     }
 
     @Deprecated
@@ -111,7 +124,7 @@ public abstract class Ability implements Modifiable, Describable, Cloneable {
     public Ability clone() {
         try {
             Ability clone = (Ability) super.clone();
-            clone.modifiers = new ArrayList<>(modifiers);
+            clone.modifiers = new HashMap<>(modifiers);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

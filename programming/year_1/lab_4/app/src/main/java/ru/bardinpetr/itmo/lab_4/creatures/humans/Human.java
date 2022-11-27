@@ -14,6 +14,7 @@ import ru.bardinpetr.itmo.lab_4.properties.modifiers.FriendModifier;
 import ru.bardinpetr.itmo.lab_4.properties.modifiers.HasModifier;
 import ru.bardinpetr.itmo.lab_4.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.scenarios.StoryContext;
+import ru.bardinpetr.itmo.lab_4.scenarios.TextualScenario;
 import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IAbilityConfigurationRunnable;
 import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.IScenarioAction;
 import ru.bardinpetr.itmo.lab_4.scenarios.interfaces.Scriptable;
@@ -29,7 +30,7 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
 
     private final WearAction wearAbility = new WearAction();
 
-    private final Scenario scenario = new Scenario();
+    private final Scenario scenario = new TextualScenario();
 
     public Human(String name, String patronymic, String surname) {
         super(name, patronymic, surname);
@@ -116,19 +117,21 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     }
 
     @Override
-    public IScenarioAction perform(Ability ability, IAbilityConfigurationRunnable conf) {
+    public IScenarioAction perform(Ability baseAbility, IAbilityConfigurationRunnable conf) {
         var ctx = new StoryContext();
+        var ability = baseAbility.clone();
+
         return new IScenarioAction() {
             @Override
             public String execute() {
-                var configured = (Ability) conf.configure(ability.clone(), ctx);
-                var result = configured.perform();
+                Ability configuredAbility = conf.configure(ability, ctx);
+                var result = configuredAbility.execute(Human.this);
                 return "%s сделал %s".formatted(getName(), result);
             }
 
             @Override
             public String describe() {
-                return ability.describe();
+                return conf.configure(ability, ctx).describe();
             }
         };
     }

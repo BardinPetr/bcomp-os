@@ -21,16 +21,20 @@ import ru.bardinpetr.itmo.lab_4.story.creatures.humans.professions.*;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.models.*;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.*;
 import ru.bardinpetr.itmo.lab_4.story.stories.ForestStory;
+import ru.bardinpetr.itmo.lab_4.story.stories.MainStory;
 import ru.bardinpetr.itmo.lab_4.story.things.places.House;
 import ru.bardinpetr.itmo.lab_4.story.things.tools.Weapon;
 
 public class App {
     public static void main(String[] args) {
-        var fs = new ForestStory();
-        fs.compile();
-        var a = fs.scenarioFindFood();
-        for(var i: a) System.out.println(i.print());
+        var story = new MainStory();
+        story.compile();
+        System.out.println(story.tell());
 
+//        var fs = new ForestStory();
+//        fs.compile();
+//        var a = fs.scenarioFindFood();
+//        for (var i : a) System.out.println(i.print());
 
 //        HumanGroup allGroup = new HumanGroup("Малыши");
 //        HumanGroup girlsGroup = new HumanGroup("Малышки");
@@ -159,7 +163,7 @@ public class App {
 //        neznaika.addAbility(new LookLikeAction());
 //        PhysicalObject parrot = new Animal("попугай");
 //
-//        Ability neznaikaWalk = new WalkAction();
+//        Ability neznaikaWalk = new GoAction();
 //        neznaika.addAbility(neznaikaWalk);
 //
 //        Ability createNebilitsa = new ThinkAction("сочинение небылиц");
@@ -180,8 +184,8 @@ public class App {
 //                        .newSentence()
 //                        .addIf(neznaika.performByType(WearAction.TYPE))
 //                        .addThen(neznaika.performByTypeWithOn(LookLikeAction.TYPE, null, parrot))
-//                        .addThen(neznaika.perform(WalkAction.class,
-//                                ((ability, ctx) -> ((WalkAction) ability)
+//                        .addThen(neznaika.perform(GoAction.class,
+//                                ((ability, ctx) -> ((GoAction) ability)
 //                                        .setPlace(city)
 //                                        .applyModifier(new TimeModifier("целыми днями"))))
 //                        )

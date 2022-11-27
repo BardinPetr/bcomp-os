@@ -2,7 +2,7 @@ package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.Scriptable;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.ScenarioFor;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryInvocationError;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryScenarioAnnotationError;
@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class ScenarioForProcessor {
-    public static void process(Story story) {
+    public static void process(SubStory story) {
         var sClass = story.getClass();
         for (var method : sClass.getDeclaredMethods()) {
 

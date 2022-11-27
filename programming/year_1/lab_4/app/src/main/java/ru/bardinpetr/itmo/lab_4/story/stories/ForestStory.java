@@ -5,12 +5,10 @@ import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.TextualScenario;
-import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.IScenarioAction;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.Able;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.ScenarioFor;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.StoryActor;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.StoryPlace;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryInject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.Thing;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
@@ -21,30 +19,28 @@ import ru.bardinpetr.itmo.lab_4.story.modifiers.models.Size;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.*;
 import ru.bardinpetr.itmo.lab_4.story.things.food.Eatable;
 import ru.bardinpetr.itmo.lab_4.story.things.food.Plant;
-import ru.bardinpetr.itmo.lab_4.story.things.places.House;
 
-public class ForestStory extends Story {
+public class ForestStory extends SubStory {
 
-    @StoryPlace
-    private final Place home = new House("домик", new double[]{1.2, 1.5}, 100);
-
-    @StoryPlace
     private final Place river = new Place("Река", new double[]{32.2, 234.2});
 
-    @StoryPlace
     private final Place forest = new Place("Лес", new double[]{1.3, 2.2});
 
-    @StoryActor
+    @StoryInject
     @Able(CreateAction.class)
     @Able(CrossObstacleAction.class)
     @Able(FindFoodAction.class)
     @Able(WantAction.class)
     @Able(TooledAbility.class)
     @Able(GoAction.class)
-    public final HumanGroup littleManGroup = new HumanGroup("коротышки");
+    public HumanGroup littleManGroup;
+
+    @StoryInject
+    private Place home;
 
 
     public ForestStory() {
+        super("forest story");
         forest.applyModifier(new PlaceModifier(PlaceModifier.PlaceRelation.IN_BEHIND, river));
     }
 

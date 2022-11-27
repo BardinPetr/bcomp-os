@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations;
+package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency;
 
 
 import java.lang.annotation.ElementType;
@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface StoryPlace {
+public @interface StoryInject {
 }

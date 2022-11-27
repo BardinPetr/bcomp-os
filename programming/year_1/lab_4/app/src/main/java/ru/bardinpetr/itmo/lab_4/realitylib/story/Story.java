@@ -4,10 +4,7 @@ import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.AbleProcessor;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.CreateScenarioProcessor;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.StoryInjectProcessor;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.StoryItemProviderProcessor;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors.*;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 
 import java.util.HashMap;
@@ -25,12 +22,6 @@ public abstract class Story {
 
     public Story(String storyName) {
         this.storyName = storyName;
-    }
-
-    public void compile() {
-        StoryItemProviderProcessor.process(this, this);
-        AbleProcessor.process(this);
-        CreateScenarioProcessor.process(this);
     }
 
     public String getStoryName() {
@@ -79,13 +70,6 @@ public abstract class Story {
         scenarios.put(internalName, other);
     }
 
-    public final void addSubStory(String internalName, Story story) {
-        subStories.put(internalName, story);
-        StoryItemProviderProcessor.process(this, story);
-        StoryInjectProcessor.process(this, story);
-        story.compile();
-    }
-
     public final Human getActor(String name) {
         return actors.get(name);
     }
@@ -104,6 +88,22 @@ public abstract class Story {
 
     public final Story getSubStory(String name) {
         return subStories.get(name);
+    }
+
+    // DI- and annotation- related:
+
+    public void compile() {
+        StoryItemProviderProcessor.process(this, this);
+        AbleProcessor.process(this);
+        SetupMethodProcessor.process(this);
+        CreateScenarioProcessor.process(this);
+    }
+
+    public final void addSubStory(String internalName, Story story) {
+        subStories.put(internalName, story);
+        StoryItemProviderProcessor.process(this, story);
+        StoryInjectProcessor.process(this, story);
+        story.compile();
     }
 
     public final Object getProvidedObject(String identifier, Class targetClass) {

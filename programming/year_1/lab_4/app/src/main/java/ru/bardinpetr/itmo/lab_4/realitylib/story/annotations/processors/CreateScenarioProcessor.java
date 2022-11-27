@@ -2,7 +2,7 @@ package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.CreateScenario;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.initialization.CreateScenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryScenarioAnnotationError;
 
 import java.lang.reflect.Field;

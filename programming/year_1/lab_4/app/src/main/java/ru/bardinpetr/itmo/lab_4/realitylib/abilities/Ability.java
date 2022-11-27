@@ -50,7 +50,7 @@ public abstract class Ability implements AlteringModifiable, Describable, Clonea
         sb.append(" ").append(getDescription());
 
         if(modifiers.size() > 0)
-            sb.append(" (свойства действия ").append(describeMods()).append(")");
+            sb.append(" (свойства действия: ").append(describeMods()).append(")");
 
         return sb.toString();
     }

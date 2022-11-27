@@ -27,8 +27,7 @@ import ru.bardinpetr.itmo.lab_4.story.things.tools.Weapon;
 
 public class App {
     public static void main(String[] args) {
-        var story = new MainStory();
-        story.compile();
+        var story = (new MainStory()).compile();
         System.out.println(story.tell());
 
 //        var fs = new ForestStory();

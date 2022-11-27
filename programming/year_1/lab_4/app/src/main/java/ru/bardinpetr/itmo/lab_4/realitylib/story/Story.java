@@ -28,25 +28,7 @@ public abstract class Story {
         return storyName;
     }
 
-    public String tell() {
-        var sb = new StringBuilder("(STORY): %s: \n".formatted(getStoryName()));
-
-        sb.append("\n(STORY): Окружение:\n");
-        describeMany(sb, environment);
-
-        sb.append("\n(STORY): Участники:\n");
-        describeMany(sb, actors);
-
-        sb.append("\n(STORY): Группы:\n");
-        describeMany(sb, groups);
-
-        sb.append("\n(STORY): Сценарии:\n");
-        describeMany(sb, scenarios);
-
-        return sb.toString();
-    }
-
-    private void describeMany(StringBuilder sb, Map data) {
+    static void describeMany(StringBuilder sb, Map data) {
         for (var i : data.values())
             sb
                     .append(">")
@@ -90,13 +72,34 @@ public abstract class Story {
         return subStories.get(name);
     }
 
+    public Map<String, Human> getActors() {
+        return actors;
+    }
+
+    public Map<String, HumanGroup> getGroups() {
+        return groups;
+    }
+
+    public Map<String, PhysicalObject> getEnvironment() {
+        return environment;
+    }
+
+    public Map<String, Scenario> getScenarios() {
+        return scenarios;
+    }
+
+    public Map<String, Story> getSubStories() {
+        return subStories;
+    }
+
     // DI- and annotation- related:
 
-    public void compile() {
+    public CompiledStory compile() {
         StoryItemProviderProcessor.process(this, this);
         AbleProcessor.process(this);
         SetupMethodProcessor.process(this);
         CreateScenarioProcessor.process(this);
+        return new CompiledStory(this);
     }
 
     public final void addSubStory(String internalName, Story story) {
@@ -114,5 +117,32 @@ public abstract class Story {
                 return targetClass.cast(val);
         }
         return null;
+    }
+
+    public static class CompiledStory {
+
+        private final Story story;
+
+        public CompiledStory(Story story) {
+            this.story = story;
+        }
+
+        public String tell() {
+            var sb = new StringBuilder("(STORY): %s: \n".formatted(story.getStoryName()));
+
+            sb.append("\n(STORY): Окружение:\n");
+            describeMany(sb, story.getEnvironment());
+
+            sb.append("\n(STORY): Участники:\n");
+            describeMany(sb, story.getActors());
+
+            sb.append("\n(STORY): Группы:\n");
+            describeMany(sb, story.getGroups());
+
+            sb.append("\n(STORY): Сценарии:\n");
+            describeMany(sb, story.getScenarios());
+
+            return sb.toString();
+        }
     }
 }

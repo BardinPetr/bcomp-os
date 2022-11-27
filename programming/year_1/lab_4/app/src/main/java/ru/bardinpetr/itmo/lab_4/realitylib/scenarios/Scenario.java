@@ -12,7 +12,7 @@ public abstract class Scenario {
     }
 
     public Scenario addIf(IScenarioAction action) {
-        return addIf(action.execute());
+        return addIf(action.describe());
     }
 
     public abstract Scenario addThen(LogicOperator operator, IScenarioAction action);
@@ -22,8 +22,6 @@ public abstract class Scenario {
     }
 
     public abstract Scenario addElse();
-
-    public abstract Scenario newSentence();
 
     public abstract void append(Scenario other);
 

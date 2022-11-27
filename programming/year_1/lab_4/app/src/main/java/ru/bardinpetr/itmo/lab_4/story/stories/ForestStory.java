@@ -78,16 +78,10 @@ public class ForestStory extends Story {
             }
         };
 
-        var test = littleManGroup.perform(
-                WantAction.class,
-                (ability, ctx) -> ((WantAction) ability)
-                        .setWantedAction((inside_ctx) -> "еда")
-        );
-
-
         // Scenario about forest
         var scenarioGoForest = new TextualScenario();
 
+        scenarioGoForest.newSentence();
         scenarioGoForest.addIf(littleManGroup.perform(
                 WantAction.class,
                 (ability, ctx) -> ((WantAction) ability)
@@ -120,11 +114,11 @@ public class ForestStory extends Story {
 
         scenarioGoForest.addThen(findFoodScenarioAction);
 
-        System.out.println(scenarioGoForest);
-        // Scenario of how it is hard
 
+        // Scenario of how it is hard
         var scenarioTakeFood = new TextualScenario();
 
+        scenarioTakeFood.newSentence();
         scenarioTakeFood.addIf(littleManGroup.perform(
                 WantAction.class,
                 (ability, ctx) -> ((WantAction) ability)

@@ -28,7 +28,9 @@ public class App {
     public static void main(String[] args) {
         var fs = new ForestStory();
         fs.compile();
-        fs.scenarioFindFood();
+        var a = fs.scenarioFindFood();
+        for(var i: a) System.out.println(i.print());
+
 
 //        HumanGroup allGroup = new HumanGroup("Малыши");
 //        HumanGroup girlsGroup = new HumanGroup("Малышки");

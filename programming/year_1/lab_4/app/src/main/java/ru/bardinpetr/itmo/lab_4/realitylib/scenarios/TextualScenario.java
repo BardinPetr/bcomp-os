@@ -29,7 +29,7 @@ public class TextualScenario extends Scenario {
         }
 
         String pre = partsCount == 0 ? "" : ", %s".formatted(operator);
-        scenario.append(" %s %s".formatted(pre, action.execute()));
+        scenario.append(" %s %s".formatted(pre, action.describe()));
 
         isIfSectionActive = false;
         partsCount++;

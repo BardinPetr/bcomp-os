@@ -23,21 +23,21 @@ public interface IPerforming extends IAble, Nameable {
 
     @Deprecated
     default IScenarioAction performByName(String name) {
-        return () -> "%s %s".formatted(getName(), getAbilityByName(name).perform());
+        return (ctx) -> "%s %s".formatted(getName(), getAbilityByName(name).perform());
     }
 
     @Deprecated
     default IScenarioAction performByType(String type) {
-        return () -> "%s %s".formatted(getName(), getAbility(type).perform());
+        return (ctx) -> "%s %s".formatted(getName(), getAbility(type).perform());
     }
 
     @Deprecated
     default IScenarioAction performByNameWithOn(String name, Tool tool, PhysicalObject object) {
-        return () -> "%s %s".formatted(getName(), getAbilityByName(name).performWithOn(tool, object));
+        return (ctx) -> "%s %s".formatted(getName(), getAbilityByName(name).performWithOn(tool, object));
     }
 
     @Deprecated
     default IScenarioAction performByTypeWithOn(String type, Tool tool, PhysicalObject object) {
-        return () -> "%s %s".formatted(getName(), getAbility(type).performWithOn(tool, object));
+        return (ctx) -> "%s %s".formatted(getName(), getAbility(type).performWithOn(tool, object));
     }
 }

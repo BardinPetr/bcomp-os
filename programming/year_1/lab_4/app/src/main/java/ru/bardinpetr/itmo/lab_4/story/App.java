@@ -28,6 +28,7 @@ public class App {
     public static void main(String[] args) {
         var fs = new ForestStory();
         fs.compile();
+        fs.scenarioFindFood();
 
 //        HumanGroup allGroup = new HumanGroup("Малыши");
 //        HumanGroup girlsGroup = new HumanGroup("Малышки");

@@ -1,14 +1,17 @@
 package ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers;
 
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 
 import java.util.Objects;
 
-public class PlaceModifier implements IModifier {
+public class PlaceModifier implements IAlteringModifier {
 
     private Place place;
     private PlaceRelation relation = null;
+
+    public PlaceModifier() {}
     public PlaceModifier(Place place) {
         this.place = place;
     }
@@ -24,6 +27,11 @@ public class PlaceModifier implements IModifier {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        place = (Place) value;
     }
 
     public PlaceRelation getRelation() {

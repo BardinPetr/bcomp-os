@@ -24,14 +24,14 @@ public interface AlteringModifiable extends Modifiable {
 
     default AlteringModifiable setModifier(Class modClass, Object modValue) throws ModifierNotEditableException {
         var mods = getModifierMapping();
-        if (!AlteringModifiable.class.isAssignableFrom(modClass))
+
+        if (!IAlteringModifier.class.isAssignableFrom(modClass))
             throw new ModifierNotEditableException(modClass);
 
         if (!mods.containsKey(modClass)) {
             getModifierMapping().put(modClass, InstantiationHelper.instantiateModifier(modClass));
-        } else {
-            ((IAlteringModifier) getModifier(modClass)).setValue(modValue);
         }
+        ((IAlteringModifier) getModifier(modClass)).setValue(modValue);
         return this;
     }
 

@@ -3,6 +3,7 @@ package ru.bardinpetr.itmo.lab_4.story.actions;
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.AbilityResult;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
+import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class GoAction extends Ability {
     }
 
     @Override
-    public AbilityResult execute(Human self) {
+    public AbilityResult execute(PhysicalObject self) {
         self.setPosition(place.getPosition());
         return new AbilityResult(describe());
     }

@@ -1,9 +1,7 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.abilities;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.AlteringModifiable;
-import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.tool.Tool;
@@ -42,13 +40,19 @@ public abstract class Ability implements AlteringModifiable, Describable, Clonea
         return "";
     }
 
-    public AbilityResult execute(Human self) {
+    public AbilityResult execute(PhysicalObject self) {
         return new AbilityResult("done");
     }
 
     @Override
-    public String describe() {
-        return "%s %s".formatted(getVerb(), getDescription());
+    public final String describe() {
+        var sb = new StringBuilder(getVerb());
+        sb.append(" ").append(getDescription());
+
+        if(modifiers.size() > 0)
+            sb.append(" (свойства действия ").append(describeMods()).append(")");
+
+        return sb.toString();
     }
 
     public String perform() {

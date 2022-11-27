@@ -12,7 +12,7 @@ public interface Modifiable {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < mods.size(); i++) {
             sb.append(mods.get(i).describe());
-            if (i != mods.size() - 1) sb.append(";; ");
+            if (i != mods.size() - 1) sb.append("; ");
         }
         return sb.toString();
     }

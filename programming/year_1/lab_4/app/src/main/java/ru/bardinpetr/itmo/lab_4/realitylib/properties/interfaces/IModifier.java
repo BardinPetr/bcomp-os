@@ -9,6 +9,6 @@ public interface IModifier extends Describable {
 
     @Override
     default String describe() {
-        return "%s: %s".formatted(getType(), getValue());
+        return getType() != null ? "%s: %s".formatted(getType(), getValue()) : "";
     }
 }

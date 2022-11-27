@@ -17,7 +17,10 @@ public class Story {
 
     public static void compile(Story story) {
         AbleProcessor.process(story);
-        ScenarioForProcessor.process(story);
+//        ScenarioForProcessor.process(story);
     }
 
+    public void compile() {
+        Story.compile(this);
+    }
 }

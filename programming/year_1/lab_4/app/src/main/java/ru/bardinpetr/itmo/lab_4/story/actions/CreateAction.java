@@ -18,7 +18,7 @@ public class CreateAction extends TargetedAbility {
     }
 
     @Override
-    public AbilityResult execute(Human self) {
+    public AbilityResult execute(PhysicalObject self) {
         return new AbilityResult("сделал %s".formatted(this.targetObject.getPhysicalObjectName()));
     }
 }

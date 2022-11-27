@@ -2,18 +2,13 @@ package ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans;
 
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
-import ru.bardinpetr.itmo.lab_4.story.actions.LiveAction;
-import ru.bardinpetr.itmo.lab_4.story.actions.WearAction;
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.errors.AbilityNotFoundException;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.Creature;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.interfaces.Friendable;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.interfaces.ICommonHumanAbilities;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.interfaces.IPerforming;
-import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.BrotherModifier;
-import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.FriendModifier;
-import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.HasModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
-import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.StoryContext;
+import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.ScenarioActionFactory;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.TextualScenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.IAbilityConfigurationRunnable;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.IScenarioAction;
@@ -21,6 +16,11 @@ import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.wear.Clothing;
+import ru.bardinpetr.itmo.lab_4.story.actions.LiveAction;
+import ru.bardinpetr.itmo.lab_4.story.actions.WearAction;
+import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.BrotherModifier;
+import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.FriendModifier;
+import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.HasModifier;
 
 import java.util.*;
 
@@ -55,21 +55,19 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     public String describe() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("%s\n* умеет: \n".formatted(getFullName()));
-        var abilities = getAbilities();
-        for (int i = 0; i < abilities.size(); i++)
-            sb.append("%s\n".formatted(abilities.get(i).describe()));
+        sb.append("####\n%s\n* имеет способности: \n".formatted(getFullName()));
+        for (var i : getPureAbilities())
+            sb.append("%s, ".formatted(i.getSimpleName()));
+
+        sb.append("\n* обычно делает: \n");
+        for (var i : getAbilities())
+            sb.append("-*%s\n".formatted(i.describe()));
 
         if (getModifiers().size() > 0) {
-            sb.append("* обладает свойствами: \n");
-            sb.append(describeMods());
-            sb.append("\n");
-        }
-
-        String scenario = getScenario();
-        if (!scenario.equals("")) {
-            sb.append("* имеет следующий сценарий: \n");
-            sb.append(getScenario());
+            sb
+                    .append("* обладает свойствами: \n")
+                    .append(describeMods())
+                    .append("\n");
         }
 
         sb.append("\n\n");
@@ -118,22 +116,9 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
 
     @Override
     public IScenarioAction perform(Ability baseAbility, IAbilityConfigurationRunnable conf) {
-        var ctx = new StoryContext();
-        var ability = baseAbility.clone();
-
-        return new IScenarioAction() {
-            @Override
-            public String execute() {
-                Ability configuredAbility = conf.configure(ability, ctx);
-                var result = configuredAbility.execute(Human.this);
-                return "%s сделал %s".formatted(getName(), result);
-            }
-
-            @Override
-            public String describe() {
-                return conf.configure(ability, ctx).describe();
-            }
-        };
+        return ScenarioActionFactory.getInstance().newScenarioAction(
+                this, baseAbility.clone(), conf
+        );
     }
 
     @Override

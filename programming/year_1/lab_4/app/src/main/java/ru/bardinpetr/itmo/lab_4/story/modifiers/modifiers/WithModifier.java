@@ -16,6 +16,8 @@ public class WithModifier implements IAlteringModifier {
         this.other = other;
     }
 
+    public WithModifier() {}
+
     @Override
     public String getValue() {
         return other.describe();

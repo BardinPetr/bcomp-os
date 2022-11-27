@@ -7,7 +7,7 @@ import ru.bardinpetr.itmo.lab_4.story.things.food.Eatable;
 
 public class FindFoodAction extends Ability {
 
-    private Eatable[] foodTypes;
+    private Eatable[] foodTypes = new Eatable[]{};
 
     @Override
     protected String getVerb() {
@@ -17,7 +17,7 @@ public class FindFoodAction extends Ability {
     @Override
     protected String getDescription() {
         var builder = new StringBuilder("следующих видов: ");
-        for (var i : foodTypes) builder.append("%s, ".formatted(i));
+        for (var i : foodTypes) builder.append("%s, ".formatted(i.describe()));
         return builder.toString();
     }
 

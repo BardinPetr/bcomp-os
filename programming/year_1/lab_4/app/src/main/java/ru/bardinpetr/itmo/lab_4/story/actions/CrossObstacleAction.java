@@ -49,15 +49,15 @@ public class CrossObstacleAction extends TargetedAbility {
     }
 
     @Override
-    public AbilityResult execute(Human self) {
+    public AbilityResult execute(PhysicalObject self) {
         self.setPosition(this.targetObject.getPosition());
         return new AbilityResult(describe());
     }
 
     public enum CrossType {
-        VIA_GROUD("перебираться"),
-        VIA_WATER("переплывать"),
-        VIA_AIR("перелетать");
+        VIA_GROUD("бираться"),
+        VIA_WATER("плывать"),
+        VIA_AIR("летать");
 
         private final String text;
 

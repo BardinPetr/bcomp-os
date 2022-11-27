@@ -24,7 +24,7 @@ public class Place extends PhysicalObject {
 
     @Override
     public String describe() {
-        return "%s (at %.3f %.3f)".formatted(getName(), getCoordinates()[0], getCoordinates()[1]);
+        return "%s (at %.3f %.3f)".formatted(super.describe(), getCoordinates()[0], getCoordinates()[1]);
     }
 
     @Override

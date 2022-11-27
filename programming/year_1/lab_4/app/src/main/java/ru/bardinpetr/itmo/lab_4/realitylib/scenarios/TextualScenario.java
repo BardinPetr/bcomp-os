@@ -10,6 +10,13 @@ public class TextualScenario extends Scenario {
     private int partsCount = 0;
     private boolean isIfSectionActive = true;
 
+    public TextualScenario(String name) {
+        setName(name);
+    }
+
+    public TextualScenario() {
+    }
+
     public TextualScenario addIf(LogicOperator operator, String text) {
         if (sentenceCount == 0 || !isIfSectionActive) return this;
 

@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations;
+package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.abilities;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

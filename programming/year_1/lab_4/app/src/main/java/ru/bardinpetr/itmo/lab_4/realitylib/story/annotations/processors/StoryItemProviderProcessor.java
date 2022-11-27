@@ -3,7 +3,7 @@ package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryProvide;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryAnnotationError;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryDIError;
@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 
 public class StoryItemProviderProcessor {
 
-    public static void process(SubStory main, SubStory sub) {
+    public static void process(Story main, Story sub) {
         Class subClass = sub.getClass();
 
         for (Field field : subClass.getDeclaredFields()) {
@@ -40,8 +40,8 @@ public class StoryItemProviderProcessor {
                 main.addGroup(fieldName, (HumanGroup) data);
             } else if (Scenario.class.isAssignableFrom(target)) {
                 main.addScenario(fieldName, (Scenario) data);
-            } else if (SubStory.class == target) {
-                main.addSubStory(fieldName, (SubStory) data);
+            } else if (Story.class == target) {
+                main.addSubStory(fieldName, (Story) data);
             } else if (PhysicalObject.class.isAssignableFrom(target)) {
                 main.addEnvironment(fieldName, (PhysicalObject) data);
             } else {

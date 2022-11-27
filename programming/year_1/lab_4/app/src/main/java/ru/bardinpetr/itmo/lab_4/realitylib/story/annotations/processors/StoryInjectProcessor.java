@@ -1,6 +1,6 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.processors;
 
-import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryInject;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryAnnotationError;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.errors.StoryDIError;
@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 
 public class StoryInjectProcessor {
 
-    public static void process(SubStory main, SubStory target) {
+    public static void process(Story main, Story target) {
         for (Field field : target.getClass().getDeclaredFields()) {
             if (!field.isAnnotationPresent(StoryInject.class)) continue;
 

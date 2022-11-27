@@ -69,7 +69,7 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
     public String describe() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("####\nГруппа %s:\n".formatted(getName()));
+        sb.append("Группа %s:\n".formatted(getName()));
 
         sb.append("* представители:\n");
         for (Human human : group)
@@ -83,7 +83,6 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
         for (var i : getAbilities())
             sb.append("-* %s\n".formatted(i.describe()));
 
-        sb.append("\n\n");
         return sb.toString();
     }
 

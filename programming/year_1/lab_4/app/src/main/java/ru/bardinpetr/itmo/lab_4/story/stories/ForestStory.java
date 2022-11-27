@@ -1,13 +1,12 @@
 package ru.bardinpetr.itmo.lab_4.story.stories;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TooledAbility;
-import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.Human;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.humans.HumanGroup;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.Scenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.TextualScenario;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.SubStory;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.Able;
-import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.ScenarioFor;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.Story;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.abilities.Able;
+import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.CreateScenario;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryInject;
 import ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.dependency.StoryProvide;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
@@ -21,13 +20,24 @@ import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.*;
 import ru.bardinpetr.itmo.lab_4.story.things.food.Eatable;
 import ru.bardinpetr.itmo.lab_4.story.things.food.Plant;
 
-public class ForestStory extends SubStory {
+public class ForestStory extends Story {
 
     @StoryProvide
     private final Place river = new Place("Река", new double[]{32.2, 234.2});
 
     @StoryProvide
     private final Place forest = new Place("Лес", new double[]{1.3, 2.2});
+
+    @StoryProvide
+    private final Thing bark = new Thing("березовая кора");
+
+    @StoryProvide
+    private final Tool boat = new Tool("лодка") {
+        @Override
+        public String apply(PhysicalObject target) {
+            return "двигаться на %s по %s".formatted(getPhysicalObjectName(), target.describe());
+        }
+    };
 
     @StoryInject
     @Able(CreateAction.class)
@@ -36,10 +46,13 @@ public class ForestStory extends SubStory {
     @Able(WantAction.class)
     @Able(TooledAbility.class)
     @Able(GoAction.class)
-    public HumanGroup littleManGroup;
+    private HumanGroup littleManGroup;
 
     @StoryInject
     private Place home;
+
+    @StoryProvide
+    private final Scenario scenarioFindFood = new TextualScenario("find food scenario");
 
 
     public ForestStory() {
@@ -47,19 +60,10 @@ public class ForestStory extends SubStory {
         forest.applyModifier(new PlaceModifier(PlaceModifier.PlaceRelation.IN_BEHIND, river));
     }
 
-    @ScenarioFor("littleManGroup")
-    public Scenario[] scenarioFindFood() {
+    @CreateScenario
+    private void scenarioFindFood(Scenario scenario) {
         // Boat
-        Thing bark = new Thing("березовая кора");
-        Tool boat = new Tool("лодка") {
-            @Override
-            public String apply(PhysicalObject target) {
-                return "двигаться на %s по %s".formatted(getPhysicalObjectName(), target.describe());
-            }
-        };
         boat.setModifier(MaterialModifier.class, bark);
-
-        Human h = new Human("a");
 
         // Food
         var berries = new Plant("ягоды");
@@ -77,22 +81,19 @@ public class ForestStory extends SubStory {
             }
         };
 
-        // Scenario about forest
-        var scenarioGoForest = new TextualScenario();
-
-        scenarioGoForest.newSentence();
-        scenarioGoForest.addIf(littleManGroup.perform(
+        scenario.newSentence();
+        scenario.addIf(littleManGroup.perform(
                 WantAction.class,
                 (ability, ctx) -> ((WantAction) ability)
                         .setWantedAction((inside_ctx) -> "еда")
         ));
 
-        scenarioGoForest.addThen(littleManGroup.perform(
+        scenario.addThen(littleManGroup.perform(
                 CreateAction.class,
                 (ability, ctx) -> ((CreateAction) ability).setTargetObject(boat)
         ));
 
-        scenarioGoForest.addThen(littleManGroup.perform(
+        scenario.addThen(littleManGroup.perform(
                 CrossObstacleAction.class,
                 (ability, ctx) -> ((CrossObstacleAction) ability)
                         .setMoveType(CrossObstacleAction.CrossType.VIA_WATER)
@@ -111,68 +112,70 @@ public class ForestStory extends SubStory {
                         ))
         );
 
-        scenarioGoForest.addThen(findFoodScenarioAction);
+        scenario.addThen(findFoodScenarioAction);
+    }
 
-
-        // Scenario of how it is hard
-        var scenarioTakeFood = new TextualScenario();
-
-        scenarioTakeFood.newSentence();
-        scenarioTakeFood.addIf(littleManGroup.perform(
-                WantAction.class,
-                (ability, ctx) -> ((WantAction) ability)
-                        .setWantedAction(findFoodScenarioAction)
-        ));
-
-        scenarioTakeFood.addThen(littleManGroup.perform(
-                GoAction.class,
-                (ability, ctx) -> ((GoAction) ability)
-                        .setPlace(bush)
-                        .setModifier(WithModifier.class, saw)
-        ));
-
-        scenarioTakeFood.addThen(littleManGroup.perform(
-                TooledAbility.class,
-                (ability, ctx) -> ((TooledAbility) ability)
-                        .setTool(saw)
-                        .setTargetObject(nuts)
-                        .applyModifier(new ActivityReasonModifier(
-                                Size.SMALL
-                        ))
-        ));
-
-        scenarioTakeFood.addThen(littleManGroup.perform(
-                TooledAbility.class,
-                (ability, ctx) -> ((TooledAbility) ability)
-                        .setTool(saw)
-                        .setTargetObject(mushrooms)
-                        .applyModifier(
-                                new PlaceModifier(
-                                        PlaceModifier.PlaceRelation.OVER,
-                                        mushrooms.getRoot().asPlace()
-                                )
-                        )
-        ));
-
-        scenarioTakeFood.addThen(littleManGroup.perform(
-                TooledAbility.class,
-                (ability, ctx) -> ((TooledAbility) ability)
-                        .setTool(saw)
-                        .setTargetObject(mushrooms)
-                        .applyModifier(new GoalModifier("разрезать на части"))
-        ));
-
-        scenarioTakeFood.addThen(littleManGroup.perform(
-                GoAction.class,
-                (ability, ctx) -> ((GoAction) ability)
-                        .setPlace(home)
-                        .applyModifier(new WithModifier(mushrooms))
-        ));
-
-
+    public Scenario[] scenarioFindFood0() {
+//
+//        // Scenario of how it is hard
+//        var scenarioTakeFood = new TextualScenario();
+//
+//        scenarioTakeFood.newSentence();
+//        scenarioTakeFood.addIf(littleManGroup.perform(
+//                WantAction.class,
+//                (ability, ctx) -> ((WantAction) ability)
+//                        .setWantedAction(scenario)
+//        ));
+//
+//        scenarioTakeFood.addThen(littleManGroup.perform(
+//                GoAction.class,
+//                (ability, ctx) -> ((GoAction) ability)
+//                        .setPlace(bush)
+//                        .setModifier(WithModifier.class, saw)
+//        ));
+//
+//        scenarioTakeFood.addThen(littleManGroup.perform(
+//                TooledAbility.class,
+//                (ability, ctx) -> ((TooledAbility) ability)
+//                        .setTool(saw)
+//                        .setTargetObject(nuts)
+//                        .applyModifier(new ActivityReasonModifier(
+//                                Size.SMALL
+//                        ))
+//        ));
+//
+//        scenarioTakeFood.addThen(littleManGroup.perform(
+//                TooledAbility.class,
+//                (ability, ctx) -> ((TooledAbility) ability)
+//                        .setTool(saw)
+//                        .setTargetObject(mushrooms)
+//                        .applyModifier(
+//                                new PlaceModifier(
+//                                        PlaceModifier.PlaceRelation.OVER,
+//                                        mushrooms.getRoot().asPlace()
+//                                )
+//                        )
+//        ));
+//
+//        scenarioTakeFood.addThen(littleManGroup.perform(
+//                TooledAbility.class,
+//                (ability, ctx) -> ((TooledAbility) ability)
+//                        .setTool(saw)
+//                        .setTargetObject(mushrooms)
+//                        .applyModifier(new GoalModifier("разрезать на части"))
+//        ));
+//
+//        scenarioTakeFood.addThen(littleManGroup.perform(
+//                GoAction.class,
+//                (ability, ctx) -> ((GoAction) ability)
+//                        .setPlace(home)
+//                        .applyModifier(new WithModifier(mushrooms))
+//        ));
+//
+//
         return new Scenario[]{
-                scenarioGoForest,
-                scenarioTakeFood
+//                scenarioGoForest,
+//                scenarioTakeFood
         };
     }
 }

@@ -10,7 +10,7 @@ public class StoryScenarioAnnotationError extends Error {
     }
 
     public StoryScenarioAnnotationError(Method annotatedMethod, String info) {
-        super(("Failed to process \"%s\" scenario generator with @ScenarioFor annotation %s. " +
+        super(("Failed to process \"%s\" scenario generator with @CreateScenario annotation %s. " +
                 "Annotations in Story are important, " +
                 "running without processing them would cause many unfixable fails later")
                 .formatted(info, annotatedMethod.getName()));

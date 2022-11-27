@@ -55,7 +55,7 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     public String describe() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("####\n%s\n* имеет способности: \n".formatted(getFullName()));
+        sb.append("Человек %s\n* имеет способности: \n".formatted(getFullName()));
         for (var i : getPureAbilities())
             sb.append("%s, ".formatted(i.getSimpleName()));
 
@@ -70,7 +70,6 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
                     .append("\n");
         }
 
-        sb.append("\n\n");
         return sb.toString();
     }
 

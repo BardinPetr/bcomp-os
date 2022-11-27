@@ -1,7 +1,6 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.scenarios;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
-import ru.bardinpetr.itmo.lab_4.realitylib.creatures.interfaces.NameSettable;
 import ru.bardinpetr.itmo.lab_4.realitylib.creatures.interfaces.Nameable;
 import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.IScenarioAction;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.models.LogicOperator;
@@ -40,6 +39,10 @@ public abstract class Scenario implements Describable, Nameable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Scenario newSentence() {
+        return this;
     }
 
     @Override

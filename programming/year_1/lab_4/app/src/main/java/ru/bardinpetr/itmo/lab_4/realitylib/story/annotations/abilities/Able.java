@@ -1,6 +1,5 @@
-package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations;
+package ru.bardinpetr.itmo.lab_4.realitylib.story.annotations.abilities;
 
-import javax.annotation.processing.SupportedAnnotationTypes;
 import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)

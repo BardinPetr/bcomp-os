@@ -9,7 +9,7 @@ public class WithModifier implements IAlteringModifier {
     private PhysicalObject other;
 
     public String getType() {
-        return "вместе с";
+        return "с";
     }
 
     public WithModifier(PhysicalObject other) {

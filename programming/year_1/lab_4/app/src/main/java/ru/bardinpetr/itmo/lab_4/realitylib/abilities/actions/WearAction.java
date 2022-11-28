@@ -22,8 +22,9 @@ public class WearAction extends Ability implements Cloneable {
         this.wearing = wearing;
     }
 
-    public void putOn(Clothing clothing) {
+    public WearAction putOn(Clothing clothing) {
         wearing.add(clothing);
+        return this;
     }
 
     @Override

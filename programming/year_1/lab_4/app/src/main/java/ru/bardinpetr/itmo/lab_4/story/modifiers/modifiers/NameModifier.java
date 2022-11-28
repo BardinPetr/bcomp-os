@@ -1,15 +1,19 @@
 package ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers;
 
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 
 import java.util.Objects;
 
-public class NameModifier implements IModifier {
+public class NameModifier implements IAlteringModifier {
 
-    private final String name;
+    private String name;
 
     public NameModifier(String name) {
         this.name = name;
+    }
+
+    public NameModifier() {
     }
 
     @Override
@@ -20,6 +24,11 @@ public class NameModifier implements IModifier {
     @Override
     public String getValue() {
         return name;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        name = (String) value;
     }
 
     @Override

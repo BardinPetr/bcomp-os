@@ -1,7 +1,7 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.things.wear;
 
 public enum WearType {
-    MEDICAL_GOWN("халат"), CAP("колпак"), HAT("шляпа"), TROUSERS("штаны"), SHIRT("рубашка"), TIE("галстук");
+    GLASSES("очки"),SUIT("костюм"), MEDICAL_GOWN("халат"), CAP("колпак"), HAT("шляпа"), TROUSERS("штаны"), SHIRT("рубашка"), TIE("галстук");
 
     private final String text;
 

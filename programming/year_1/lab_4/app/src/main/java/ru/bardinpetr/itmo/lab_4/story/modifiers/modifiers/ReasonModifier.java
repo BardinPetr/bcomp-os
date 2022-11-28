@@ -6,7 +6,7 @@ import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
 import java.util.Objects;
 
 public class ReasonModifier implements IModifier {
-    private IModifier modifier;
+    private IModifier modifier = null;
 
     private Describable reason;
 
@@ -20,6 +20,10 @@ public class ReasonModifier implements IModifier {
         this.reason = reason;
     }
 
+    public ReasonModifier(Describable reason) {
+        this.reason = reason;
+    }
+
     @Override
     public String getType() {
         return "по причине";
@@ -27,7 +31,8 @@ public class ReasonModifier implements IModifier {
 
     @Override
     public String getValue() {
-        return "\"%s\" имелись свойства: (%s)".formatted(getReason(), modifier.describe());
+        return "\"%s\"%s".formatted(getReason(),
+                modifier == null ? "" : "имелись свойства: (%s)".formatted(modifier.describe()));
     }
 
     public String getReason() {

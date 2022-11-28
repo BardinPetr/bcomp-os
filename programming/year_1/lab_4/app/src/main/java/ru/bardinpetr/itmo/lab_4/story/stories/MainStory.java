@@ -47,6 +47,8 @@ public class MainStory extends Story {
     @StoryProvide
     private final Human neznaika = new Human("Незнайка");
     @StoryProvide
+    private final Human znaika = new Human("Знайка");
+    @StoryProvide
     private final Human gunka = new Human("Гунька");
     @StoryProvide
     private final ProfessionHuman guslya = new Musician("Гусля");
@@ -80,6 +82,9 @@ public class MainStory extends Story {
 
     @StoryProvide
     private final Story inCityStory = new CityStory();
+
+    @StoryProvide
+    private final Story znaikaStory = new ZnaikaStory();
 
     public MainStory() {
         super("MAIN");

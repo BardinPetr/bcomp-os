@@ -12,7 +12,7 @@ public abstract class ProfessionHuman extends Human implements Professionable {
     public ProfessionHuman(String name, String patronymic, String surname, Ability professionalAbility) {
         super(name, patronymic, surname);
         this.professionalAbility = professionalAbility;
-        addAbility(this.professionalAbility);
+        addAbility("profession", this.professionalAbility);
     }
 
     public ProfessionHuman(String name, Ability professionalAbility) {

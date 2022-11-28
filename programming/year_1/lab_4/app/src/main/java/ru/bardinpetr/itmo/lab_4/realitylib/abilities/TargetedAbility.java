@@ -18,6 +18,11 @@ public abstract class TargetedAbility extends Ability {
     }
 
     @Override
+    protected String getDescription() {
+        return "%s %s".formatted(getObjectPreposition(), targetObject.getPhysicalObjectName());
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

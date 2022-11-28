@@ -5,13 +5,18 @@ import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
 import java.util.Objects;
 
 public class SayAction extends Ability {
-    public static final String TYPE = "говорить";
-
-    private final String text;
+    private String text = "";
 
     public SayAction(String text) {
-        super(TYPE);
         this.text = text;
+    }
+
+    public SayAction() {
+    }
+
+    public SayAction setText(String text) {
+        this.text = text;
+        return this;
     }
 
     @Override

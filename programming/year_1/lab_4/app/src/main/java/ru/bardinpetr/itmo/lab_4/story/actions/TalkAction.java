@@ -1,12 +1,10 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
 
-public class TalkAction extends Ability {
-    public static final String TYPE = "болтать";
-
+public class TalkAction extends TargetedAbility {
     public TalkAction() {
-        super(TYPE);
     }
 
     @Override

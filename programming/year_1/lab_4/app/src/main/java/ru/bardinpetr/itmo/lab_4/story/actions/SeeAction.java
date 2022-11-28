@@ -1,12 +1,9 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
-import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
 
-public class SeeAction extends Ability {
-    public static final String TYPE = "видеть";
-
+public class SeeAction extends TargetedAbility {
     public SeeAction() {
-        super(TYPE);
     }
 
     @Override

@@ -14,8 +14,8 @@ import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.wear.Clothing;
-import ru.bardinpetr.itmo.lab_4.story.actions.LiveAction;
-import ru.bardinpetr.itmo.lab_4.story.actions.WearAction;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions.LiveAction;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions.WearAction;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
 
     private final List<Human> group = new ArrayList<>();
     private final String name;
-    private final boolean applied = false;
+    private boolean applied = false;
     private Scenario globalScenario = null;
 
 
@@ -39,10 +39,12 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
     }
 
     public void add(Human human) {
-        group.add(human);
+        if (!applied)
+            group.add(human);
     }
 
     public void apply() {
+        applied = true;
         for (Human human : group) {
             for (Class ability : getPureAbilities()) {
                 try {
@@ -50,15 +52,15 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
                 } catch (AbilityExistsException ignored) {
                 }
             }
-            for (String name : getModifiedAbilities().keySet()) {
+            for (String ability : getModifiedAbilities().keySet()) {
                 try {
-                    human.addAbility(name, getAbilityByName(name));
+                    human.overrideAbility(ability, getAbilityByName(ability));
                 } catch (AbilityExistsException ignored) {
                 }
             }
-            for (IModifier name : getModifiers()) {
+            for (IModifier mod : getModifiers()) {
                 try {
-                    human.applyModifier(name);
+                    human.setModifier(mod.getClass(), mod);
                 } catch (AbilityExistsException ignored) {
                 }
             }
@@ -75,7 +77,7 @@ public class HumanGroup extends PhysicalObject implements ICommonHumanAbilities,
         for (Human human : group)
             sb.append("%s, ".formatted(human.getFullName()));
 
-        sb.append("* групповые способности: \n");
+        sb.append("\n* групповые способности: \n");
         for (var i : getPureAbilities())
             sb.append("%s, ".formatted(i.getSimpleName()));
 

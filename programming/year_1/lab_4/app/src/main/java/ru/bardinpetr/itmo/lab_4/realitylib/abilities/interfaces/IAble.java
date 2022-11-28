@@ -49,6 +49,11 @@ public interface IAble {
             throw new AbilityExistsException(name, res);
     }
 
+    default void overrideAbility(String name, Ability ability) throws AbilityExistsException {
+        getModifiedAbilities().put(name, ability);
+    }
+
+
     /**
      * Returns all named abilities
      *
@@ -71,7 +76,7 @@ public interface IAble {
      *             Name in Ability object is Deprecated and not used here
      * @return found ability if exists
      */
-    default Ability getAbilityByName(String name) {
+    default Ability getAbilityByName(String name) throws AbilityNotFoundException {
         Ability res = getModifiedAbilities().get(name);
         if (res == null)
             throw new AbilityNotFoundException(AbilityNotFoundException.SearchType.NAME, name);

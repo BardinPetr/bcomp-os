@@ -5,13 +5,22 @@ import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
 import java.util.Objects;
 
 public class TurnAction extends Ability {
-    public static final String TYPE = "поворачивать";
-
-    private final String dir;
+    private String dir;
 
     public TurnAction(String dir) {
-        super(TYPE);
         this.dir = dir;
+    }
+
+    public TurnAction() {
+    }
+
+    public String getDir() {
+        return dir;
+    }
+
+    public TurnAction setDir(String dir) {
+        this.dir = dir;
+        return this;
     }
 
     @Override

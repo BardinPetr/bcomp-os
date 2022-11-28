@@ -1,11 +1,11 @@
-package ru.bardinpetr.itmo.lab_4.story.actions;
+package ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 
 import java.util.Objects;
 
-public class LiveAction extends Ability {
+public class LiveAction extends Ability implements Cloneable {
     public static final String TYPE = "LIVE";
     private Place place;
 
@@ -21,7 +21,7 @@ public class LiveAction extends Ability {
 
     @Override
     public String getDescription() {
-        return "в %s".formatted(place.getName());
+        return place == null ? null : "в %s".formatted(place.getName());
     }
 
     public Place getPlace() {
@@ -51,5 +51,12 @@ public class LiveAction extends Ability {
     @Override
     public String toString() {
         return "LiveAction{place=%s} %s".formatted(place, super.toString());
+    }
+
+    @Override
+    public Ability clone() {
+        LiveAction clone = (LiveAction) super.clone();
+        clone.setPlace(place);
+        return clone;
     }
 }

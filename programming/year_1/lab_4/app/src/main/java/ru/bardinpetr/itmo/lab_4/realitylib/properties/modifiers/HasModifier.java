@@ -1,15 +1,18 @@
-package ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers;
+package ru.bardinpetr.itmo.lab_4.realitylib.properties.modifiers;
 
-import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IAlteringModifier;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 
 import java.util.Objects;
 
-public class HasModifier implements IModifier {
-    private final PhysicalObject thing;
+public class HasModifier implements IAlteringModifier {
+    private PhysicalObject thing;
 
     public HasModifier(PhysicalObject thing) {
         this.thing = thing;
+    }
+
+    public HasModifier() {
     }
 
     public String getType() {
@@ -18,7 +21,16 @@ public class HasModifier implements IModifier {
 
     @Override
     public String getValue() {
-        return thing.describe();
+        return thing != null ? thing.describe() : "";
+    }
+
+    @Override
+    public void setValue(Object value) {
+        this.thing = (PhysicalObject) value;
+    }
+
+    public void setThing(PhysicalObject thing) {
+        this.thing = thing;
     }
 
     @Override

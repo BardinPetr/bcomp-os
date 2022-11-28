@@ -6,12 +6,22 @@ import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 import java.util.Objects;
 
 public class HideAction extends Ability {
-    public static final String TYPE = "прятаться";
-    private final Place place;
+    private Place place;
 
     public HideAction(Place place) {
-        super(TYPE);
         this.place = place;
+    }
+
+    public HideAction() {
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public HideAction setPlace(Place place) {
+        this.place = place;
+        return this;
     }
 
     @Override

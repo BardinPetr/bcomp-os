@@ -1,12 +1,11 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
 
-public class LookLikeAction extends Ability {
-    public static final String TYPE = "выглядеть";
-
+public class LookLikeAction extends TargetedAbility {
     public LookLikeAction() {
-        super(TYPE);
+
     }
 
     @Override

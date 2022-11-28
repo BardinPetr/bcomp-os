@@ -1,4 +1,4 @@
-package ru.bardinpetr.itmo.lab_4.story.actions;
+package ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.wear.Clothing;
@@ -7,13 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class WearAction extends Ability {
-    public static final String TYPE = "wear";
-
-    private final List<Clothing> wearing = new ArrayList<>();
+public class WearAction extends Ability implements Cloneable {
+    private List<Clothing> wearing;
 
     public WearAction() {
-        super(TYPE);
+        wearing = new ArrayList<>();
+    }
+
+    public WearAction(List<Clothing> wearing) {
+        this.wearing = wearing;
+    }
+
+    public void setWearing(List<Clothing> wearing) {
+        this.wearing = wearing;
     }
 
     public void putOn(Clothing clothing) {
@@ -56,5 +62,12 @@ public class WearAction extends Ability {
     @Override
     public String toString() {
         return "WearAction{wearing=%s} %s".formatted(wearing, super.toString());
+    }
+
+    @Override
+    public Ability clone() {
+        WearAction clone = (WearAction) super.clone();
+        clone.setWearing(List.copyOf(this.wearing));
+        return clone;
     }
 }

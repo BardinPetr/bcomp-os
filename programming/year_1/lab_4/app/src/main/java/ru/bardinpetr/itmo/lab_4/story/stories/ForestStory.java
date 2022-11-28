@@ -77,10 +77,10 @@ public class ForestStory extends Story {
     @Able(WantAction.class)
     @Able(TooledAbility.class)
     @Able(GoAction.class)
-    private HumanGroup littleManGroup;
+    private HumanGroup allLittleManGroup;
 
     @StoryInject
-    private Place home;
+    private Place house;
 
 
     // Classic
@@ -110,18 +110,18 @@ public class ForestStory extends Story {
     private void scenarioFindFood(Scenario scenario) {
         // Bush
         scenario.newSentence();
-        scenario.addIf(littleManGroup.perform(
+        scenario.addIf(allLittleManGroup.perform(
                 WantAction.class,
                 (ability, ctx) -> ((WantAction) ability)
                         .setWantedAction((inside_ctx) -> "еда")
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 CreateAction.class,
                 (ability, ctx) -> ((CreateAction) ability).setTargetObject(boat)
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 CrossObstacleAction.class,
                 (ability, ctx) -> ((CrossObstacleAction) ability)
                         .setMoveType(CrossObstacleAction.CrossType.VIA_WATER)
@@ -129,7 +129,7 @@ public class ForestStory extends Story {
                         .setTool(boat)
         ));
 
-        findFoodScenarioAction = littleManGroup.perform(
+        findFoodScenarioAction = allLittleManGroup.perform(
                 FindFoodAction.class,
                 (ability, ctx) -> ((FindFoodAction) ability)
                         .setFoodTypes(new Eatable[]{berries, mushrooms, nuts})
@@ -146,20 +146,20 @@ public class ForestStory extends Story {
     @CreateScenario
     private void scenarioGetFood(Scenario scenario) {
         scenario.newSentence();
-        scenario.addIf(littleManGroup.perform(
+        scenario.addIf(allLittleManGroup.perform(
                 WantAction.class,
                 (ability, ctx) -> ((WantAction) ability)
                         .setWantedAction(findFoodScenarioAction)
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 GoAction.class,
                 (ability, ctx) -> ((GoAction) ability)
                         .setPlace(bush)
                         .setModifier(WithModifier.class, saw)
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 TooledAbility.class,
                 (ability, ctx) -> ((TooledAbility) ability)
                         .setTool(saw)
@@ -169,7 +169,7 @@ public class ForestStory extends Story {
                         ))
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 TooledAbility.class,
                 (ability, ctx) -> ((TooledAbility) ability)
                         .setTool(saw)
@@ -182,7 +182,7 @@ public class ForestStory extends Story {
                         )
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 TooledAbility.class,
                 (ability, ctx) -> ((TooledAbility) ability)
                         .setTool(saw)
@@ -190,10 +190,10 @@ public class ForestStory extends Story {
                         .applyModifier(new GoalModifier("разрезать на части"))
         ));
 
-        scenario.addThen(littleManGroup.perform(
+        scenario.addThen(allLittleManGroup.perform(
                 GoAction.class,
                 (ability, ctx) -> ((GoAction) ability)
-                        .setPlace(home)
+                        .setPlace(house)
                         .applyModifier(new WithModifier(mushrooms))
         ));
     }

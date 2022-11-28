@@ -16,11 +16,11 @@ import ru.bardinpetr.itmo.lab_4.realitylib.scenarios.interfaces.Scriptable;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.place.Place;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.wear.Clothing;
-import ru.bardinpetr.itmo.lab_4.story.actions.LiveAction;
-import ru.bardinpetr.itmo.lab_4.story.actions.WearAction;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions.LiveAction;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions.WearAction;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.BrotherModifier;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.FriendModifier;
-import ru.bardinpetr.itmo.lab_4.story.modifiers.modifiers.HasModifier;
+import ru.bardinpetr.itmo.lab_4.realitylib.properties.modifiers.HasModifier;
 
 import java.util.*;
 
@@ -28,12 +28,11 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
     private final Map<String, Ability> namedAbilities = new HashMap<>();
     private final Set<Class> pureAbilities = new HashSet<>();
 
-    private final WearAction wearAbility = new WearAction();
-
     private final Scenario scenario = new TextualScenario();
 
     public Human(String name, String patronymic, String surname) {
         super(name, patronymic, surname);
+        addAbility("wear", new WearAction());
     }
 
     public Human(String name) {
@@ -61,7 +60,7 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
 
         sb.append("\n* обычно делает: \n");
         for (var i : getAbilities())
-            sb.append("-*%s\n".formatted(i.describe()));
+            sb.append("-* %s\n".formatted(i.describe()));
 
         if (getModifiers().size() > 0) {
             sb
@@ -75,17 +74,14 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
 
     public void live(Place place) {
         try {
-            ((LiveAction) getAbility(LiveAction.class))
-                    .setPlace(place);
-        } catch (AbilityNotFoundException ex) {
-            addAbility(new LiveAction(place));
+            ((LiveAction) getAbilityByName("live")).setPlace(place);
+        } catch (AbilityNotFoundException e) {
+            addAbility("live", new LiveAction(place));
         }
     }
 
     public void wear(Clothing thing) {
-        if (wearAbility.getWearing().size() == 0)
-            addAbility(wearAbility);
-        wearAbility.putOn(thing);
+        ((WearAction) getAbilityByName("wear")).putOn(thing);
     }
 
     public void have(PhysicalObject thing) {
@@ -129,21 +125,19 @@ public class Human extends Creature implements IPerforming, Scriptable, ICommonH
         Human human = (Human) o;
 
         if (!getAbilities().equals(human.getAbilities())) return false;
-        if (wearAbility != null ? !wearAbility.equals(human.wearAbility) : human.wearAbility != null) return false;
         return scenario != null ? scenario.equals(human.scenario) : human.scenario == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getAbilities(), wearAbility, scenario);
+        return Objects.hash(super.hashCode(), getAbilities(), scenario);
     }
 
     @Override
     public String toString() {
-        return "Human{abilities=%s, wearAbility=%s, scenario=%s, %s}"
+        return "Human{abilities=%s, scenario=%s, %s}"
                 .formatted(
                         getAbilities(),
-                        wearAbility.toString(),
                         scenario.print(),
                         super.toString()
                 );

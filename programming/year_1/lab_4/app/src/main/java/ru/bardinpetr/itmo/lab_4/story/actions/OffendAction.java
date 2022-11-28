@@ -1,12 +1,11 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
+import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 
-public class OffendAction extends Ability {
-    public static final String TYPE = "обижать";
-
+public class OffendAction extends TargetedAbility {
     public OffendAction() {
-        super(TYPE);
     }
 
     @Override
@@ -17,5 +16,11 @@ public class OffendAction extends Ability {
     @Override
     public String toString() {
         return "OffendAction{} %s".formatted(super.toString());
+    }
+
+    @Override
+    public OffendAction setTargetObject(PhysicalObject targetObject) {
+        super.setTargetObject(targetObject);
+        return this;
     }
 }

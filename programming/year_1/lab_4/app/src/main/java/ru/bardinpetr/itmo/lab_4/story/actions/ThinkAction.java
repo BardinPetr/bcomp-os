@@ -1,17 +1,27 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
 
 import java.util.Objects;
 
 public class ThinkAction extends Ability {
-    public static final String TYPE = "думать";
-
-    private final String text;
+    private String text = "";
 
     public ThinkAction(String text) {
-        super(TYPE);
         this.text = text;
+    }
+
+    public ThinkAction() {
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public ThinkAction setText(String text) {
+        this.text = text;
+        return this;
     }
 
     @Override

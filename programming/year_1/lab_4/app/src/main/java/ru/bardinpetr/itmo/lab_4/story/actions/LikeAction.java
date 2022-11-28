@@ -6,21 +6,29 @@ import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
 import java.util.Objects;
 
 public class LikeAction extends Ability {
-
-    public static final String TYPE = "like";
-    private final Describable describable;
-    private boolean isLike;
-
-    public LikeAction(Describable describable) {
-        super(TYPE);
-        this.describable = describable;
-        this.isLike = true;
-    }
+    private Describable describable;
+    private boolean isLike = true;
 
     public LikeAction(Describable describable, boolean isLike) {
-        super(TYPE);
         this.describable = describable;
         this.isLike = isLike;
+    }
+
+    public LikeAction(Describable describable) {
+        this.describable = describable;
+    }
+
+    public LikeAction() {
+    }
+
+    public LikeAction setLike(boolean like) {
+        isLike = like;
+        return this;
+    }
+
+    public LikeAction setDescribable(Describable describable) {
+        this.describable = describable;
+        return this;
     }
 
     public Describable getDescribable() {

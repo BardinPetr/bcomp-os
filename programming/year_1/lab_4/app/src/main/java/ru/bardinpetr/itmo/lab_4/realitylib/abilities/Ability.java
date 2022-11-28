@@ -41,7 +41,7 @@ public abstract class Ability implements AlteringModifiable, Describable, Clonea
     }
 
     public AbilityResult execute(PhysicalObject self) {
-        return new AbilityResult("done");
+        return new AbilityResult(describe());
     }
 
     @Override

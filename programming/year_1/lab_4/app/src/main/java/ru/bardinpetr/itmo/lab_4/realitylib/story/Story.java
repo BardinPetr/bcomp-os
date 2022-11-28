@@ -36,7 +36,7 @@ import java.util.Map;
  * 5. All scenario methods of current class are called sequentially
  * 6. The End!
  */
-public abstract class Story {
+public abstract class Story implements Describable {
     private final String storyName;
     private final Map<String, Human> actors = new HashMap<>();
     private final Map<String, HumanGroup> groups = new HashMap<>();
@@ -125,6 +125,9 @@ public abstract class Story {
         AbleProcessor.process(this);
         SetupMethodProcessor.process(this);
         CreateScenarioProcessor.process(this);
+
+        for (var i : groups.values()) i.apply();
+
         return new CompiledStory(this);
     }
 
@@ -143,6 +146,11 @@ public abstract class Story {
                 return targetClass.cast(val);
         }
         return null;
+    }
+
+    @Override
+    public String describe() {
+        return compile().tell();
     }
 
     public static class CompiledStory {

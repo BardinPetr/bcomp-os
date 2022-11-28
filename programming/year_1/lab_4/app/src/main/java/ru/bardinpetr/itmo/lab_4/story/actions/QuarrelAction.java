@@ -1,18 +1,28 @@
 package ru.bardinpetr.itmo.lab_4.story.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.TargetedAbility;
 import ru.bardinpetr.itmo.lab_4.story.modifiers.models.QuarrelState;
 
 import java.util.Objects;
 
-public class QuarrelAction extends Ability {
-    public static final String TYPE = "ссориться";
-
-    private final QuarrelState state;
+public class QuarrelAction extends TargetedAbility {
+    private QuarrelState state = QuarrelState.NORMAL;
 
     public QuarrelAction(QuarrelState state) {
-        super(TYPE);
         this.state = state;
+    }
+
+    public QuarrelAction() {
+    }
+
+    public QuarrelState getState() {
+        return state;
+    }
+
+    public QuarrelAction setState(QuarrelState state) {
+        this.state = state;
+        return this;
     }
 
     @Override

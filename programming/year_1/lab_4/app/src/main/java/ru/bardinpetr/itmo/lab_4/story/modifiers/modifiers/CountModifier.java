@@ -15,7 +15,7 @@ public class CountModifier implements IModifier {
 
     @Override
     public String getValue() {
-        return "%d раз".formatted(count);
+        return "%d раз за день".formatted(count);
     }
 
     @Override

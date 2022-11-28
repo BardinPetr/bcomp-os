@@ -1,0 +1,759 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+'skinparam CircledCharacterFontSize 0
+'skinparam CircledCharacterRadius 0
+hide circle
+
+<style>
+classDiagram {
+  class {
+      header {
+        FontStyle bold
+      }
+  }
+}
+</style>
+
+abstract class Ability <<abstract>> {
+  # Ability(): 
+  # Ability(String, String): 
+  # Ability(String): 
+  - abilityName: String
+  - abilityType: String
+  {abstract} # getVerb(): String
+  + execute(PhysicalObject): AbilityResult
+  + hashCode(): int
+  + clone(): Ability
+  + equals(Object): boolean
+  + setModifier(Class, Object): Ability
+  + perform(): String
+  + describe(): String
+  + applyModifier(IModifier): Ability
+  + performWithOn(Tool, PhysicalObject): String
+   description: String
+   objectPreposition: String
+   abilityType: String
+   abilityName: String
+   verb: String
+   modifierMapping: Map<Class, IModifier>
+   pure: boolean
+}
+annotation AbilityContainer << annotation >> {
+  + value(): Able[]
+}
+class AbilityExecutionException {
+  + AbilityExecutionException(Class, PhysicalObject, Exception): 
+  - ability: Class
+  - executor: PhysicalObject
+  - internal: Exception
+   internal: Exception
+   ability: Class
+   executor: PhysicalObject
+}
+class AbilityExistsException {
+  + AbilityExistsException(Class): 
+  + AbilityExistsException(String, Ability): 
+  - conflictingAbility: Ability
+  - conflictingClass: Class
+  - conflictingName: String
+   conflictingAbility: Ability
+   conflictingClass: Class
+   conflictingName: String
+}
+class AbilityNotFoundException {
+  + AbilityNotFoundException(SearchType, String): 
+  - abilityRequest: String
+  - abilitySearchType: SearchType
+   abilitySearchType: SearchType
+   abilityRequest: String
+}
+entity AbilityResult << record >> {
+  + AbilityResult(String): 
+  + AbilityResult(boolean): 
+  + AbilityResult(boolean, String, Map<String, Object>): 
+  + resultText(): String
+  + data(): Map<String, Object>
+  + status(): boolean
+}
+annotation Able << annotation >> {
+  + value(): Class
+}
+class AbleProcessor {
+  + AbleProcessor(): 
+  + process(Story): void
+}
+interface AlteringModifiable << interface >> {
+  + applyModifier(IModifier): AlteringModifiable
+  + setModifier(Class, Object): AlteringModifiable
+  + getModifier(Class): IModifier
+   modifierMapping: Map<Class, IModifier>
+   modifiers: List<IModifier>
+}
+class Animal {
+  + Animal(String): 
+  + toString(): String
+}
+interface Annotation << interface >> {
+  + hashCode(): int
+  + annotationType(): Class<Annotation>
+  + equals(Object): boolean
+  + toString(): String
+}
+class Clothing {
+  + Clothing(WearType, int): 
+  - size: int
+  - type: WearType
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + wear(): String
+   size: int
+   type: WearType
+   physicalObjectName: String
+}
+class CompiledStory {
+  + CompiledStory(Story): 
+  + tell(): String
+}
+annotation CreateScenario << annotation >>
+class CreateScenarioProcessor {
+  + CreateScenarioProcessor(): 
+  + process(Story): void
+}
+abstract class Creature <<abstract>> {
+  + Creature(String, String, String): 
+  + Creature(String): 
+  - height: double
+  + equals(Object): boolean
+  + hashCode(): int
+  + setName(String, String, String): void
+   name: String
+   fullName: String
+   physicalObjectName: String
+   height: double
+}
+interface Describable << interface >> {
+  + describe(): String
+}
+enum ErrType << enumeration >> {
+  + ErrType(): 
+  + values(): ErrType[]
+  + valueOf(String): ErrType
+}
+class Error {
+  + Error(): 
+  + Error(String): 
+  # Error(String, Throwable, boolean, boolean): 
+  + Error(Throwable): 
+  + Error(String, Throwable): 
+}
+class Exception {
+  + Exception(): 
+  # Exception(String, Throwable, boolean, boolean): 
+  + Exception(Throwable): 
+  + Exception(String, Throwable): 
+  + Exception(String): 
+}
+class ExecutableScenario {
+  + ExecutableScenario(): 
+  + addIf(LogicOperator, String): ExecutableScenario
+  + hashCode(): int
+  + print(): String
+  + toString(): String
+  + newSentence(): ExecutableScenario
+  + equals(Object): boolean
+  + addThen(LogicOperator, IScenarioAction): ExecutableScenario
+  + append(Scenario): void
+  + addElse(): ExecutableScenario
+}
+interface Friendable << interface >> {
+  + addBrother(Human): void
+  + addFriend(Human): void
+}
+class HasModifier {
+  + HasModifier(PhysicalObject): 
+  + HasModifier(): 
+  - thing: PhysicalObject
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   thing: PhysicalObject
+   type: String
+   value: String
+}
+interface Heightable << interface >> {
+  + setHeightSpecies(): void
+   height: double
+   heightSpecies: HeightSpecies
+}
+class Human {
+  + Human(String, String, String): 
+  + Human(String): 
+  - pureAbilities: Set<Class>
+  - scenario: Scenario
+  + hashCode(): int
+  + addFriend(Human): void
+  + live(Place): void
+  + toString(): String
+  + addBrother(Human): void
+  + describe(): String
+  + addScenario(Scenario): void
+  + perform(Ability, IAbilityConfigurationRunnable): IScenarioAction
+  + have(PhysicalObject): void
+  + equals(Object): boolean
+  + wear(Clothing): void
+  # addBrotherReply(Human): void
+   pureAbilities: Set<Class>
+   modifiedAbilities: Map<String, Ability>
+   scenario: String
+}
+class HumanGroup {
+  + HumanGroup(String): 
+  - pureAbilities: Set<Class>
+  - name: String
+  - group: List<Human>
+  + wear(Clothing): void
+  + describe(): String
+  + equals(Object): boolean
+  + addScenario(Scenario): void
+  + add(Human): void
+  + getByName(String): Human
+  + hashCode(): int
+  + perform(Ability, IAbilityConfigurationRunnable): IScenarioAction
+  + have(PhysicalObject): void
+  + toString(): String
+  + live(Place): void
+  + apply(): void
+   name: String
+   modifiedAbilities: Map<String, Ability>
+   scenario: String
+   pureAbilities: Set<Class>
+   physicalObjectName: String
+   group: List<Human>
+}
+interface IAbilityConfigurationRunnable << interface >> {
+  + configure(Ability, StoryContext): Ability
+}
+interface IAble << interface >> {
+  + getAbility(Class): Ability
+  + overrideAbility(String, Ability): void
+  + getAbilityByName(String): Ability
+  + addAbility(String, Ability): void
+  + getAbility(String): Ability
+  + addAbility(Ability): void
+  + addAbility(Class): void
+   pureAbilities: Set<Class>
+   abilities: List<Ability>
+   modifiedAbilities: Map<String, Ability>
+}
+interface IAlteringModifier << interface >> {
+   value: Object
+}
+interface ICommonHumanAbilities << interface >> {
+  + have(PhysicalObject): void
+  + live(Place): void
+  + wear(Clothing): void
+}
+interface IModifier << interface >> {
+  + describe(): String
+   value: Object
+   type: String
+}
+interface IPerforming << interface >> {
+  + perform(Class, IAbilityConfigurationRunnable): IScenarioAction
+  + performByName(String): IScenarioAction
+  + perform(Ability, IAbilityConfigurationRunnable): IScenarioAction
+  + perform(String, IAbilityConfigurationRunnable): IScenarioAction
+  + performByTypeWithOn(String, Tool, PhysicalObject): IScenarioAction
+  + performByType(String): IScenarioAction
+  + performByNameWithOn(String, Tool, PhysicalObject): IScenarioAction
+}
+interface IScenarioAction << interface >> {
+  + execute(): String
+  + execute(StoryContext): String
+  + describe(): String
+}
+class LiveAction {
+  + LiveAction(Place): 
+  - place: Place
+  + toString(): String
+  + hashCode(): int
+  + clone(): Ability
+  + equals(Object): boolean
+   description: String
+   place: Place
+   verb: String
+}
+interface Modifiable << interface >> {
+  + applyModifier(IModifier): Modifiable
+  + describeMods(): String
+   modifiers: List<IModifier>
+}
+class ModifierNotEditableException {
+  + ModifierNotEditableException(Class): 
+  - targetModifierClass: Class
+   targetModifierClass: Class
+}
+class ModifierNotFoundException {
+  + ModifierNotFoundException(Class): 
+  - targetModifierClass: Class
+   targetModifierClass: Class
+}
+interface NameSettable << interface >> {
+  + setName(String, String, String): void
+   name: String
+}
+interface Nameable << interface >> {
+   name: String
+   fullName: String
+}
+class NotPureAbilityException {
+  + NotPureAbilityException(Ability): 
+}
+abstract class PhysicalObject <<abstract>> {
+  + PhysicalObject(): 
+  - position: double[]
+  {abstract} + getPhysicalObjectName(): String
+  + describe(): String
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   modifierMapping: Map<Class, IModifier>
+   physicalObjectName: String
+   position: double[]
+}
+class Place {
+  + Place(String, double[]): 
+  - name: String
+  - coordinates: double[]
+  + hashCode(): int
+  + describe(): String
+  + toString(): String
+  + equals(Object): boolean
+   name: String
+   coordinates: double[]
+   physicalObjectName: String
+}
+abstract class ProfessionHuman <<abstract>> {
+  + ProfessionHuman(String, Ability): 
+  + ProfessionHuman(String, String, String, Ability): 
+  - professionalAbility: Ability
+  + hashCode(): int
+  + equals(Object): boolean
+  + doProfession(): String
+  + describe(): String
+  + toString(): String
+  {abstract} + getProfessionName(): String
+   professionName: String
+   professionalAbility: Ability
+}
+interface Professionable << interface >> {
+   professionalAbility: Ability
+}
+class RuntimeException {
+  + RuntimeException(String, Throwable): 
+  + RuntimeException(): 
+  # RuntimeException(String, Throwable, boolean, boolean): 
+  + RuntimeException(Throwable): 
+  + RuntimeException(String): 
+}
+abstract class Scenario <<abstract>>  {
+  + Scenario(): 
+  - name: String
+  + addIf(String): Scenario
+  {abstract} + append(Scenario): void
+  {abstract} + print(): String
+  + newSentence(): Scenario
+  + addThen(IScenarioAction): Scenario
+  {abstract} + addIf(LogicOperator, String): Scenario
+  + append(Scenario): void
+  {abstract} + addElse(): Scenario
+  + addIf(IScenarioAction): Scenario
+  + addThen(LogicOperator, IScenarioAction): Scenario
+  + describe(): String
+   name: String
+}
+class ScenarioActionFactory {
+  + ScenarioActionFactory(): 
+  - instance: ScenarioActionFactory
+  + newScenarioAction(PhysicalObject, Ability, IAbilityConfigurationRunnable): IScenarioAction
+   instance: ScenarioActionFactory
+}
+interface Scriptable << interface >> {
+  + addScenario(Scenario): void
+   scenario: String
+}
+enum SearchType << enumeration >> {
+  + SearchType(): 
+  + values(): SearchType[]
+  + valueOf(String): SearchType
+}
+annotation SetupMethod << annotation >>
+class SetupMethodProcessor {
+  + SetupMethodProcessor(): 
+  + process(Story): void
+}
+class Story {
+  + Story(String): 
+  - subStories: Map<String, Story>
+  - storyName: String
+  - groups: Map<String, HumanGroup>
+  - actors: Map<String, Human>
+  - environment: Map<String, PhysicalObject>
+  - scenarios: Map<String, Scenario>
+  + addSubStory(String, Story): void
+  + getActor(String): Human
+  + addEnvironment(String, PhysicalObject): void
+  + compile(): CompiledStory
+  + getScenario(String): Scenario
+  + getProvidedObject(String, Class): Object?
+  + getGroup(String): HumanGroup
+  + getEnvironment(String): PhysicalObject
+  + getSubStory(String): Story
+  ~ describeMany(StringBuilder, Map): void
+  + addActor(String, Human): void
+  + addGroup(String, HumanGroup): void
+  + addScenario(String, Scenario): void
+  + describe(): String
+   scenarios: Map<String, Scenario>
+   actors: Map<String, Human>
+   groups: Map<String, HumanGroup>
+   storyName: String
+   environment: Map<String, PhysicalObject>
+   subStories: Map<String, Story>
+}
+class StoryAnnotationError {
+  + StoryAnnotationError(ErrType, Class, Field): 
+  - annotation: Class
+  - annotatedField: Field
+  - errType: ErrType
+   annotation: Class
+   errType: ErrType
+   annotatedField: Field
+}
+class StoryContext {
+  + StoryContext(): 
+}
+class StoryDIError {
+  + StoryDIError(Class, Field, String): 
+  - field: Field
+  - diMessage: String
+  - annotation: Class
+   diMessage: String
+   annotation: Class
+   field: Field
+}
+annotation StoryInject << annotation >>
+class StoryInjectProcessor {
+  + StoryInjectProcessor(): 
+  + process(Story, Story): void
+}
+class StoryInvocationError {
+  + StoryInvocationError(InvocationTargetException): 
+  - exception: InvocationTargetException
+   exception: InvocationTargetException
+}
+class StoryItemProviderProcessor {
+  + StoryItemProviderProcessor(): 
+  + process(Story, Story): void
+}
+annotation StoryProvide << annotation >>
+class StoryScenarioAnnotationError {
+  + StoryScenarioAnnotationError(Method, String): 
+  + StoryScenarioAnnotationError(Method): 
+  - annotatedMethod: Method
+   annotatedMethod: Method
+}
+abstract class TargetedAbility <<abstract>> {
+  + TargetedAbility(): 
+  # targetObject: PhysicalObject
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   description: String
+   targetObject: PhysicalObject
+}
+class TextualScenario {
+  + TextualScenario(): 
+  + TextualScenario(String): 
+  + toString(): String
+  + print(): String
+  + newSentence(): TextualScenario
+  + equals(Object): boolean
+  + addElse(): TextualScenario
+  + addIf(LogicOperator, String): TextualScenario
+  + append(Scenario): void
+  + addThen(LogicOperator, IScenarioAction): TextualScenario
+  + hashCode(): int
+}
+class Thing {
+  + Thing(String): 
+  + asPlace(): Place
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   physicalObjectName: String
+}
+abstract class Tool <<abstract>> {
+  + Tool(String): 
+  {abstract} + apply(PhysicalObject): String
+  + toString(): String
+}
+class TooledAbility {
+  + TooledAbility(): 
+  # tool: Tool
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   verb: String
+   tool: Tool
+}
+class WearAction {
+  + WearAction(): 
+  + WearAction(List<Clothing>): 
+  - wearing: List<Clothing>
+  + hashCode(): int
+  + equals(Object): boolean
+  + clone(): Ability
+  + toString(): String
+  + putOn(Clothing): WearAction
+   wearing: List<Clothing>
+   description: String
+   verb: String
+}
+enum WearType << enumeration >> {
+  - WearType(String): 
+  + values(): WearType[]
+  + valueOf(String): WearType
+  + toString(): String
+}
+
+Ability                        ..>  Ability                       
+Ability                        ..>  AbilityExecutionException     
+Ability                        ..>  AbilityResult                 : "«create»"
+Ability                        ..^  AlteringModifiable            
+Ability                        ..^  Describable                   
+Ability                       "1" *--> "modifiers\n*" IModifier                     
+Ability                        ..>  Modifiable                    
+Ability                        ..>  PhysicalObject                
+Ability                        ..>  Tool                          
+AbilityContainer               "1" *-> "1" Able
+AbilityContainer               --^  Annotation                    
+AbilityExecutionException      --^  Exception                     
+AbilityExecutionException     "1" *--> "internal\n1" Exception                     
+AbilityExecutionException     "1" *--> "executor\n1" PhysicalObject                
+AbilityExistsException        "1" *--> "conflictingAbility\n1" Ability                       
+AbilityExistsException         --^  RuntimeException              
+AbilityNotFoundException       --^  RuntimeException              
+AbilityNotFoundException      "1" *--> "abilitySearchType\n1" SearchType                    
+AbilityResult                  ..>  AbilityResult                 
+Able                           --^  Annotation
+AbleProcessor                  ..>  AbilityContainer              
+AbleProcessor                  ..>  AbilityExistsException        
+AbleProcessor                  ..>  Able                          
+AbleProcessor                  ..>  IAble                         
+AbleProcessor                  ..>  RuntimeException              : "«create»"
+AbleProcessor                  ..>  Story                         
+AbleProcessor                  ..>  StoryAnnotationError          : "«create»"
+AlteringModifiable             ..>  AlteringModifiable            
+AlteringModifiable             ..>  IAlteringModifier             
+AlteringModifiable             ..>  IModifier                     
+AlteringModifiable             --^  Modifiable                    
+AlteringModifiable             ..>  ModifierNotEditableException  : "«create»"
+AlteringModifiable             ..>  ModifierNotFoundException     : "«create»"
+Animal                         --^  Creature                      
+Animal                         ..>  PhysicalObject                
+Annotation                     ..>  Annotation                    
+Clothing                       ..>  Clothing                      
+Clothing                       --^  PhysicalObject                
+Clothing                      "1" *--> "type\n1" WearType                      
+CompiledStory                  --+  Story                         
+CompiledStory                 "1" *--> "story\n1" Story                         
+CreateScenario                 --^  Annotation                    
+CreateScenarioProcessor        ..>  CreateScenario                
+CreateScenarioProcessor        ..>  RuntimeException              : "«create»"
+CreateScenarioProcessor        ..>  Scenario                      
+CreateScenarioProcessor        ..>  Story                         
+CreateScenarioProcessor        ..>  StoryScenarioAnnotationError  : "«create»"
+Creature                       ..>  Creature                      
+Creature                       ..^  Describable                   
+Creature                       ..^  Heightable                    
+Creature                       ..^  NameSettable                  
+Creature                       ..^  Nameable                      
+Creature                       --^  PhysicalObject                
+ErrType                        --+  StoryAnnotationError          
+ExecutableScenario             ..>  ExecutableScenario            
+ExecutableScenario            "1" *--> "conditions\n*" IScenarioAction               
+ExecutableScenario             --^  Scenario                      
+Friendable                     ..>  Human                         
+HasModifier                    ..>  HasModifier                   
+HasModifier                    ..^  IAlteringModifier             
+HasModifier                   "1" *--> "thing\n1" PhysicalObject                
+Heightable                     ..>  Heightable                    
+Human                         "1" *--> "namedAbilities\n*" Ability                       
+Human                          ..>  AbilityNotFoundException      
+Human                          ..>  AlteringModifiable            
+Human                          ..>  Clothing                      
+Human                          --^  Creature                      
+Human                          ..^  Friendable                    
+Human                          ..>  HasModifier                   : "«create»"
+Human                          ..>  Human                         
+Human                          ..>  IAbilityConfigurationRunnable 
+Human                          ..>  IAble                         
+Human                          ..^  ICommonHumanAbilities         
+Human                          ..^  IPerforming                   
+Human                          ..>  IScenarioAction               
+Human                          ..>  LiveAction                    : "«create»"
+Human                          ..>  Modifiable                    
+Human                          ..>  PhysicalObject                
+Human                          ..>  Place                         
+Human                         "1" *--> "scenario\n1" Scenario                      
+Human                          ..>  ScenarioActionFactory         
+Human                          ..^  Scriptable                    
+Human                          ..>  TextualScenario               : "«create»"
+Human                          ..>  WearAction                    : "«create»"
+HumanGroup                    "1" *--> "namedAbilities\n*" Ability                       
+HumanGroup                     ..>  AbilityExistsException        
+HumanGroup                     ..>  AlteringModifiable            
+HumanGroup                     ..>  Clothing                      
+HumanGroup                     ..>  Creature                      
+HumanGroup                     ..^  Describable                   
+HumanGroup                    "1" *--> "group\n*" Human                         
+HumanGroup                     ..>  HumanGroup                    
+HumanGroup                     ..>  IAbilityConfigurationRunnable 
+HumanGroup                     ..>  IAble                         
+HumanGroup                     ..^  ICommonHumanAbilities         
+HumanGroup                     ..>  IModifier                     
+HumanGroup                     ..^  IPerforming                   
+HumanGroup                     ..>  IScenarioAction               
+HumanGroup                     ..>  LiveAction                    : "«create»"
+HumanGroup                     --^  PhysicalObject                
+HumanGroup                     ..>  Place                         
+HumanGroup                    "1" *--> "globalScenario\n1" Scenario                      
+HumanGroup                     ..>  ScenarioActionFactory         
+HumanGroup                     ..^  Scriptable                    
+HumanGroup                     ..>  WearAction                    
+IAbilityConfigurationRunnable  ..>  Ability                       
+IAbilityConfigurationRunnable  ..>  StoryContext                  
+IAble                          ..>  Ability                       
+IAble                          ..>  AbilityExistsException        : "«create»"
+IAble                          ..>  AbilityNotFoundException      : "«create»"
+IAble                          ..>  IAble                         
+IAble                          ..>  NotPureAbilityException       : "«create»"
+IAlteringModifier              --^  IModifier                     
+ICommonHumanAbilities          ..>  Clothing                      
+ICommonHumanAbilities          ..>  PhysicalObject                
+ICommonHumanAbilities          ..>  Place                         
+IModifier                      --^  Describable                   
+IModifier                      ..>  IModifier                     
+IPerforming                    ..>  Ability                       
+IPerforming                    ..>  IAbilityConfigurationRunnable 
+IPerforming                    --^  IAble                         
+IPerforming                    ..>  IPerforming                   
+IPerforming                    ..>  IScenarioAction               
+IPerforming                    --^  Nameable                      
+IPerforming                    ..>  PhysicalObject                
+IPerforming                    ..>  Tool                          
+IScenarioAction                --^  Describable                   
+IScenarioAction                ..>  IScenarioAction               
+IScenarioAction                ..>  StoryContext                  
+LiveAction                     --^  Ability                       
+LiveAction                     ..>  LiveAction                    
+LiveAction                    "1" *--> "place\n1" Place                         
+Modifiable                     ..>  IModifier                     
+Modifiable                     ..>  Modifiable                    
+ModifierNotEditableException   --^  RuntimeException              
+ModifierNotFoundException      --^  RuntimeException              
+NameSettable                   ..>  NameSettable                  
+Nameable                       ..>  Nameable                      
+NotPureAbilityException       "1" *--> "ability\n1" Ability                       
+NotPureAbilityException        --^  RuntimeException              
+PhysicalObject                 ..^  AlteringModifiable            
+PhysicalObject                 ..^  Describable                   
+PhysicalObject                "1" *--> "modifiers\n*" IModifier                     
+PhysicalObject                 ..>  Modifiable                    
+PhysicalObject                 ..>  PhysicalObject                
+Place                          --^  PhysicalObject                
+Place                          ..>  Place                         
+ProfessionHuman               "1" *--> "professionalAbility\n1" Ability                       
+ProfessionHuman                --^  Human                         
+ProfessionHuman                ..>  IAble                         
+ProfessionHuman                ..>  ProfessionHuman               
+ProfessionHuman                ..^  Professionable                
+Professionable                 ..>  Ability                       
+RuntimeException               --^  Exception                     
+Scenario                       ..^  Describable                   
+Scenario                       ..>  IScenarioAction               
+Scenario                       ..^  Nameable                      
+Scenario                       ..>  Scenario                      
+ScenarioActionFactory          ..>  Ability                       
+ScenarioActionFactory          ..>  AbilityExecutionException     
+ScenarioActionFactory          ..>  AbilityResult                 
+ScenarioActionFactory          ..>  IAbilityConfigurationRunnable 
+ScenarioActionFactory          ..>  IScenarioAction               
+ScenarioActionFactory          ..>  PhysicalObject                
+ScenarioActionFactory          ..>  ScenarioActionFactory         : "«create»"
+ScenarioActionFactory         "1" *--> "instance\n1" ScenarioActionFactory         
+ScenarioActionFactory          ..>  StoryContext                  
+Scriptable                     ..>  Scenario                      
+SearchType                     --+  AbilityNotFoundException      
+SetupMethod                    --^  Annotation                    
+SetupMethodProcessor           ..>  RuntimeException              : "«create»"
+SetupMethodProcessor           ..>  SetupMethod                   
+SetupMethodProcessor           ..>  Story                         
+SetupMethodProcessor           ..>  StoryScenarioAnnotationError  : "«create»"
+Story                          ..>  AbleProcessor                 
+Story                          ..>  CompiledStory                 : "«create»"
+Story                          ..>  CreateScenarioProcessor       
+Story                          ..^  Describable                   
+Story                         "1" *--> "actors\n*" Human                         
+Story                         "1" *--> "groups\n*" HumanGroup                    
+Story                         "1" *--> "environment\n*" PhysicalObject                
+Story                         "1" *--> "scenarios\n*" Scenario                      
+Story                          ..>  SetupMethodProcessor          
+Story                         "1" *--> "subStories\n*" Story                         
+Story                          ..>  StoryInjectProcessor          
+Story                          ..>  StoryItemProviderProcessor    
+StoryAnnotationError          "1" *--> "errType\n1" ErrType                       
+StoryAnnotationError           --^  Error                         
+StoryDIError                   --^  Error                         
+StoryInject                    --^  Annotation                    
+StoryInjectProcessor           ..>  Story                         
+StoryInjectProcessor           ..>  StoryAnnotationError          : "«create»"
+StoryInjectProcessor           ..>  StoryDIError                  : "«create»"
+StoryInjectProcessor           ..>  StoryInject                   
+StoryInvocationError           --^  Error                         
+StoryItemProviderProcessor     ..>  Human                         
+StoryItemProviderProcessor     ..>  HumanGroup                    
+StoryItemProviderProcessor     ..>  PhysicalObject                
+StoryItemProviderProcessor     ..>  Scenario                      
+StoryItemProviderProcessor     ..>  Story                         
+StoryItemProviderProcessor     ..>  StoryAnnotationError          : "«create»"
+StoryItemProviderProcessor     ..>  StoryDIError                  : "«create»"
+StoryItemProviderProcessor     ..>  StoryProvide                  
+StoryProvide                   --^  Annotation                    
+StoryScenarioAnnotationError   --^  Error                         
+StoryScenarioAnnotationError   ..>  StoryScenarioAnnotationError  
+TargetedAbility                --^  Ability                       
+TargetedAbility               "1" *--> "targetObject\n1" PhysicalObject                
+TargetedAbility                ..>  TargetedAbility               
+TextualScenario                ..>  IScenarioAction               
+TextualScenario                --^  Scenario                      
+TextualScenario                ..>  TextualScenario               
+Thing                          --^  PhysicalObject                
+Thing                          ..>  Place                         : "«create»"
+Thing                          ..>  Thing                         
+Tool                           ..>  PhysicalObject                
+Tool                           --^  Thing                         
+TooledAbility                  --^  TargetedAbility               
+TooledAbility                 "1" *--> "tool\n1" Tool                          
+TooledAbility                  ..>  TooledAbility                 
+WearAction                     --^  Ability                       
+WearAction                    "1" *--> "wearing\n*" Clothing                      
+WearAction                     ..>  PhysicalObject                
+WearAction                     ..>  WearAction                    
+@enduml

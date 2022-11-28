@@ -1,0 +1,961 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+'skinparam CircledCharacterFontSize 0
+'skinparam CircledCharacterRadius 0
+hide circle
+
+<style>
+classDiagram {
+  class {
+      header {
+        FontStyle bold
+      }
+  }
+}
+</style>
+
+class Ability {
+  # Ability(): 
+  # Ability(String, String): 
+  # Ability(String): 
+  - abilityName: String
+  - abilityType: String
+  + execute(PhysicalObject): AbilityResult
+  + hashCode(): int
+  + clone(): Ability
+  + equals(Object): boolean
+  + setModifier(Class, Object): Ability
+  + perform(): String
+  + describe(): String
+  + applyModifier(IModifier): Ability
+  + performWithOn(Tool, PhysicalObject): String
+   description: String
+   objectPreposition: String
+   abilityType: String
+   abilityName: String
+   verb: String
+   modifierMapping: Map<Class, IModifier>
+   pure: boolean
+}
+class ActivityReasonModifier {
+  + ActivityReasonModifier(Describable): 
+  + ActivityReasonModifier(String): 
+  - reason: Describable
+  + toString(): String
+  + hashCode(): int
+  + equals(Object): boolean
+   reason: String
+   type: String
+   value: String
+}
+interface AlteringModifiable << interface >> {
+  + applyModifier(IModifier): AlteringModifiable
+  + setModifier(Class, Object): AlteringModifiable
+  + getModifier(Class): IModifier
+   modifierMapping: Map<Class, IModifier>
+   modifiers: List<IModifier>
+}
+class Artist {
+  + Artist(String, String, String): 
+  + Artist(String): 
+  + draw(): String
+  + toString(): String
+   professionName: String
+}
+enum Brightness << enumeration >> {
+  - Brightness(String): 
+  + values(): Brightness[]
+  + valueOf(String): Brightness
+   type: String
+   value: String
+}
+class BrotherModifier {
+  + BrotherModifier(Human): 
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   type: String
+   value: String
+}
+class CityStory {
+  + CityStory(): 
+  - neznaikaAndGunkaScenario(Scenario): void
+  - siropchikScenario(Scenario): void
+  - neznaikaInCityScenario(Scenario): void
+  - littleGirlsGroupScenario(Scenario): void
+}
+class Clothing {
+  + Clothing(WearType, int): 
+  - size: int
+  - type: WearType
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+  + wear(): String
+   size: int
+   type: WearType
+   physicalObjectName: String
+}
+enum Color << enumeration >> {
+  - Color(String): 
+  + valueOf(String): Color
+  + values(): Color[]
+   type: String
+   value: String
+}
+class CompiledStory {
+  + CompiledStory(Story): 
+  + tell(): String
+}
+enum Count << enumeration >> {
+  - Count(String): 
+  + valueOf(String): Count
+  + values(): Count[]
+   type: String
+   value: String
+}
+class CountModifier {
+  + CountModifier(int): 
+  + toString(): String
+  + hashCode(): int
+  + equals(Object): boolean
+   type: String
+   value: String
+}
+class CreateAction {
+  + CreateAction(): 
+  + execute(PhysicalObject): AbilityResult
+   description: String
+   verb: String
+}
+class CrossObstacleAction {
+  + CrossObstacleAction(): 
+  - tool: Tool
+  - moveType: CrossType
+  + execute(PhysicalObject): AbilityResult
+   description: String
+   verb: String
+   moveType: CrossType
+   targetObject: PhysicalObject
+   tool: Tool
+}
+enum CrossType << enumeration >> {
+  - CrossType(String): 
+  + values(): CrossType[]
+  + toString(): String
+  + valueOf(String): CrossType
+}
+class CureAction {
+  + CureAction(): 
+  + toString(): String
+  + addCuredIllness(Illness): void
+  + hashCode(): int
+  + equals(Object): boolean
+   description: String
+   verb: String
+}
+enum Degree << enumeration >> {
+  - Degree(String): 
+  + valueOf(String): Degree
+  + values(): Degree[]
+   type: String
+   value: String
+}
+interface Describable << interface >> {
+  + describe(): String
+}
+enum Difficulty << enumeration >> {
+  - Difficulty(String): 
+  + values(): Difficulty[]
+  + valueOf(String): Difficulty
+   type: String
+   value: String
+}
+class DoMechanicsAction {
+  + DoMechanicsAction(): 
+  + toString(): String
+   verb: String
+}
+class Doctor {
+  + Doctor(String): 
+  + Doctor(String, String, String): 
+  + toString(): String
+   professionName: String
+}
+class Dog {
+  + Dog(String): 
+  + toString(): String
+}
+class DrawAction {
+  + DrawAction(): 
+  + toString(): String
+   verb: String
+}
+class DummyModifier {
+  + DummyModifier(): 
+   type: String
+   value: String
+}
+interface Eatable << interface >> {
+  + eat(): String
+}
+class FindFoodAction {
+  + FindFoodAction(): 
+  - foodTypes: Eatable[]
+   description: String
+   foodTypes: Eatable[]
+   verb: String
+}
+class Food {
+  + Food(String): 
+  + eat(): String
+}
+class ForestStory {
+  + ForestStory(): 
+  - setupBoat(): void
+  - scenarioGetFood(Scenario): void
+  - setupEnvironment(): void
+  - scenarioFindFood(Scenario): void
+  - setupRiverRelated(): void
+}
+class FriendModifier {
+  + FriendModifier(Human): 
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   type: String
+   value: String
+}
+class GoAction {
+  + GoAction(): 
+  - place: Place
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+  + execute(PhysicalObject): AbilityResult
+   description: String
+   place: Place
+   verb: String
+}
+class GoalModifier {
+  + GoalModifier(String): 
+  + GoalModifier(Describable): 
+  - goal: Describable
+  + toString(): String
+  + hashCode(): int
+  + equals(Object): boolean
+   type: String
+   goal: String
+   value: String
+}
+enum HeightSpecies << enumeration >> {
+  + HeightSpecies(): 
+  + valueOf(String): HeightSpecies
+  + values(): HeightSpecies[]
+}
+class HelpAction {
+  + HelpAction(): 
+  - master: Human
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   description: String
+   verb: String
+   master: Human
+}
+class Helper {
+  + Helper(String): 
+  + Helper(String, String, String): 
+  + toString(): String
+   professionName: String
+   master: Human
+}
+class HideAction {
+  + HideAction(Place): 
+  + HideAction(): 
+  - place: Place
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   description: String
+   place: Place
+   verb: String
+}
+class House {
+  + House(String, double[], int): 
+  - maxPeople: int
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   maxPeople: int
+}
+class HuntAction {
+  + HuntAction(): 
+  + toString(): String
+   verb: String
+   objectPreposition: String
+}
+class Hunter {
+  + Hunter(String, Weapon): 
+  + Hunter(String, String, String, Weapon): 
+  + goHunt(PhysicalObject): String
+  + toString(): String
+  + hashCode(): int
+  + equals(Object): boolean
+   professionName: String
+}
+interface IAlteringModifier << interface >> {
+   value: Object
+}
+interface IModifier << interface >> {
+  + describe(): String
+   value: Object
+   type: String
+}
+enum Illness << enumeration >> {
+  - Illness(String): 
+  - Illness(): 
+  + toString(): String
+  + values(): Illness[]
+  + valueOf(String): Illness
+}
+class KnownForModifier {
+  + KnownForModifier(Describable): 
+  - describable: Describable
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   describable: Describable
+   type: String
+   value: String
+}
+class LikeAction {
+  + LikeAction(): 
+  + LikeAction(Describable, boolean): 
+  + LikeAction(Describable): 
+  - describable: Describable
+  - isLike: boolean
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   isLike: boolean
+   description: String
+   describable: Describable
+   verb: String
+}
+enum LogicOperator << enumeration >> {
+  - LogicOperator(String): 
+  + toString(): String
+  + values(): LogicOperator[]
+  + valueOf(String): LogicOperator
+}
+class LookLikeAction {
+  + LookLikeAction(): 
+  + toString(): String
+   verb: String
+   objectPreposition: String
+}
+class MainStory {
+  + MainStory(): 
+  - setupHouses(): void
+  - setupNeznaika(): void
+  - setupSiropchik(): void
+  - setupManyOthers(): void
+  - setupMechanics(): void
+  - setupGunka(): void
+  - setupPulka(): void
+  - setupNeznaikaWear(): void
+  - setupPilulkin(): void
+}
+class MaterialModifier {
+  + MaterialModifier(): 
+  - material: Thing
+   material: Thing
+   type: String
+   value: String
+}
+class Mechanic {
+  + Mechanic(String, String, String): 
+  + Mechanic(String): 
+  + toString(): String
+   professionName: String
+}
+class MostOfModifier {
+  + MostOfModifier(IModifier, HumanGroup): 
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   type: String
+   value: String
+}
+class Musician {
+  + Musician(String, String, String): 
+  + Musician(String): 
+  + play(): String
+  + toString(): String
+   professionName: String
+}
+class NameModifier {
+  + NameModifier(): 
+  + NameModifier(String): 
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   type: String
+   value: String
+}
+class OffendAction {
+  + OffendAction(): 
+  + toString(): String
+   targetObject: PhysicalObject
+   verb: String
+}
+class PhysicalObject {
+  + PhysicalObject(): 
+  - position: double[]
+  + describe(): String
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   modifierMapping: Map<Class, IModifier>
+   physicalObjectName: String
+   position: double[]
+}
+class Place {
+  + Place(String, double[]): 
+  - name: String
+  - coordinates: double[]
+  + hashCode(): int
+  + describe(): String
+  + toString(): String
+  + equals(Object): boolean
+   name: String
+   coordinates: double[]
+   physicalObjectName: String
+}
+class PlaceModifier {
+  + PlaceModifier(Place): 
+  + PlaceModifier(PlaceRelation, Place): 
+  + PlaceModifier(): 
+  - place: Place
+  - relation: PlaceRelation
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   place: Place
+   type: String
+   relation: PlaceRelation
+   value: String
+}
+enum PlaceRelation << enumeration >> {
+  + PlaceRelation(): 
+  + values(): PlaceRelation[]
+  + valueOf(String): PlaceRelation
+}
+class Plant {
+  + Plant(String): 
+  - root: Thing
+  + eat(): String
+   root: Thing
+}
+enum Politeness << enumeration >> {
+  - Politeness(String): 
+  + values(): Politeness[]
+  + valueOf(String): Politeness
+   type: String
+   value: String
+}
+enum Popularity << enumeration >> {
+  - Popularity(String): 
+  + valueOf(String): Popularity
+  + values(): Popularity[]
+   type: String
+   value: String
+}
+class QuarrelAction {
+  + QuarrelAction(QuarrelState): 
+  + QuarrelAction(): 
+  - state: QuarrelState
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   state: QuarrelState
+   verb: String
+   objectPreposition: String
+}
+enum QuarrelState << enumeration >> {
+  + QuarrelState(): 
+  + values(): QuarrelState[]
+  + valueOf(String): QuarrelState
+}
+class ReadAction {
+  + ReadAction(): 
+  + execute(PhysicalObject): AbilityResult
+   description: String
+   verb: String
+}
+class ReasonModifier {
+  + ReasonModifier(IModifier, Describable): 
+  + ReasonModifier(Describable): 
+  + ReasonModifier(IModifier, String): 
+  - modifier: IModifier
+  - reason: Describable
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   reason: String
+   type: String
+   modifier: IModifier
+   value: String
+}
+class SayAction {
+  + SayAction(): 
+  + SayAction(String): 
+  - text: String
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   description: String
+   text: String
+   verb: String
+}
+class SeeAction {
+  + SeeAction(): 
+  + toString(): String
+   verb: String
+}
+class SitAction {
+  + SitAction(): 
+  - place: Place
+  + equals(Object): boolean
+  + execute(PhysicalObject): AbilityResult
+  + toString(): String
+  + hashCode(): int
+   description: String
+   place: Place
+   verb: String
+}
+enum Size << enumeration >> {
+  - Size(String): 
+  + valueOf(String): Size
+  + values(): Size[]
+   type: String
+   value: String
+}
+class SongAction {
+  + SongAction(): 
+  + toString(): String
+   verb: String
+}
+class Story {
+  + Story(String): 
+  - subStories: Map<String, Story>
+  - storyName: String
+  - groups: Map<String, HumanGroup>
+  - actors: Map<String, Human>
+  - environment: Map<String, PhysicalObject>
+  - scenarios: Map<String, Scenario>
+  + addSubStory(String, Story): void
+  + getActor(String): Human
+  + addEnvironment(String, PhysicalObject): void
+  + compile(): CompiledStory
+  + getScenario(String): Scenario
+  + getProvidedObject(String, Class): Object?
+  + getGroup(String): HumanGroup
+  + getEnvironment(String): PhysicalObject
+  + getSubStory(String): Story
+  ~ describeMany(StringBuilder, Map): void
+  + addActor(String, Human): void
+  + addGroup(String, HumanGroup): void
+  + addScenario(String, Scenario): void
+  + describe(): String
+   scenarios: Map<String, Scenario>
+   actors: Map<String, Human>
+   groups: Map<String, HumanGroup>
+   storyName: String
+   environment: Map<String, PhysicalObject>
+   subStories: Map<String, Story>
+}
+class TalkAction {
+  + TalkAction(): 
+  + toString(): String
+   verb: String
+   objectPreposition: String
+}
+class TargetModifier {
+  + TargetModifier(String): 
+  + equals(Object): boolean
+  + hashCode(): int
+  + toString(): String
+   type: String
+   value: String
+}
+class Thing {
+  + Thing(String): 
+  + asPlace(): Place
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   physicalObjectName: String
+}
+class ThinkAction {
+  + ThinkAction(): 
+  + ThinkAction(String): 
+  - text: String
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   description: String
+   text: String
+   verb: String
+}
+class TimeModifier {
+  + TimeModifier(String): 
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   type: String
+   value: String
+}
+class Tool {
+  + Tool(String): 
+  + apply(PhysicalObject): String
+  + toString(): String
+}
+class TurnAction {
+  + TurnAction(String): 
+  + TurnAction(): 
+  - dir: String
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   description: String
+   dir: String
+   verb: String
+}
+class WantAction {
+  + WantAction(): 
+  - wantedAction: IScenarioAction
+  + execute(PhysicalObject): AbilityResult
+   wantedAction: IScenarioAction
+   description: String
+   verb: String
+}
+enum WaterType << enumeration >> {
+  - WaterType(String): 
+  + valueOf(String): WaterType
+  + values(): WaterType[]
+   type: String
+   value: String
+}
+class Weapon {
+  + Weapon(String): 
+  + Weapon(String, Thing): 
+  + describe(): String
+  + equals(Object): boolean
+  + apply(PhysicalObject): String
+  + hashCode(): int
+  + toString(): String
+}
+class WithModifier {
+  + WithModifier(): 
+  + WithModifier(PhysicalObject): 
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   type: String
+   value: String
+}
+class ZnaikaStory {
+  + ZnaikaStory(): 
+  - clothing(): void
+  - places(): void
+  - name(): void
+  - znaikaScenario(Scenario): void
+  - groupScenario(Scenario): void
+  - setupImportance(): void
+}
+
+Ability                 ..>  Ability                
+Ability                 ..^  AlteringModifiable     
+Ability                 ..^  Describable            
+Ability                "1" *--> "modifiers\n*" IModifier              
+Ability                 ..>  PhysicalObject         
+Ability                 ..>  Tool                   
+ActivityReasonModifier  ..>  ActivityReasonModifier 
+ActivityReasonModifier "1" *--> "reason\n1" Describable            
+ActivityReasonModifier  ..^  IAlteringModifier      
+AlteringModifiable      ..>  AlteringModifiable     
+AlteringModifiable      ..>  IAlteringModifier      
+AlteringModifiable      ..>  IModifier              
+Artist                  ..>  Artist                 
+Artist                  ..^  Describable            
+Artist                  ..>  DrawAction             : "«create»"
+Artist                  --^  PhysicalObject         
+Brightness              ..^  IModifier              
+BrotherModifier         ..>  BrotherModifier        
+BrotherModifier         ..^  IModifier              
+CityStory               ..>  Ability                
+CityStory               ..>  CountModifier          : "«create»"
+CityStory               ..>  GoAction               
+CityStory               ..>  HideAction             
+CityStory               ..>  IModifier              
+CityStory               ..>  LikeAction             
+CityStory               ..>  LookLikeAction         
+CityStory               ..>  OffendAction           
+CityStory               ..>  PhysicalObject         
+CityStory              "1" *--> "city\n1" Place                  
+CityStory               ..>  QuarrelAction          
+CityStory               ..>  QuarrelState           
+CityStory               ..>  SayAction              
+CityStory               ..>  SeeAction              
+CityStory               --^  Story                  
+CityStory               ..>  TalkAction             
+CityStory               ..>  TargetModifier         : "«create»"
+CityStory               ..>  ThinkAction            
+CityStory               ..>  TimeModifier           : "«create»"
+CityStory               ..>  TurnAction             
+Clothing                ..>  Clothing               
+Clothing                --^  PhysicalObject         
+Color                   ..^  IModifier              
+CompiledStory           +--  Story                  
+CompiledStory          "1" *--> "story\n1" Story                  
+Count                   ..^  IModifier              
+CountModifier           ..>  CountModifier          
+CountModifier           ..^  IModifier              
+CreateAction            --^  Ability                
+CreateAction            ..>  PhysicalObject         
+CrossObstacleAction     --^  Ability                
+CrossObstacleAction     ..>  CrossObstacleAction    
+CrossObstacleAction    "1" *--> "moveType\n1" CrossType              
+CrossObstacleAction     ..>  PhysicalObject         
+CrossObstacleAction    "1" *--> "tool\n1" Tool                   
+CrossType               +--  CrossObstacleAction    
+CureAction              --^  Ability                
+CureAction              ..>  CureAction             
+CureAction             "1" *--> "cureFrom\n*" Illness                
+Degree                  ..^  IModifier              
+Difficulty              ..^  IModifier              
+DoMechanicsAction       --^  Ability                
+Doctor                  ..>  CureAction             : "«create»"
+Doctor                  ..^  Describable            
+Doctor                  ..>  Doctor                 
+Doctor                  --^  PhysicalObject         
+Dog                     ..^  Describable            
+Dog                     --^  PhysicalObject         
+DrawAction              --^  Ability                
+DummyModifier           ..^  IModifier              
+Eatable                 --^  Describable            
+FindFoodAction          --^  Ability                
+FindFoodAction          ..>  Describable            
+FindFoodAction         "1" *--> "foodTypes\n*" Eatable                
+FindFoodAction          ..>  Eatable                : "«create»"
+FindFoodAction          ..>  FindFoodAction         
+Food                    ..^  Eatable                
+Food                    --^  Thing                  
+ForestStory             ..>  Ability                
+ForestStory             ..>  ActivityReasonModifier : "«create»"
+ForestStory             ..>  AlteringModifiable     
+ForestStory             ..>  CreateAction           
+ForestStory             ..>  CrossObstacleAction    
+ForestStory             ..>  Difficulty             
+ForestStory             ..>  Eatable                : "«create»"
+ForestStory             ..>  FindFoodAction         
+ForestStory             ..>  GoAction               
+ForestStory             ..>  GoalModifier           : "«create»"
+ForestStory             ..>  MaterialModifier       
+ForestStory             ..>  PhysicalObject         
+ForestStory            "1" *--> "river\n1" Place                  
+ForestStory             ..>  Place                  : "«create»"
+ForestStory             ..>  PlaceModifier          : "«create»"
+ForestStory            "1" *--> "berries\n1" Plant                  
+ForestStory             ..>  Plant                  : "«create»"
+ForestStory             ..>  ReasonModifier         : "«create»"
+ForestStory             ..>  Size                   
+ForestStory             --^  Story                  
+ForestStory            "1" *--> "bark\n1" Thing                  
+ForestStory             ..>  Thing                  : "«create»"
+ForestStory            "1" *--> "boat\n1" Tool                   
+ForestStory             ..>  WantAction             
+ForestStory             ..>  WithModifier           : "«create»"
+FriendModifier          ..>  FriendModifier         
+FriendModifier          ..^  IModifier              
+GoAction                --^  Ability                
+GoAction                ..>  GoAction               
+GoAction                ..>  PhysicalObject         
+GoAction               "1" *--> "place\n1" Place                  
+GoalModifier           "1" *--> "goal\n1" Describable            
+GoalModifier            ..>  GoalModifier           
+GoalModifier            ..^  IAlteringModifier      
+HelpAction              --^  Ability                
+HelpAction              ..>  HelpAction             
+Helper                  ..^  Describable            
+Helper                  ..>  HelpAction             : "«create»"
+Helper                  ..>  Helper                 
+Helper                  --^  PhysicalObject         
+HideAction              --^  Ability                
+HideAction              ..>  HideAction             
+HideAction             "1" *--> "place\n1" Place                  
+House                   ..>  House                  
+House                   --^  Place                  
+HuntAction              --^  Ability                
+Hunter                  ..>  Ability                
+Hunter                  ..^  Describable            
+Hunter                  ..>  HuntAction             : "«create»"
+Hunter                  ..>  Hunter                 
+Hunter                  --^  PhysicalObject         
+Hunter                 "1" *--> "mainWeapon\n1" Weapon                 
+IAlteringModifier       --^  IModifier              
+IModifier               --^  Describable            
+IModifier               ..>  IModifier              
+KnownForModifier       "1" *--> "describable\n1" Describable            
+KnownForModifier        ..^  IModifier              
+KnownForModifier        ..>  KnownForModifier       
+LikeAction              --^  Ability                
+LikeAction             "1" *--> "describable\n1" Describable            
+LikeAction              ..>  LikeAction             
+LookLikeAction          --^  Ability                
+MainStory               ..>  Ability                
+MainStory               ..>  AlteringModifiable     
+MainStory               ..>  Artist                 : "«create»"
+MainStory               ..>  Brightness             
+MainStory               ..>  CityStory              : "«create»"
+MainStory               ..>  Clothing               : "«create»"
+MainStory               ..>  Color                  
+MainStory               ..>  CureAction             
+MainStory               ..>  Degree                 
+MainStory               ..>  Doctor                 : "«create»"
+MainStory               ..>  Dog                    : "«create»"
+MainStory               ..>  ForestStory            : "«create»"
+MainStory               ..>  HelpAction             
+MainStory               ..>  Helper                 : "«create»"
+MainStory               ..>  House                  : "«create»"
+MainStory               ..>  Hunter                 : "«create»"
+MainStory              "1" *--> "pulka\n1" Hunter                 
+MainStory               ..>  Illness                
+MainStory               ..>  KnownForModifier       : "«create»"
+MainStory               ..>  LikeAction             : "«create»"
+MainStory               ..>  Mechanic               : "«create»"
+MainStory               ..>  MostOfModifier         : "«create»"
+MainStory               ..>  Musician               : "«create»"
+MainStory               ..>  NameModifier           : "«create»"
+MainStory               ..>  PhysicalObject         
+MainStory              "1" *--> "margaritokStreet\n1" Place                  
+MainStory               ..>  Place                  : "«create»"
+MainStory               ..>  PlaceModifier          : "«create»"
+MainStory               ..>  Politeness             
+MainStory               ..>  Popularity             
+MainStory               ..>  ReasonModifier         : "«create»"
+MainStory               ..>  Size                   
+MainStory               --^  Story                  
+MainStory              "1" *--> "forestStory\n1" Story                  
+MainStory               ..>  Thing                  : "«create»"
+MainStory               ..>  WaterType              
+MainStory               ..>  Weapon                 : "«create»"
+MainStory               ..>  ZnaikaStory            : "«create»"
+MaterialModifier        ..^  IAlteringModifier      
+MaterialModifier        ..>  PhysicalObject         
+MaterialModifier       "1" *--> "material\n1" Thing                  
+Mechanic                ..^  Describable            
+Mechanic                ..>  DoMechanicsAction      : "«create»"
+Mechanic                ..>  Mechanic               
+Mechanic                --^  PhysicalObject         
+MostOfModifier          ..^  IModifier              
+MostOfModifier         "1" *--> "modifier\n1" IModifier              
+MostOfModifier          ..>  MostOfModifier         
+Musician                ..^  Describable            
+Musician                ..>  Musician               
+Musician                --^  PhysicalObject         
+Musician                ..>  SongAction             : "«create»"
+NameModifier            ..^  IAlteringModifier      
+NameModifier            ..>  NameModifier           
+OffendAction            --^  Ability                
+OffendAction            ..>  OffendAction           
+OffendAction            ..>  PhysicalObject         
+PhysicalObject          ..^  AlteringModifiable     
+PhysicalObject          ..^  Describable            
+PhysicalObject         "1" *--> "modifiers\n*" IModifier              
+PhysicalObject          ..>  PhysicalObject         
+Place                   --^  PhysicalObject         
+Place                   ..>  Place                  
+PlaceModifier           ..^  IAlteringModifier      
+PlaceModifier          "1" *--> "place\n1" Place                  
+PlaceModifier           ..>  PlaceModifier          
+PlaceModifier          "1" *--> "relation\n1" PlaceRelation          
+PlaceRelation           +--  PlaceModifier          
+Plant                   ..^  Eatable                
+Plant                   --^  Thing                  
+Plant                   ..>  Thing                  : "«create»"
+Plant                  "1" *--> "root\n1" Thing                  
+Politeness              ..^  IModifier              
+Popularity              ..^  IModifier              
+QuarrelAction           --^  Ability                
+QuarrelAction           ..>  QuarrelAction          
+QuarrelAction          "1" *--> "state\n1" QuarrelState           
+ReadAction              --^  Ability                
+ReadAction              ..>  PhysicalObject         
+ReasonModifier         "1" *--> "reason\n1" Describable            
+ReasonModifier          ..^  IModifier              
+ReasonModifier         "1" *--> "modifier\n1" IModifier              
+ReasonModifier          ..>  ReasonModifier         
+SayAction               --^  Ability                
+SayAction               ..>  SayAction              
+SeeAction               --^  Ability                
+SitAction               --^  Ability                
+SitAction               ..>  PhysicalObject         
+SitAction              "1" *--> "place\n1" Place                  
+SitAction               ..>  SitAction              
+Size                    ..^  IModifier              
+SongAction              --^  Ability                
+Story                   ..>  CompiledStory          : "«create»"
+Story                   ..^  Describable            
+Story                  "1" *--> "environment\n*" PhysicalObject         
+Story                  "1" *--> "subStories\n*" Story                  
+TalkAction              --^  Ability                
+TargetModifier          ..^  IModifier              
+TargetModifier          ..>  TargetModifier         
+Thing                   --^  PhysicalObject         
+Thing                   ..>  Place                  : "«create»"
+Thing                   ..>  Thing                  
+ThinkAction             --^  Ability                
+ThinkAction             ..>  ThinkAction            
+TimeModifier            ..^  IModifier              
+TimeModifier            ..>  TimeModifier           
+Tool                    ..>  PhysicalObject         
+Tool                    --^  Thing                  
+TurnAction              --^  Ability                
+TurnAction              ..>  TurnAction             
+WantAction              --^  Ability                
+WantAction              ..>  PhysicalObject         
+WantAction              ..>  WantAction             
+WaterType               ..^  IModifier              
+Weapon                  ..>  PhysicalObject         
+Weapon                 "1" *--> "bullet\n1" Thing                  
+Weapon                  ..>  Thing                  : "«create»"
+Weapon                  --^  Tool                   
+Weapon                  ..>  Weapon                 
+WithModifier            ..^  IAlteringModifier      
+WithModifier           "1" *--> "other\n1" PhysicalObject         
+WithModifier            ..>  WithModifier           
+ZnaikaStory             ..>  Ability                
+ZnaikaStory             ..>  AlteringModifiable     
+ZnaikaStory             ..>  Clothing               : "«create»"
+ZnaikaStory             ..>  Count                  
+ZnaikaStory             ..>  LikeAction             
+ZnaikaStory             ..>  LookLikeAction         
+ZnaikaStory             ..>  MostOfModifier         : "«create»"
+ZnaikaStory             ..>  NameModifier           : "«create»"
+ZnaikaStory             ..>  ReadAction             : "«create»"
+ZnaikaStory             ..>  ReasonModifier         : "«create»"
+ZnaikaStory             ..>  SitAction              
+ZnaikaStory             --^  Story                  
+ZnaikaStory            "1" *--> "table\n1" Thing                  
+ZnaikaStory             ..>  Thing                  : "«create»"
+ZnaikaStory             ..>  ThinkAction            : "«create»"
+ZnaikaStory             ..>  WithModifier           : "«create»"
+@enduml
+

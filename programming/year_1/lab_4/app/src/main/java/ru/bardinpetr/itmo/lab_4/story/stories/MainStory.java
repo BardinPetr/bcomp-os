@@ -86,6 +86,9 @@ public class MainStory extends Story {
     @StoryProvide
     private final Story znaikaStory = new ZnaikaStory();
 
+    @StoryProvide
+    private final Story neznaikaStory = new NeznaikaStory();
+
     public MainStory() {
         super("MAIN");
     }

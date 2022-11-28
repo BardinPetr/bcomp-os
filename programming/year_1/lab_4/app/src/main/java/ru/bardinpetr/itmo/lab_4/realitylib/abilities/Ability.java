@@ -1,5 +1,6 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.abilities;
 
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.errors.AbilityExecutionException;
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.interfaces.Describable;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.AlteringModifiable;
 import ru.bardinpetr.itmo.lab_4.realitylib.properties.interfaces.IModifier;
@@ -40,7 +41,7 @@ public abstract class Ability implements AlteringModifiable, Describable, Clonea
         return "";
     }
 
-    public AbilityResult execute(PhysicalObject self) {
+    public AbilityResult execute(PhysicalObject self) throws AbilityExecutionException {
         return new AbilityResult(describe());
     }
 

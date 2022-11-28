@@ -1,6 +1,8 @@
 package ru.bardinpetr.itmo.lab_4.realitylib.abilities.actions;
 
 import ru.bardinpetr.itmo.lab_4.realitylib.abilities.Ability;
+import ru.bardinpetr.itmo.lab_4.realitylib.abilities.AbilityResult;
+import ru.bardinpetr.itmo.lab_4.realitylib.things.PhysicalObject;
 import ru.bardinpetr.itmo.lab_4.realitylib.things.wear.Clothing;
 
 import java.util.ArrayList;

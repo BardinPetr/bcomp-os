@@ -121,5 +121,9 @@ VALUES ((SELECT * FROM flight),
                   JOIN object_type ON objects.type_id = object_type.id
          WHERE object_type.name = 'Clouds'),
         now(),
-        (123, 1251, 425));
+        (123, 1251, 425)),
+       ((SELECT * FROM flight),
+        null,
+        now(),
+        (12, 125, 42));
 

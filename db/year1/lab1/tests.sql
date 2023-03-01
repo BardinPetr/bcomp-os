@@ -11,7 +11,7 @@ FROM astronauts astr
 
 SELECT sp.name as spaceship, fle.timestamp, obj.name as obstacle_overcame_name, obj.relative_position as location
 FROM flight_log_entries fle
-         JOIN objects obj on fle.obstacle_overcame_id = obj.id
+         LEFT JOIN objects obj on fle.obstacle_overcame_id = obj.id
          JOIN spaceships sp on fle.flight_id = sp.id
 WHERE flight_id = (SELECT id FROM flights LIMIT 1);
 

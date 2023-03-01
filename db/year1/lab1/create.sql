@@ -1,5 +1,5 @@
--- ALTER USER s367079
---     SET search_path TO s367079;
+ALTER USER s367079
+    SET search_path TO s367079;
 
 DROP TABLE IF EXISTS
     live_creatures,

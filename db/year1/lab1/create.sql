@@ -50,7 +50,7 @@ CREATE TABLE s367079.objects
     type_id           int REFERENCES object_type (id) NOT NULL,
     name              varchar(50)                     NOT NULL,
     relative_position d3_position UNIQUE              NOT NULL,
-    area              float8
+    area              float
 );
 
 
@@ -80,9 +80,9 @@ CREATE TABLE s367079.crews
 
 CREATE TABLE s367079.astronauts
 (
-    creature_id int REFERENCES live_creatures (id) NOT NULL,
-    crew_id     int REFERENCES crews (id)          NOT NULL,
-    role        crew_role                          NOT NULL DEFAULT ('private'),
+    creature_id int REFERENCES live_creatures (id) UNIQUE NOT NULL,
+    crew_id     int REFERENCES crews (id)                 NOT NULL,
+    role        crew_role                                 NOT NULL DEFAULT ('private'),
 
     PRIMARY KEY (creature_id, crew_id)
 );
@@ -127,7 +127,7 @@ CREATE TABLE s367079.disclosure_type
 (
     id                 int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description        TEXT NOT NULL UNIQUE,
-    disclosure_percent int
+    disclosure_percent int2
 );
 
 CREATE TABLE s367079.mystery_disclosure

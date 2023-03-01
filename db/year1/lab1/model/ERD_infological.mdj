@@ -559,7 +559,7 @@
 												"$ref": "AAAAAAGGja5hE1dFJkg="
 											},
 											"font": "Arial;13;0",
-											"left": 1032,
+											"left": 1024,
 											"top": 224,
 											"width": 73.7216796875,
 											"height": 13,
@@ -578,7 +578,7 @@
 												"$ref": "AAAAAAGGja5hE1dFJkg="
 											},
 											"font": "Arial;13;0",
-											"left": 1039,
+											"left": 1031,
 											"top": 214,
 											"height": 13,
 											"alpha": 0.5235987755982988,
@@ -595,7 +595,7 @@
 												"$ref": "AAAAAAGGja5hE1dFJkg="
 											},
 											"font": "Arial;13;0",
-											"left": 1039,
+											"left": 1031,
 											"top": 240,
 											"height": 13,
 											"alpha": -0.5235987755982988,
@@ -613,7 +613,7 @@
 										"$ref": "AAAAAAGGjaZvfFZ4PEs="
 									},
 									"lineStyle": 2,
-									"points": "1024:195;1024:272",
+									"points": "1016:195;1016:272",
 									"nameLabel": {
 										"$ref": "AAAAAAGGja5hE1dGy7o="
 									},
@@ -2871,7 +2871,8 @@
 											"$ref": "AAAAAAGGnJAmBsIV7wU="
 										},
 										"cardinality": "0..1"
-									}
+									},
+									"identifying": false
 								}
 							],
 							"columns": [
@@ -3775,7 +3776,8 @@
 										"$ref": "AAAAAAGGnJAmBsIV7wU="
 									},
 									"name": "name",
-									"length": 0
+									"length": 0,
+									"unique": true
 								},
 								{
 									"_type": "ERDColumn",

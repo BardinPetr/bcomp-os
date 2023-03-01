@@ -13,7 +13,8 @@ DROP TABLE IF EXISTS
     object_type,
     disclosure_type,
     mystery_disclosure,
-    crew_participants,
+    astronauts,
+    crews,
     objects_mysteries
     CASCADE;
 
@@ -70,20 +71,27 @@ CREATE TABLE s367079.live_creatures
 );
 
 -- Space ship
-CREATE TABLE s367079.crew_participants
+CREATE TABLE s367079.crews
 (
-    id          int GENERATED ALWAYS AS IDENTITY UNIQUE,
-    creature_id int REFERENCES live_creatures (id) NOT NULL,
-    role        crew_role                          NOT NULL,
+    id            int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name          varchar(50) UNIQUE NOT NULL,
+    creation_date date               NOT NULL
+);
 
-    PRIMARY KEY (id, creature_id)
+CREATE TABLE s367079.astronauts
+(
+    creature_id int REFERENCES live_creatures (id) NOT NULL,
+    crew_id     int REFERENCES crews (id)          NOT NULL,
+    role        crew_role                          NOT NULL DEFAULT ('private'),
+
+    PRIMARY KEY (creature_id, crew_id)
 );
 
 CREATE TABLE s367079.spaceships
 (
     id      int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    varchar(50) NOT NULL,
-    crew_id int REFERENCES crew_participants (id)
+    crew_id int REFERENCES crews (id)
 );
 
 CREATE TABLE s367079.flights

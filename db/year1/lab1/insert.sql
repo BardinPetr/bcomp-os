@@ -12,10 +12,13 @@ TRUNCATE TABLE
     object_type,
     disclosure_type,
     mystery_disclosure,
-    crew_participants,
+    astronauts,
+    crews,
     objects_mysteries
     CASCADE;
 
+
+-- Humans
 WITH ins_ids as
          (INSERT INTO planets (name, location)
              VALUES ('Earth', (10.0, 10.0, 10.0)),
@@ -23,7 +26,9 @@ WITH ins_ids as
              RETURNING id)
 INSERT
 INTO creature_species (name, base_planet_id)
-VALUES ('Humans', (SELECT * FROM ins_ids));
+VALUES ('Humans', (SELECT * FROM ins_ids LIMIT 1)),
+       ('Jupiterians', (SELECT * FROM ins_ids OFFSET 1 LIMIT 1));
+
 
 INSERT
 INTO live_creatures (species_id, name)
@@ -35,47 +40,26 @@ SELECT (SELECT id FROM creature_species WHERE name = 'Humans'),
 --        ((SELECT id FROM creature_species WHERE name = 'Humans'), 'B');
 
 
--- spaceships
-
--- INSERT INTO crew_participants (creature_id, role)
--- SELECT id as creature_id, 'private' FROM live_creatures;
-
-
--- WITH ship as (INSERT INTO spaceships (name, crew_id)
---     VALUES ('Alexey Leonov', ) RETURNING id)
--- INSERT
--- INTO flights
--- VALUES (default,
---         (SELECT * FROM ship),
---         (123, 123, 124),
---         (6153, 11223, 6124),
---         now());
-
-INSERT INTO flight_log_entries (flight_id, obstacle_overcame_id, timestamp, location)
-VALUES ((SELECT id FROM flights LIMIT 1),
-        (SELECT objects.id
-         FROM objects
-                  JOIN object_type ON objects.type_id = object_type.id
-         WHERE object_type.description == 'Clouds'),
-        now(),
-        (123, 1251, 425));
-
 -- mysteries
 INSERT INTO mysteries (name, description)
-VALUES ('unknown mystery', 'we do not know about what this mystery is');
+VALUES ('strange mystery', 'we do not know about what this mystery is');
 
 INSERT INTO disclosure_type (description, disclosure_percent)
 VALUES ('guess', 10),
-       ('solve', 100);
+       ('know', 100);
 
-INSERT INTO mystery_disclosure (mystery_id, creature_species_id, available_type_id)
-VALUES ((SELECT id FROM mysteries WHERE name = 'unknown mystery'),
+WITH myst as (SELECT id FROM mysteries WHERE name = 'strange mystery')
+INSERT
+INTO mystery_disclosure (mystery_id, creature_species_id, available_type_id)
+VALUES ((SELECT * FROM myst),
         (SELECT id FROM creature_species WHERE name = 'Humans'),
-        (SELECT id FROM disclosure_type WHERE description = 'guess'));
+        (SELECT id FROM disclosure_type WHERE description = 'guess')),
+       ((SELECT * FROM myst),
+        (SELECT id FROM creature_species WHERE name = 'Jupiterians'),
+        (SELECT id FROM disclosure_type WHERE description = 'know'));
 
 
 -- objects
-
 INSERT INTO object_type (name, description)
 VALUES ('Clouds', 'cloud layers'),
        ('Storm', 'storm'),
@@ -105,6 +89,37 @@ WITH brs_data as
                      (SELECT id FROM brs_data)) RETURNING id)
 INSERT
 INTO objects_mysteries (mystery_id, object_id)
-VALUES ((SELECT id FROM mysteries WHERE name LIKE '%unknown%'),
+VALUES ((SELECT id FROM mysteries WHERE name LIKE '%strange%'),
         (SELECT id FROM area_data));
+
+
+-- spaceships
+WITH crew_id as
+         (INSERT INTO crews (name, creation_date)
+             VALUES ('main crew', now()) RETURNING id),
+     ship as
+         (INSERT INTO spaceships (name, crew_id)
+             VALUES ('Alexey Leonov', (SELECT * FROM crew_id))
+             RETURNING id)
+INSERT
+INTO astronauts (creature_id, crew_id)
+SELECT id, (SELECT * FROM crew_id)
+FROM live_creatures;
+
+WITH flight as (INSERT
+    INTO flights
+        VALUES (default,
+                (SELECT id FROM spaceships LIMIT 1),
+                (123, 123, 124),
+                (6153, 11223, 6124),
+                now()) RETURNING id)
+INSERT
+INTO flight_log_entries (flight_id, obstacle_overcame_id, timestamp, location)
+VALUES ((SELECT * FROM flight),
+        (SELECT objects.id
+         FROM objects
+                  JOIN object_type ON objects.type_id = object_type.id
+         WHERE object_type.name = 'Clouds'),
+        now(),
+        (123, 1251, 425));
 

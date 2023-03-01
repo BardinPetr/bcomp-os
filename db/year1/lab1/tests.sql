@@ -9,12 +9,12 @@ FROM astronauts astr
          JOIN crews cr on astr.crew_id = cr.id
          JOIN spaceships sp on cr.id = sp.crew_id;
 
-SELECT sp.name as spaceship, fle.timestamp, obj.name as obstacle_overcame_name, obj.relative_position as location
+SELECT sp.name as spaceship, fle.timestamp, obj.name as obstacle_overcame_name, fle.location as location
 FROM flight_log_entries fle
          LEFT JOIN objects obj on fle.obstacle_overcame_id = obj.id
-         JOIN spaceships sp on fle.flight_id = sp.id
+         JOIN flights fl on fle.flight_id = fl.id
+         JOIN spaceships sp on fl.spaceship_id = sp.id
 WHERE flight_id = (SELECT id FROM flights LIMIT 1);
-
 
 SELECT obj.name       as object,
        parent.name    as part_of,

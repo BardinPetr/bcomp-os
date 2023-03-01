@@ -124,6 +124,5 @@ VALUES ((SELECT * FROM flight),
         (123, 1251, 425)),
        ((SELECT * FROM flight),
         null,
-        now(),
+        '2023-03-01 10:11:12',
         (12, 125, 42));
-

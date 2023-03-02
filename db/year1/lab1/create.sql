@@ -2,20 +2,20 @@ ALTER USER s367079
     SET search_path TO s367079;
 
 DROP TABLE IF EXISTS
-    live_creatures,
+    live_creature,
     creature_species,
-    spaceships,
-    flights,
-    flight_log_entries,
-    planets,
-    objects,
-    mysteries,
+    spaceship,
+    flight,
+    flight_log_entry,
+    planet,
+    object,
+    mystery,
     object_type,
     disclosure_type,
     mystery_disclosure,
-    astronauts,
-    crews,
-    objects_mysteries
+    astronaut,
+    crew,
+    object_mystery
     CASCADE;
 
 DROP TYPE IF EXISTS crew_role, d3_position CASCADE;
@@ -27,7 +27,7 @@ CREATE TYPE s367079.d3_position AS
     z float
 );
 
--- Objects
+-- object
 CREATE TABLE s367079.object_type
 (
     id          int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -35,18 +35,18 @@ CREATE TABLE s367079.object_type
     description text
 );
 
-CREATE TABLE s367079.planets
+CREATE TABLE s367079.planet
 (
     id       int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name     varchar(50) NOT NULL UNIQUE,
     location d3_position NOT NULL
 );
 
-CREATE TABLE s367079.objects
+CREATE TABLE s367079.object
 (
     id                int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    parent_object_id  int REFERENCES objects (id),
-    planet_id         int REFERENCES planets (id),
+    parent_object_id  int REFERENCES object (id),
+    planet_id         int REFERENCES planet (id),
     type_id           int REFERENCES object_type (id) NOT NULL,
     name              varchar(50)                     NOT NULL,
     relative_position d3_position UNIQUE              NOT NULL,
@@ -59,10 +59,10 @@ CREATE TABLE s367079.creature_species
 (
     id             int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name           varchar(50) UNIQUE NOT NULL,
-    base_planet_id int REFERENCES planets (id)
+    base_planet_id int REFERENCES planet (id)
 );
 
-CREATE TABLE s367079.live_creatures
+CREATE TABLE s367079.live_creature
 (
     id         int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     species_id int REFERENCES creature_species (id) NOT NULL,
@@ -71,52 +71,52 @@ CREATE TABLE s367079.live_creatures
 );
 
 -- Space ship
-CREATE TABLE s367079.crews
+CREATE TABLE s367079.crew
 (
     id            int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name          varchar(50) UNIQUE NOT NULL,
     creation_date date               NOT NULL
 );
 
-CREATE TABLE s367079.astronauts
+CREATE TABLE s367079.astronaut
 (
-    creature_id int REFERENCES live_creatures (id) UNIQUE NOT NULL,
-    crew_id     int REFERENCES crews (id)                 NOT NULL,
+    creature_id int REFERENCES live_creature (id) UNIQUE NOT NULL,
+    crew_id     int REFERENCES crew (id)                 NOT NULL,
     role        crew_role                                 NOT NULL DEFAULT ('private'),
 
     PRIMARY KEY (creature_id, crew_id)
 );
 
-CREATE TABLE s367079.spaceships
+CREATE TABLE s367079.spaceship
 (
     id      int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    varchar(50) NOT NULL,
-    crew_id int REFERENCES crews (id)
+    crew_id int REFERENCES crew (id)
 );
 
-CREATE TABLE s367079.flights
+CREATE TABLE s367079.flight
 (
     id           int GENERATED ALWAYS AS IDENTITY UNIQUE,
-    spaceship_id int REFERENCES spaceships (id) NOT NULL,
+    spaceship_id int REFERENCES spaceship (id) NOT NULL,
     origin       d3_position                    NOT NULL,
     destination  d3_position                    NOT NULL,
     start_date   timestamp                      NOT NULL,
     PRIMARY KEY (id, spaceship_id)
 );
 
-CREATE TABLE s367079.flight_log_entries
+CREATE TABLE s367079.flight_log_entry
 (
     id                   int GENERATED ALWAYS AS IDENTITY,
-    flight_id            int REFERENCES flights (id) NOT NULL,
-    obstacle_overcame_id int REFERENCES objects (id),
+    flight_id            int REFERENCES flight (id) NOT NULL,
+    obstacle_overcame_id int REFERENCES object (id),
     timestamp            timestamp                   NOT NULL,
     location             d3_position                 NOT NULL,
     PRIMARY KEY (id, flight_id)
 );
 
 
--- Mysteries 
-CREATE TABLE s367079.mysteries
+-- mystery
+CREATE TABLE s367079.mystery
 (
     id          int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        varchar(50) NOT NULL UNIQUE,
@@ -132,15 +132,15 @@ CREATE TABLE s367079.disclosure_type
 
 CREATE TABLE s367079.mystery_disclosure
 (
-    mystery_id          int REFERENCES mysteries (id)        NOT NULL,
+    mystery_id          int REFERENCES mystery (id)        NOT NULL,
     creature_species_id int REFERENCES creature_species (id) NOT NULL,
     available_type_id   int REFERENCES disclosure_type (id)  NOT NULL,
     PRIMARY KEY (mystery_id, creature_species_id)
 );
 
-CREATE TABLE s367079.objects_mysteries
+CREATE TABLE s367079.object_mystery
 (
-    mystery_id int REFERENCES mysteries (id) NOT NULL,
-    object_id  int REFERENCES objects (id)   NOT NULL,
+    mystery_id int REFERENCES mystery (id) NOT NULL,
+    object_id  int REFERENCES object (id)   NOT NULL,
     PRIMARY KEY (mystery_id, object_id)
 );

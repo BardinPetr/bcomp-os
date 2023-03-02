@@ -1,54 +1,49 @@
 ALTER USER s367079 SET search_path TO s367079;
 
 TRUNCATE TABLE
-    live_creatures,
+    live_creature,
     creature_species,
-    spaceships,
-    flights,
-    flight_log_entries,
-    planets,
-    objects,
-    mysteries,
+    spaceship,
+    flight,
+    flight_log_entry,
+    planet,
+    object,
+    mystery,
     object_type,
     disclosure_type,
     mystery_disclosure,
-    astronauts,
-    crews,
-    objects_mysteries
+    astronaut,
+    crew,
+    object_mystery
     CASCADE;
 
 
 -- Humans
 WITH ins_ids as
-         (INSERT INTO planets (name, location)
+         (INSERT INTO planet (name, location)
              VALUES ('Earth', (10.0, 10.0, 10.0)),
                     ('Jupiter', (30.0, 40.0, 50.0))
+             RETURNING id),
+     ins_species as
+         (INSERT INTO creature_species (name, base_planet_id)
+             VALUES ('Humans', (SELECT * FROM ins_ids LIMIT 1)),
+                    ('Jupiterians', (SELECT * FROM ins_ids OFFSET 1 LIMIT 1))
              RETURNING id)
 INSERT
-INTO creature_species (name, base_planet_id)
-VALUES ('Humans', (SELECT * FROM ins_ids LIMIT 1)),
-       ('Jupiterians', (SELECT * FROM ins_ids OFFSET 1 LIMIT 1));
+INTO live_creature (species_id, name)
+VALUES ((SELECT * FROM ins_species LIMIT 1), 'A'),
+       ((SELECT * FROM ins_species LIMIT 1), 'B');
 
 
-INSERT
-INTO live_creatures (species_id, name)
-SELECT (SELECT id FROM creature_species WHERE name = 'Humans'),
-       unnest(array ['A', 'B', 'C']);
-
--- INSERT INTO live_creatures (species_id, name)
--- VALUES ((SELECT id FROM creature_species WHERE name = 'Humans'), 'A'),
---        ((SELECT id FROM creature_species WHERE name = 'Humans'), 'B');
-
-
--- mysteries
-INSERT INTO mysteries (name, description)
+-- mystery
+INSERT INTO mystery (name, description)
 VALUES ('strange mystery', 'we do not know about what this mystery is');
 
 INSERT INTO disclosure_type (description, disclosure_percent)
 VALUES ('guess', 10),
        ('know', 100);
 
-WITH myst as (SELECT id FROM mysteries WHERE name = 'strange mystery')
+WITH myst as (SELECT id FROM mystery WHERE name = 'strange mystery')
 INSERT
 INTO mystery_disclosure (mystery_id, creature_species_id, available_type_id)
 VALUES ((SELECT * FROM myst),
@@ -59,28 +54,28 @@ VALUES ((SELECT * FROM myst),
         (SELECT id FROM disclosure_type WHERE description = 'know'));
 
 
--- objects
+-- object
 INSERT INTO object_type (name, description)
 VALUES ('Clouds', 'cloud layers'),
        ('Storm', 'storm'),
        ('Unknown', null);
 
-INSERT INTO objects (type_id, planet_id, name, relative_position, area)
+INSERT INTO object (type_id, planet_id, name, relative_position, area)
 VALUES ((SELECT id FROM object_type WHERE object_type.name = 'Clouds'),
-        (SELECT id FROM planets WHERE planets.name = 'Jupiter'),
+        (SELECT id FROM planet WHERE planet.name = 'Jupiter'),
         'Cloud layers',
         (0, 0, 1000),
         1000000);
 
 WITH brs_data as
-         (INSERT INTO objects (type_id, planet_id, name, relative_position, area)
+         (INSERT INTO object (type_id, planet_id, name, relative_position, area)
              VALUES ((SELECT id FROM object_type WHERE object_type.name = 'Storm'),
-                     (SELECT id FROM planets WHERE planets.name = 'Jupiter'),
+                     (SELECT id FROM planet WHERE planet.name = 'Jupiter'),
                      'Big Red Spot',
                      (10.2, 123.4, 13.42),
                      312123) RETURNING id, planet_id),
      area_data as
-         (INSERT INTO objects (type_id, planet_id, name, relative_position, area, parent_object_id)
+         (INSERT INTO object (type_id, planet_id, name, relative_position, area, parent_object_id)
              VALUES ((SELECT id FROM object_type WHERE object_type.name = 'Unknown'),
                      (SELECT planet_id FROM brs_data),
                      'Some area in Big Red Spot',
@@ -88,37 +83,37 @@ WITH brs_data as
                      1000,
                      (SELECT id FROM brs_data)) RETURNING id)
 INSERT
-INTO objects_mysteries (mystery_id, object_id)
-VALUES ((SELECT id FROM mysteries WHERE name LIKE '%strange%'),
+INTO object_mystery (mystery_id, object_id)
+VALUES ((SELECT id FROM mystery WHERE name LIKE '%strange%'),
         (SELECT id FROM area_data));
 
 
--- spaceships
+-- spaceship
 WITH crew_id as
-         (INSERT INTO crews (name, creation_date)
+         (INSERT INTO crew (name, creation_date)
              VALUES ('main crew', now()) RETURNING id),
      ship as
-         (INSERT INTO spaceships (name, crew_id)
+         (INSERT INTO spaceship (name, crew_id)
              VALUES ('Alexey Leonov', (SELECT * FROM crew_id))
              RETURNING id)
 INSERT
-INTO astronauts (creature_id, crew_id)
+INTO astronaut (creature_id, crew_id)
 SELECT id, (SELECT * FROM crew_id)
-FROM live_creatures;
+FROM live_creature;
 
 WITH flight as (INSERT
-    INTO flights
+    INTO flight
         VALUES (default,
-                (SELECT id FROM spaceships LIMIT 1),
+                (SELECT id FROM spaceship LIMIT 1),
                 (123, 123, 124),
                 (6153, 11223, 6124),
                 now()) RETURNING id)
 INSERT
-INTO flight_log_entries (flight_id, obstacle_overcame_id, timestamp, location)
+INTO flight_log_entry (flight_id, obstacle_overcame_id, timestamp, location)
 VALUES ((SELECT * FROM flight),
-        (SELECT objects.id
-         FROM objects
-                  JOIN object_type ON objects.type_id = object_type.id
+        (SELECT object.id
+         FROM object
+                  JOIN object_type ON object.type_id = object_type.id
          WHERE object_type.name = 'Clouds'),
         now(),
         (123, 1251, 425)),

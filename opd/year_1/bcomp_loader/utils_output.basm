@@ -1,0 +1,53 @@
+; ----------------------------- TERMINAL OUTPUT -----------------------------
+
+; func PRINT_CHAR: outputs one char to text printer with wait for device availability
+; 
+; params: AC - 1b character in low byte
+; return: none
+; begin func
+PRINT_CHAR:
+  PUSH ; store target char
+
+  PUT_CHAR_LOOP:
+    IN 0xD
+    AND #0x40
+    BZS PUT_CHAR_LOOP
+
+  POP
+  OUT 0xC
+  RET
+; end func PUT_CHAR
+
+
+; func PRINT: outputs string to text printer 
+; 
+; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
+; params: AC - pointer to first string data address
+; return: none
+; stack:  &0 - ret addr
+; begin globals:
+PRINT_CUR: WORD ? ; pointer/iterator to currect mem address
+MASK_LOW: WORD 0x00FF
+; end globals
+; begin func
+PRINT:
+  ST PRINT_CUR
+
+; begin loop
+PRINT_LOOP:
+  LD (PRINT_CUR)+
+
+  BZS PRINT_EXIT
+  CALL PRINT_CHAR
+
+  SWAB
+  
+  AND $MASK_LOW
+  BZS PRINT_EXIT
+  CALL PRINT_CHAR
+
+  JUMP PRINT_LOOP
+; end loop
+PRINT_EXIT:
+  RET
+; end func PRINT

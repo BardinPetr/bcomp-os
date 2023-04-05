@@ -1,0 +1,85 @@
+; ----------------------------- TERMINAL INPUT -----------------------------
+; func READ_LINE: (dst: word) read text string from keyboard untill enter pressed(LF):
+; 
+; requires: free memory of string starting from addr in param
+;
+; params:  AC: dst: address in memory from which the result will be placed;
+; return:  AC: string length
+;          MEM: string starting at mem addr "dst"
+; affects: AC
+; stack:   &0 - current character id
+;          &1 - ret addr
+; begin globals:
+READ_LINE_CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
+; end globals
+; begin func
+READ_LINE:
+; begin prologue
+  PUSH 
+; end prologue
+
+  ; set base output address from AC
+  ST $READ_LINE_CUR_POINTER
+
+  ; set character id to zero 
+  CLA
+  ST &0
+
+  ; begin loop
+  READ_LINE_LOOP: 
+    LD &0 ; cur id
+    INC 
+    ST &0 ; i++
+
+    ; begin if
+    AND #1
+    BZS READ_LINE_HIGH_BYTE
+    ; begin branch char_id % 2 == 0
+      CALL $READ_CHAR
+
+      CMP #0x0A ; LF (NUL is full next word)
+      BEQ READ_LINE_EOL_APPEND_NUL
+
+      ST (READ_LINE_CUR_POINTER)
+      JUMP READ_LINE_LOOP
+    ; begin branch char_id % 2 == 1
+    READ_LINE_HIGH_BYTE:
+      CALL $READ_CHAR
+
+      CMP #0x0A ; LF, NUL is this word high byte
+      ; no need to set NUL as it is automatically set when writing low byte
+      BEQ READ_LINE_EOL
+
+      SWAB
+      OR (READ_LINE_CUR_POINTER)
+      ST (READ_LINE_CUR_POINTER)+
+      JUMP READ_LINE_LOOP
+    ; end if
+  ; end loop
+
+READ_LINE_EOL_APPEND_NUL:
+  CLA ; put EOS
+  ST (READ_LINE_CUR_POINTER)
+READ_LINE_EOL:
+  ; begin epilogue
+    POP ; length as return in AC
+    RET
+  ; end epilogue
+; end func READ_LINE
+
+
+; func READ_CHAR: pool keyboard for ready and read 1 char from it
+;
+; params: none
+; return: AC: data read from dev in low byte
+; affects: AC higher byte is cleared
+; begin func
+READ_CHAR:
+READ_CHAR_LOOP:
+  CLA
+  IN 0x19
+  AND #0x40
+  BZS READ_CHAR_LOOP
+  IN 0x18
+  RET
+; end func READ_CHAR

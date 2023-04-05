@@ -1,0 +1,176 @@
+; func ATOI_HEX: (src) converts hex string to int 
+; 
+; params: AC src: pointer to NUL-ended string beginning
+; return: AC: unsigned 2byte integer
+; stack:  &0: current sum value
+;         &1: current char index (from 0)
+;         &2: ret addr
+; begin globals
+ATOI_HEX_STR_PTR: DATA ?
+ATOI_HEX_LOW_MASK: DATA 0xFF
+; end globals
+; begin func
+ATOI_HEX:
+; begin prologue
+  PUSH
+  PUSH
+; end prologue
+
+  ST ATOI_STR_PTR
+
+  CLA 
+  ST &0
+  ST &1
+
+  ; begin loop
+  ATOI_HEX_LOOP:
+    LD &1
+
+    
+    LD (ATOI_STR_PTR)
+    AND ATOI_LOW_MASK
+    CALL ATOI_CHAR
+
+    BZS ATOI_END
+    
+    ; begin loop
+    ; ATOI_HEX_MULT:
+    ;   ASL
+    ;   ASL
+    ;   ASL
+    ;   ASL
+
+
+    JUMP ATOI_HEX_LOOP
+  ; end loop
+
+  ATOI_HEX_END:
+; begin epilogue
+  POP
+  POP
+  RET
+; end epilogue
+; end func ATOI_HEX
+
+
+; func ATOI: (src, radix) converts string number to int 
+; 
+; params: STACK src: pointer to NUL-ended string beginning
+;         STACK radix: number radix
+; return: AC: unsigned 2byte integer
+; stack:  &0: radix in current power (from power 0)
+;         &1: current sum value
+;         &2: current char index
+;         &3: ret addr
+;         &4: src
+;         &5: radix
+; begin globals
+ATOI_STR_PTR: DATA ?
+ATOI_LOW_MASK: DATA 0xFF
+; end globals
+; begin func
+ATOI:
+; begin prologue
+  PUSH
+  PUSH
+; end prologue
+
+  LD &4
+  ST ATOI_STR_PTR
+
+  CLA 
+  ST &1
+  ST &2
+  INC
+  ST &0
+
+  ; begin loop
+  ATOI_LOOP:
+    LD &2
+
+    LD (ATOI_STR_PTR)+
+    AND ATOI_LOW_MASK
+    CALL ATOI_CHAR
+
+    BZS ATOI_END
+    
+    PUSH
+    LD &0 ; radix in power
+    PUSH  
+    CALL $MUL ; ATOI(char[i]) * (radix ^ i)
+    POP
+    POP
+
+    ; save sum
+    ADD &1
+    ST &1
+
+    ; increase power
+    LD &0
+    PUSH
+    LD &4
+    PUSH  
+    CALL $MUL
+    POP
+    POP
+    ST &0
+
+    JUMP ATOI_LOOP
+  ; end loop
+
+  ATOI_END:
+; begin epilogue
+  POP
+  POP
+  RET
+; end epilogue
+; end func ATOI
+
+
+; func ATOI_CHAR: (char) returns integer representation of character with radix up to 36
+; uses sequence 0,1,...,9,A(a),B(b),...,Z(z)
+; params: AC char: input character
+; return: AC: int value 
+; begin func
+ATOI_CHAR:
+  ; begin if
+  CMP #0x3A
+  BLT ATOI_CHAR_ISNUM
+  ; begin branch char >= 10
+    SUB #0x37 ; A=0x41, A is 10
+    
+    ; begin if
+    CMP #0x2A ; A=0x41, a = 0x61; 0x61-0x37 = 0x2A
+    BLT ATOI_CHAR_END
+    ; begin branch char in [a..z]
+      SUB #0x20
+      JUMP ATOI_CHAR_END
+    ; end if
+  ; begin branch char < 10
+  ATOI_CHAR_ISNUM:
+    SUB #0x30
+  ; end if
+ATOI_CHAR_END:
+  RET
+; end func ATOI_CHAR
+
+
+; func ITOA_CHAR: (val) returns character representation of one digit in some radix up to 36
+; uses sequence 0,1,...,9,A,B,...,Z
+; params: AC val: integer input digit
+; return: AC: char value 
+; begin func
+ITOA_CHAR:
+  ; begin if
+  CMP #0xA
+  BLT ITOA_CHAR_ISNUM
+  ; begin branch char >= 10
+    ADD #0x37 ; A=0x41, A is 10
+    JUMP ITOA_CHAR_END
+  ; begin branch char < 10
+  ITOA_CHAR_ISNUM:
+    ADD #0x30
+  ; end if
+ITOA_CHAR_END:
+  RET
+; end func ITOA

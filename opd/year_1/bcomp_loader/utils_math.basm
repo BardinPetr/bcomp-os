@@ -1,0 +1,14 @@
+; func MUL: (a, b) multiply numbers
+; 
+; params: AC a
+;         STACK b
+; return: a*b
+; requires: a, b in ???
+; stack: &0: ret
+;        &1: a
+;        &2: b
+; begin func
+MUL:
+  RET
+
+; end func

@@ -1,0 +1,311 @@
+; string format: (char[1] char[0]) ... (char[i+1]@1b char[i]@1b) (0x00, 0x00/char[2n-1])
+
+ORG 0x10
+
+; INCLUDE utils_math.basm
+; INCLUDE utils_string.basm
+
+
+
+; --------------------INCLUDED FROM utils_output.basm--------------------
+; ----------------------------- TERMINAL OUTPUT -----------------------------
+
+; func PRINT_CHAR: outputs one char to text printer with wait for device availability
+; 
+; params: AC - 1b character in low byte
+; return: none
+; begin func
+PRINT_CHAR:
+  PUSH ; store target char
+
+  PUT_CHAR_LOOP:
+    IN 0xD
+    AND #0x40
+    BZS PUT_CHAR_LOOP
+
+  POP
+  OUT 0xC
+  RET
+; end func PUT_CHAR
+
+
+; func PRINT: outputs string to text printer 
+; 
+; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
+; params: AC - pointer to first string data address
+; return: none
+; stack:  &0 - ret addr
+; begin globals:
+PRINT_CUR: WORD ? ; pointer/iterator to currect mem address
+MASK_LOW: WORD 0x00FF
+; end globals
+; begin func
+PRINT:
+  ST PRINT_CUR
+
+; begin loop
+PRINT_LOOP:
+  LD (PRINT_CUR)+
+
+  BZS PRINT_EXIT
+  CALL PRINT_CHAR
+
+  SWAB
+  
+  AND $MASK_LOW
+  BZS PRINT_EXIT
+  CALL PRINT_CHAR
+
+  JUMP PRINT_LOOP
+; end loop
+PRINT_EXIT:
+  RET
+; end func PRINT
+
+
+; --------------------INCLUDED END utils_output.basm--------------------
+        
+
+
+; --------------------INCLUDED FROM utils_input.basm--------------------
+; ----------------------------- TERMINAL INPUT -----------------------------
+; func READ_LINE: (dst: word) read text string from keyboard untill enter pressed(LF):
+; 
+; requires: free memory of string starting from addr in param
+;
+; params:  AC: dst: address in memory from which the result will be placed;
+; return:  AC: string length
+;          MEM: string starting at mem addr "dst"
+; affects: AC
+; stack:   &0 - current character id
+;          &1 - ret addr
+; begin globals:
+READ_LINE_CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
+; end globals
+; begin func
+READ_LINE:
+; begin prologue
+  PUSH 
+; end prologue
+
+  ; set base output address from AC
+  ST $READ_LINE_CUR_POINTER
+
+  ; set character id to zero 
+  CLA
+  ST &0
+
+  ; begin loop
+  READ_LINE_LOOP: 
+    LD &0 ; cur id
+    INC 
+    ST &0 ; i++
+
+    ; begin if
+    AND #1
+    BZS READ_LINE_HIGH_BYTE
+    ; begin branch char_id % 2 == 0
+      CALL $READ_CHAR
+
+      CMP #0x0A ; LF (NUL is full next word)
+      BEQ READ_LINE_EOL_APPEND_NUL
+
+      ST (READ_LINE_CUR_POINTER)
+      JUMP READ_LINE_LOOP
+    ; begin branch char_id % 2 == 1
+    READ_LINE_HIGH_BYTE:
+      CALL $READ_CHAR
+
+      CMP #0x0A ; LF, NUL is this word high byte
+      ; no need to set NUL as it is automatically set when writing low byte
+      BEQ READ_LINE_EOL
+
+      SWAB
+      OR (READ_LINE_CUR_POINTER)
+      ST (READ_LINE_CUR_POINTER)+
+      JUMP READ_LINE_LOOP
+    ; end if
+  ; end loop
+
+READ_LINE_EOL_APPEND_NUL:
+  CLA ; put EOS
+  ST (READ_LINE_CUR_POINTER)
+READ_LINE_EOL:
+  ; begin epilogue
+    POP ; length as return in AC
+    RET
+  ; end epilogue
+; end func READ_LINE
+
+
+; func READ_CHAR: pool keyboard for ready and read 1 char from it
+;
+; params: none
+; return: AC: data read from dev in low byte
+; affects: AC higher byte is cleared
+; begin func
+READ_CHAR:
+READ_CHAR_LOOP:
+  CLA
+  IN 0x19
+  AND #0x40
+  BZS READ_CHAR_LOOP
+  IN 0x18
+  RET
+; end func READ_CHAR
+
+; --------------------INCLUDED END utils_input.basm--------------------
+        
+
+
+; --------------------INCLUDED FROM utils_loader.basm--------------------
+; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
+
+; func LOAD_BIN:
+; 
+; stack:
+; &: cur_section_org_delta
+; &: cur_section_len
+; &: cur_section_offset
+; &: cur_section_org
+; &: cur_section_cnt
+; &: real_org
+; &: start_addr
+; &: section_cnt
+; &: ret_addr
+; begin globals
+LOAD_BIN_USERSPACE_END: WORD 0x700
+LOAD_BIN_NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
+LOAD_BIN_LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
+LOAD_BIN_LOAD_PTR: WORD $LOAD_BIN_LOAD_POINT
+; end globals
+; begin func
+LOAD_BIN:
+  ; begin prologue
+    PUSH
+  PUSH
+  PUSH
+  PUSH
+  PUSH
+  PUSH
+  PUSH
+  PUSH
+
+  ; end prologue
+  
+  CALL (LOAD_BIN_NEXT_INPUT_WORD)
+  ST &7
+  ST &4
+
+  CALL (LOAD_BIN_NEXT_INPUT_WORD)
+  ST &6
+
+  LD LOAD_BIN_LOAD_PTR
+  ST &5
+
+  ; begin loop over sections
+  LOAD_BIN_LOAD_SECT_LOOP:    
+    CALL (LOAD_BIN_NEXT_INPUT_WORD)
+    ST &2
+
+    CALL (LOAD_BIN_NEXT_INPUT_WORD)
+    ST &1
+  
+    CALL (LOAD_BIN_NEXT_INPUT_WORD)
+    ST &3
+    ; calculate org delta (section_org - real_section_org)
+    SUB &5
+    ST &0
+
+    ; increase targer org counter
+    LD &5
+    ADD &1
+    ST &5
+
+    ; begin if check memory availability
+    CMP LOAD_BIN_USERSPACE_END
+    BLT LOAD_BIN_SECTION_VALID 
+    ; begin branch section out of space
+      LD LOAD_BIN_STR_NO_SPACE_PTR
+      CALL PRINT
+      JUMP LOAD_BIN_END
+    ; end if
+
+    LOAD_BIN_SECTION_VALID:
+    LOOP &4
+    JUMP LOAD_BIN_LOAD_SECT_LOOP
+  ; end loop over sections
+
+  LD LOAD_BIN_STR_HEADER_OK_PTR
+  CALL PRINT
+
+
+  ; restart sections iteration
+  LD &7
+  ST &4
+
+  ; begin loop over sections
+  LOAD_BIN_SECT_LOOP:    
+    LD #0 ; load cur_section_offset
+    
+    ; begin if cur_section_offset[15]
+    ROL
+    BCS LOAD_BIN_CODE_SEC
+    ; begin branch if data sector
+
+      ; begin loop over commands
+      LOAD_BIN_DATA_CMD_LOOP:
+        CALL (LOAD_BIN_NEXT_INPUT_WORD)
+        ST (LOAD_BIN_LOAD_PTR)+
+
+        LOOP &1
+        JUMP LOAD_BIN_DATA_CMD_LOOP
+      ; end loop over commands
+
+    ; begin branch if code sector
+    LOAD_BIN_CODE_SEC:
+    ; end if
+
+    LOOP &7
+    JUMP LOAD_BIN_SECT_LOOP
+  ; end loop over sections
+
+LOAD_BIN_END:
+; begin epilogue
+    POP
+  POP
+  POP
+  POP
+  POP
+  POP
+  POP
+  POP
+
+  RET
+; end epilogue
+
+; begin globals strings 
+LOAD_BIN_STR_NO_SPACE: WORD 0x6F6E, 0x2074, 0x6E65, 0x756F, 0x6867, 0x5220, 0x4D41, 0x7420, 0x206F, 0x6F6C, 0x6461, 0x7020, 0x6F72, 0x7267, 0x6D61, 0x000A
+      LOAD_BIN_STR_NO_SPACE_PTR: WORD $LOAD_BIN_STR_NO_SPACE
+LOAD_BIN_STR_HEADER_OK: WORD 0x6568, 0x6461, 0x7265, 0x7020, 0x7261, 0x6573, 0x2064, 0x6E61, 0x2064, 0x6176, 0x696C, 0x0A64
+      LOAD_BIN_STR_HEADER_OK_PTR: WORD $LOAD_BIN_STR_HEADER_OK
+; end globals
+; end func LOAD_BIN
+
+
+; --------------------INCLUDED END utils_loader.basm--------------------
+        
+START:
+  CALL $LOAD_BIN
+  HLT
+
+
+READ_WORD_DEMO_PTR: WORD $BIN
+READ_WORD_DEMO:
+  LD (READ_WORD_DEMO_PTR)+
+  RET
+
+
+BIN: WORD 0x0004, 0x0100, 0x8000, 0x0002, 0x0100, 0x0002, 0x0001, 0x0200, 0x8003, 0x0003, 0x0201, 0x0006, 0x0001, 0x0300, 0xD201, 0x0100, 0x3445, 0xA300, 0x130C, 0x0A00, 0x0031
+
+CODE_END_PTR: WORD 0

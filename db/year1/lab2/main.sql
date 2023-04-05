@@ -3,15 +3,14 @@ SELECT human."ОТЧЕСТВО", ved."ДАТА"
 FROM "Н_ЛЮДИ" as human
          INNER JOIN "Н_ВЕДОМОСТИ" as ved ON human."ИД" = ved."ЧЛВК_ИД"
 WHERE human."ФАМИЛИЯ" < 'Афанасьев'
-  AND (ved."ИД" > 1490007 OR ved."ИД" < 1457443);
--- AND ved."ИД" > 1490007 AND ved."ИД" < 1457443
+  AND ved."ИД" > 1490007 AND ved."ИД" < 1457443;
 
 -- #2
 SELECT human."ИД", learn."НЗК", stud."ИД"
 FROM "Н_ЛЮДИ" as human
          INNER JOIN "Н_ОБУЧЕНИЯ" learn on human."ИД" = learn."ЧЛВК_ИД"
          INNER JOIN "Н_УЧЕНИКИ" stud on human."ИД" = stud."ЧЛВК_ИД"
-WHERE human."ИМЯ" = 'Дмитрий' -- 'Ярослав'
+WHERE human."ИМЯ" = 'Ярослав'
   AND learn."ЧЛВК_ИД" = 113409;
 
 -- #3
@@ -21,7 +20,7 @@ FROM "Н_ЛЮДИ" as human
 WHERE stud."ГРУППА" = '3102';
 
 -- #4
-SELECT human."ОТЧЕСТВО" as middlename, count(human."ОТЧЕСТВО") as count
+SELECT human."ОТЧЕСТВО" as middlename, count(human."ИД") as count
 FROM "Н_ЛЮДИ" as human
          JOIN "Н_УЧЕНИКИ" stud ON human."ИД" = stud."ЧЛВК_ИД"
          JOIN "Н_ПЛАНЫ" plan on stud."ПЛАН_ИД" = plan."ИД"
@@ -29,7 +28,7 @@ FROM "Н_ЛЮДИ" as human
 WHERE otd."КОРОТКОЕ_ИМЯ" = 'КТиУ'
   AND human."ОТЧЕСТВО" <> '.'
 GROUP BY human."ОТЧЕСТВО"
-HAVING count(human."ОТЧЕСТВО") > 10
+HAVING count(human."ИД") > 10
 ORDER BY count DESC;
 
 -- #5

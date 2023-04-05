@@ -73,17 +73,15 @@ CREATE TABLE s367079.live_creature
 CREATE TABLE s367079.crew
 (
     id            int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name          varchar(50) UNIQUE NOT NULL,
-    creation_date date               NOT NULL
+    name          varchar(50) NOT NULL,
+    creation_date date        NOT NULL
 );
 
 CREATE TABLE s367079.astronaut
 (
-    creature_id int REFERENCES live_creature (id) UNIQUE NOT NULL,
+    creature_id int REFERENCES live_creature (id) UNIQUE NOT NULL PRIMARY KEY,
     crew_id     int REFERENCES crew (id)                 NOT NULL,
-    role        crew_role                                NOT NULL DEFAULT ('private'),
-
-    PRIMARY KEY (creature_id, crew_id)
+    role        crew_role                                NOT NULL DEFAULT ('private')
 );
 
 CREATE TABLE s367079.spaceship
@@ -105,12 +103,11 @@ CREATE TABLE s367079.flight
 
 CREATE TABLE s367079.flight_log_entry
 (
-    id                   int GENERATED ALWAYS AS IDENTITY,
+    timestamp            timestamp                  NOT NULL,
     flight_id            int REFERENCES flight (id) NOT NULL,
     obstacle_overcame_id int REFERENCES object (id),
-    timestamp            timestamp                  NOT NULL,
     location             d3_position                NOT NULL,
-    PRIMARY KEY (id, flight_id)
+    PRIMARY KEY (timestamp, flight_id)
 );
 
 

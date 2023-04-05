@@ -8,10 +8,10 @@
 PRINT_CHAR:
   PUSH ; store target char
 
-  PUT_CHAR_LOOP:
+  PCH__LOOP:
     IN 0xD
     AND #0x40
-    BZS PUT_CHAR_LOOP
+    BZS PCH__LOOP
 
   POP
   OUT 0xC
@@ -26,16 +26,16 @@ PRINT_CHAR:
 ; return: none
 ; stack:  &0 - ret addr
 ; begin globals:
-PRINT_CUR: WORD ? ; pointer/iterator to currect mem address
+PRINT__CUR: WORD ? ; pointer/iterator to currect mem address
 MASK_LOW: WORD 0x00FF
 ; end globals
 ; begin func
 PRINT:
-  ST PRINT_CUR
+  ST PRINT__CUR
 
 ; begin loop
 PRINT_LOOP:
-  LD (PRINT_CUR)+
+  LD (PRINT__CUR)+
 
   BZS PRINT_EXIT
   CALL PRINT_CHAR

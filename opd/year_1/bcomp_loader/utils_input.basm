@@ -10,7 +10,7 @@
 ; stack:   &0 - current character id
 ;          &1 - ret addr
 ; begin globals:
-READ_LINE_CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
+RL__CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
 ; end globals
 ; begin func
 READ_LINE:
@@ -19,48 +19,48 @@ READ_LINE:
 ; end prologue
 
   ; set base output address from AC
-  ST $READ_LINE_CUR_POINTER
+  ST $RL__CUR_POINTER
 
   ; set character id to zero 
   CLA
   ST &0
 
   ; begin loop
-  READ_LINE_LOOP: 
+  RL__LOOP: 
     LD &0 ; cur id
     INC 
     ST &0 ; i++
 
     ; begin if
     AND #1
-    BZS READ_LINE_HIGH_BYTE
+    BZS RL__HIGH_BYTE
     ; begin branch char_id % 2 == 0
       CALL $READ_CHAR
 
       CMP #0x0A ; LF (NUL is full next word)
-      BEQ READ_LINE_EOL_APPEND_NUL
+      BEQ RL__EOL_APPEND_NUL
 
-      ST (READ_LINE_CUR_POINTER)
-      JUMP READ_LINE_LOOP
+      ST (RL__CUR_POINTER)
+      JUMP RL__LOOP
     ; begin branch char_id % 2 == 1
-    READ_LINE_HIGH_BYTE:
+    RL__HIGH_BYTE:
       CALL $READ_CHAR
 
       CMP #0x0A ; LF, NUL is this word high byte
       ; no need to set NUL as it is automatically set when writing low byte
-      BEQ READ_LINE_EOL
+      BEQ RL__EOL
 
       SWAB
-      OR (READ_LINE_CUR_POINTER)
-      ST (READ_LINE_CUR_POINTER)+
-      JUMP READ_LINE_LOOP
+      OR (RL__CUR_POINTER)
+      ST (RL__CUR_POINTER)+
+      JUMP RL__LOOP
     ; end if
   ; end loop
 
-READ_LINE_EOL_APPEND_NUL:
+RL__EOL_APPEND_NUL:
   CLA ; put EOS
-  ST (READ_LINE_CUR_POINTER)
-READ_LINE_EOL:
+  ST (RL__CUR_POINTER)
+RL__EOL:
   ; begin epilogue
     POP ; length as return in AC
     RET
@@ -75,11 +75,11 @@ READ_LINE_EOL:
 ; affects: AC higher byte is cleared
 ; begin func
 READ_CHAR:
-READ_CHAR_LOOP:
+RCH__LOOP:
   CLA
   IN 0x19
   AND #0x40
-  BZS READ_CHAR_LOOP
+  BZS RCH__LOOP
   IN 0x18
   RET
 ; end func READ_CHAR

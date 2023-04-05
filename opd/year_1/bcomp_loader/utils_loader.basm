@@ -19,15 +19,20 @@ LB__ABS_CMD_MIN_VAL: WORD 0x2000
 LB__ABS_CMD_MAX_VAL: WORD 0xF000
 LB__USERSPACE_END: WORD 0x700
 LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
-LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
-LB__LOAD_PTR: WORD $LB__LOAD_POINT
+; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
+LB__LOAD_POINT: WORD 0x600
+LB__LOAD_PTR: WORD ?
+LB__SEC_LEN: WORD 0x8003, 0x1
+LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
 ; end globals
 ; begin func
 LOAD_BIN:
   ; begin prologue
   PUSHA
   ; end prologue
-  
+  LD $LB__STR_STARTED_PTR
+  CALL $PRINT
+
   CALL (LB__NEXT_INPUT_WORD)
   ST &section_cnt
   ST &cur_section_cnt
@@ -35,7 +40,8 @@ LOAD_BIN:
   CALL (LB__NEXT_INPUT_WORD)
   ST &start_addr
 
-  LD LB__LOAD_PTR
+  LD LB__LOAD_POINT
+  ST LB__LOAD_PTR
   ST &real_org
 
   ; begin loop over sections
@@ -61,8 +67,8 @@ LOAD_BIN:
     CMP LB__USERSPACE_END
     BLT LB__SECTION_VALID 
     ; begin branch section out of space
-      LD LB__STR_NO_SPACE_PTR
-      CALL PRINT
+      ; LD $LB__STR_NO_SPACE_PTR
+      ; CALL $PRINT
       JUMP LB__END
     ; end if
 
@@ -71,9 +77,8 @@ LOAD_BIN:
     JUMP LB__LOAD_SECT_LOOP
   ; end loop over sections
 
-  LD LB__STR_HEADER_OK_PTR
-  CALL PRINT
-
+  LD $LB__STR_HEADER_OK_PTR
+  CALL $PRINT
 
   ; restart sections iteration
   LD &section_cnt
@@ -81,26 +86,30 @@ LOAD_BIN:
 
   ; begin loop over sections
   LB__SECT_LOOP:    
-    LD #0 ; load cur_section_offset
-    
-    ; begin if cur_section_offset[15]
+    ; TODO: load cur_section_len
+    LD (LB__SEC_LEN_PTR)
+    ASL
+    ASR
+    ST &cur_section_len
+
+    LD (LB__SEC_LEN_PTR)+
+    ; begin if cur_section_len[15]
     ROL
     BCS LB__CODE_SEC
     ; begin branch if data sector
 
-      ; begin loop over commands
+      ; begin loop over data
       LB__DATA_CMD_LOOP:
         CALL (LB__NEXT_INPUT_WORD)
         ST (LB__LOAD_PTR)+
 
         LOOP &cur_section_len
         JUMP LB__DATA_CMD_LOOP
-      ; end loop over commands
-
+      ; end loop over data
+      JUMP LB__SEC_RELOC_END
 
     ; begin branch if code sector
     LB__CODE_SEC:
-
       ; begin loop over commands
       LB__CODE_CMD_LOOP:
         CALL (LB__NEXT_INPUT_WORD) ; load command
@@ -114,14 +123,17 @@ LOAD_BIN:
         CMP LB__ABS_CMD_MIN_VAL
         BLT LB__OTHER_CMD
         AND LB__CMD_ADDR_TYPE_MASK
-        BZC LB__OTHER_CMD
+        BZC LB__OTHER_CMD_WITH_LD
         ; begin branch absolute addressing
           ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
           LD &cur_cmd
           SUB &cur_section_org_delta 
+          JUMP LB__OTHER_CMD
         ; begin branch not absolute addressing
+        LB__OTHER_CMD_WITH_LD:
+          LD &cur_cmd
         LB__OTHER_CMD:
-          LD (LB__LOAD_PTR)+ ; just for increment
+          ST (LB__LOAD_PTR)+ ; load command
         ; end if
 
         LOOP &cur_section_len
@@ -129,18 +141,38 @@ LOAD_BIN:
       ; end loop over commands
 
     ; end if
-    LOOP &section_cnt
+    LB__SEC_RELOC_END:
+
+    LD &section_cnt
+    SUB &cur_section_cnt
+    CALL $ITOA_CHAR
+    CALL $PRINT_CHAR
+
+    LD $LB__STR_SECTION_LOADED_PTR
+    CALL $PRINT
+
+    LOOP &cur_section_cnt
     JUMP LB__SECT_LOOP
   ; end loop over sections
 
 LB__END:
+
+  LD $LB__STR_FULL_LOADED_PTR
+  CALL $PRINT
+
+  LD &start_addr
+  ST &ret_addr
+
 ; begin epilogue
   POPA
   RET
 ; end epilogue
 
 ; begin globals strings 
-LB__STR_NO_SPACE: WORD "not enough RAM to load program\n"
-LB__STR_HEADER_OK: WORD "header parsed and valid\n"
+LB__STR_STARTED: WORD "Started loading program\n\r"
+LB__STR_NO_SPACE: WORD "Not enough RAM to load program\n\r"
+LB__STR_HEADER_OK: WORD "Header parsed and valid\n\r"
+LB__STR_SECTION_LOADED: WORD " section loaded\n\r"
+LB__STR_FULL_LOADED: WORD "Loading successful\n\r"
 ; end globals
 ; end func LOAD_BIN

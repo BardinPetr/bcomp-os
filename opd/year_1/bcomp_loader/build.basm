@@ -3,8 +3,189 @@
 ORG 0x10
 
 ; INCLUDE utils_math.basm
-; INCLUDE utils_string.basm
 
+
+
+; --------------------INCLUDED FROM utils_string.basm--------------------
+; ; func ATOI_HEX: (src) converts hex string to int 
+; ; 
+; ; params: AC src: pointer to NUL-ended string beginning
+; ; return: AC: unsigned 2byte integer
+; ; stack:  &0: current sum value
+; ;         &1: current char index (from 0)
+; ;         &2: ret addr
+; ; begin globals
+; ATOI_HEX__STR_PTR: DATA ?
+; ATOI_HEX__LOW_MASK: DATA 0xFF
+; ; end globals
+; ; begin func
+; ATOI_HEX:
+; ; begin prologue
+;   PUSH
+;   PUSH
+; ; end prologue
+
+;   ST ATOI_STR_PTR
+
+;   CLA 
+;   ST &0
+;   ST &1
+
+;   ; begin loop
+;   ATOI_HEX__LOOP:
+;     LD &1
+
+    
+;     LD (ATOI_STR_PTR)
+;     AND ATOI_LOW_MASK
+;     CALL ATOI_CHAR
+
+;     BZS ATOI_END
+    
+;     ; begin loop
+;     ; ATOI_HEX__MULT:
+;     ;   ASL
+;     ;   ASL
+;     ;   ASL
+;     ;   ASL
+
+
+;     JUMP ATOI_HEX__LOOP
+;   ; end loop
+
+;   ATOI_HEX__END:
+; ; begin epilogue
+;   POP
+;   POP
+;   RET
+; ; end epilogue
+; ; end func ATOI_HEX
+
+
+; ; func ATOI: (src, radix) converts string number to int 
+; ; 
+; ; params: STACK src: pointer to NUL-ended string beginning
+; ;         STACK radix: number radix
+; ; return: AC: unsigned 2byte integer
+; ; stack:  &0: radix in current power (from power 0)
+; ;         &1: current sum value
+; ;         &2: current char index
+; ;         &3: ret addr
+; ;         &4: src
+; ;         &5: radix
+; ; begin globals
+; ATOI_STR_PTR: DATA ?
+; ATOI_LOW_MASK: DATA 0xFF
+; ; end globals
+; ; begin func
+; ATOI:
+; ; begin prologue
+;   PUSH
+;   PUSH
+; ; end prologue
+
+;   LD &4
+;   ST ATOI_STR_PTR
+
+;   CLA 
+;   ST &1
+;   ST &2
+;   INC
+;   ST &0
+
+;   ; begin loop
+;   ATOI_LOOP:
+;     LD &2
+
+;     LD (ATOI_STR_PTR)+
+;     AND ATOI_LOW_MASK
+;     CALL ATOI_CHAR
+
+;     BZS ATOI_END
+    
+;     PUSH
+;     LD &0 ; radix in power
+;     PUSH  
+;     CALL $MUL ; ATOI(char[i]) * (radix ^ i)
+;     POP
+;     POP
+
+;     ; save sum
+;     ADD &1
+;     ST &1
+
+;     ; increase power
+;     LD &0
+;     PUSH
+;     LD &4
+;     PUSH  
+;     CALL $MUL
+;     POP
+;     POP
+;     ST &0
+
+;     JUMP ATOI_LOOP
+;   ; end loop
+
+;   ATOI_END:
+; ; begin epilogue
+;   POP
+;   POP
+;   RET
+; ; end epilogue
+; ; end func ATOI
+
+
+; func ATOI_CHAR: (char) returns integer representation of character with radix up to 36
+; uses sequence 0,1,...,9,A(a),B(b),...,Z(z)
+; params: AC char: input character
+; return: AC: int value 
+; begin func
+ATOI_CHAR:
+  ; begin if
+  CMP #0x3A
+  BLT ATOI_CHAR__ISNUM
+  ; begin branch char >= 10
+    SUB #0x37 ; A=0x41, A is 10
+    
+    ; begin if
+    CMP #0x2A ; A=0x41, a = 0x61; 0x61-0x37 = 0x2A
+    BLT ATOI_CHAR__END
+    ; begin branch char in [a..z]
+      SUB #0x20
+      JUMP ATOI_CHAR__END
+    ; end if
+  ; begin branch char < 10
+  ATOI_CHAR__ISNUM:
+    SUB #0x30
+  ; end if
+ATOI_CHAR__END:
+  RET
+; end func ATOI_CHAR
+
+
+; func ITOA_CHAR: (val) returns character representation of one digit in some radix up to 36
+; uses sequence 0,1,...,9,A,B,...,Z
+; params: AC val: integer input digit
+; return: AC: char value 
+; begin func
+ITOA_CHAR:
+  ; begin if
+  CMP #0xA
+  BLT ITOA_CHAR__ISNUM
+  ; begin branch char >= 10
+    ADD #0x37 ; A=0x41, A is 10
+    JUMP ITOA_CHAR__END
+  ; begin branch char < 10
+  ITOA_CHAR__ISNUM:
+    ADD #0x30
+  ; end if
+ITOA_CHAR__END:
+  RET
+; end func ITOA
+
+; --------------------INCLUDED END utils_string.basm--------------------
+        
 
 
 ; --------------------INCLUDED FROM utils_output.basm--------------------
@@ -18,10 +199,10 @@ ORG 0x10
 PRINT_CHAR:
   PUSH ; store target char
 
-  PUT_CHAR_LOOP:
+  PCH__LOOP:
     IN 0xD
     AND #0x40
-    BZS PUT_CHAR_LOOP
+    BZS PCH__LOOP
 
   POP
   OUT 0xC
@@ -36,16 +217,16 @@ PRINT_CHAR:
 ; return: none
 ; stack:  &0 - ret addr
 ; begin globals:
-PRINT_CUR: WORD ? ; pointer/iterator to currect mem address
+PRINT__CUR: WORD ? ; pointer/iterator to currect mem address
 MASK_LOW: WORD 0x00FF
 ; end globals
 ; begin func
 PRINT:
-  ST PRINT_CUR
+  ST PRINT__CUR
 
 ; begin loop
 PRINT_LOOP:
-  LD (PRINT_CUR)+
+  LD (PRINT__CUR)+
 
   BZS PRINT_EXIT
   CALL PRINT_CHAR
@@ -80,7 +261,7 @@ PRINT_EXIT:
 ; stack:   &0 - current character id
 ;          &1 - ret addr
 ; begin globals:
-READ_LINE_CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
+RL__CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
 ; end globals
 ; begin func
 READ_LINE:
@@ -89,48 +270,48 @@ READ_LINE:
 ; end prologue
 
   ; set base output address from AC
-  ST $READ_LINE_CUR_POINTER
+  ST $RL__CUR_POINTER
 
   ; set character id to zero 
   CLA
   ST &0
 
   ; begin loop
-  READ_LINE_LOOP: 
+  RL__LOOP: 
     LD &0 ; cur id
     INC 
     ST &0 ; i++
 
     ; begin if
     AND #1
-    BZS READ_LINE_HIGH_BYTE
+    BZS RL__HIGH_BYTE
     ; begin branch char_id % 2 == 0
       CALL $READ_CHAR
 
       CMP #0x0A ; LF (NUL is full next word)
-      BEQ READ_LINE_EOL_APPEND_NUL
+      BEQ RL__EOL_APPEND_NUL
 
-      ST (READ_LINE_CUR_POINTER)
-      JUMP READ_LINE_LOOP
+      ST (RL__CUR_POINTER)
+      JUMP RL__LOOP
     ; begin branch char_id % 2 == 1
-    READ_LINE_HIGH_BYTE:
+    RL__HIGH_BYTE:
       CALL $READ_CHAR
 
       CMP #0x0A ; LF, NUL is this word high byte
       ; no need to set NUL as it is automatically set when writing low byte
-      BEQ READ_LINE_EOL
+      BEQ RL__EOL
 
       SWAB
-      OR (READ_LINE_CUR_POINTER)
-      ST (READ_LINE_CUR_POINTER)+
-      JUMP READ_LINE_LOOP
+      OR (RL__CUR_POINTER)
+      ST (RL__CUR_POINTER)+
+      JUMP RL__LOOP
     ; end if
   ; end loop
 
-READ_LINE_EOL_APPEND_NUL:
+RL__EOL_APPEND_NUL:
   CLA ; put EOS
-  ST (READ_LINE_CUR_POINTER)
-READ_LINE_EOL:
+  ST (RL__CUR_POINTER)
+RL__EOL:
   ; begin epilogue
     POP ; length as return in AC
     RET
@@ -145,11 +326,11 @@ READ_LINE_EOL:
 ; affects: AC higher byte is cleared
 ; begin func
 READ_CHAR:
-READ_CHAR_LOOP:
+RCH__LOOP:
   CLA
   IN 0x19
   AND #0x40
-  BZS READ_CHAR_LOOP
+  BZS RCH__LOOP
   IN 0x18
   RET
 ; end func READ_CHAR
@@ -164,6 +345,7 @@ READ_CHAR_LOOP:
 ; func LOAD_BIN:
 ; 
 ; stack:
+; &: cur_cmd
 ; &: cur_section_org_delta
 ; &: cur_section_len
 ; &: cur_section_offset
@@ -174,10 +356,16 @@ READ_CHAR_LOOP:
 ; &: section_cnt
 ; &: ret_addr
 ; begin globals
-LOAD_BIN_USERSPACE_END: WORD 0x700
-LOAD_BIN_NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
-LOAD_BIN_LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
-LOAD_BIN_LOAD_PTR: WORD $LOAD_BIN_LOAD_POINT
+LB__CMD_ADDR_TYPE_MASK: WORD 0x0800 ; (0000 1000 0000 0000)
+LB__ABS_CMD_MIN_VAL: WORD 0x2000
+LB__ABS_CMD_MAX_VAL: WORD 0xF000
+LB__USERSPACE_END: WORD 0x700
+LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
+; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
+LB__LOAD_POINT: WORD 0x600
+LB__LOAD_PTR: WORD ?
+LB__SEC_LEN: WORD 0x8003, 0x1
+LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
 ; end globals
 ; begin func
 LOAD_BIN:
@@ -190,89 +378,145 @@ LOAD_BIN:
   PUSH
   PUSH
   PUSH
+  PUSH
 
   ; end prologue
-  
-  CALL (LOAD_BIN_NEXT_INPUT_WORD)
-  ST &7
-  ST &4
+  LD $LB__STR_STARTED_PTR
+  CALL $PRINT
 
-  CALL (LOAD_BIN_NEXT_INPUT_WORD)
+  CALL (LB__NEXT_INPUT_WORD)
+  ST &8
+  ST &5
+
+  CALL (LB__NEXT_INPUT_WORD)
+  ST &7
+
+  LD LB__LOAD_POINT
+  ST LB__LOAD_PTR
   ST &6
 
-  LD LOAD_BIN_LOAD_PTR
+  ; begin loop over sections
+  LB__LOAD_SECT_LOOP:    
+    CALL (LB__NEXT_INPUT_WORD)
+    ST &3
+
+    CALL (LB__NEXT_INPUT_WORD)
+    ST &2
+  
+    CALL (LB__NEXT_INPUT_WORD)
+    ST &4
+    ; calculate org delta (section_org - real_section_org)
+    SUB &6
+    ST &1
+
+    ; increase targer org counter
+    LD &6
+    ADD &2
+    ST &6
+
+    ; begin if check memory availability
+    CMP LB__USERSPACE_END
+    BLT LB__SECTION_VALID 
+    ; begin branch section out of space
+      ; LD $LB__STR_NO_SPACE_PTR
+      ; CALL $PRINT
+      JUMP LB__END
+    ; end if
+
+    LB__SECTION_VALID:
+    LOOP &5
+    JUMP LB__LOAD_SECT_LOOP
+  ; end loop over sections
+
+  LD $LB__STR_HEADER_OK_PTR
+  CALL $PRINT
+
+  ; restart sections iteration
+  LD &8
   ST &5
 
   ; begin loop over sections
-  LOAD_BIN_LOAD_SECT_LOOP:    
-    CALL (LOAD_BIN_NEXT_INPUT_WORD)
+  LB__SECT_LOOP:    
+    ; TODO: load cur_section_len
+    LD (LB__SEC_LEN_PTR)
+    ASL
+    ASR
     ST &2
 
-    CALL (LOAD_BIN_NEXT_INPUT_WORD)
-    ST &1
-  
-    CALL (LOAD_BIN_NEXT_INPUT_WORD)
-    ST &3
-    ; calculate org delta (section_org - real_section_org)
-    SUB &5
-    ST &0
-
-    ; increase targer org counter
-    LD &5
-    ADD &1
-    ST &5
-
-    ; begin if check memory availability
-    CMP LOAD_BIN_USERSPACE_END
-    BLT LOAD_BIN_SECTION_VALID 
-    ; begin branch section out of space
-      LD LOAD_BIN_STR_NO_SPACE_PTR
-      CALL PRINT
-      JUMP LOAD_BIN_END
-    ; end if
-
-    LOAD_BIN_SECTION_VALID:
-    LOOP &4
-    JUMP LOAD_BIN_LOAD_SECT_LOOP
-  ; end loop over sections
-
-  LD LOAD_BIN_STR_HEADER_OK_PTR
-  CALL PRINT
-
-
-  ; restart sections iteration
-  LD &7
-  ST &4
-
-  ; begin loop over sections
-  LOAD_BIN_SECT_LOOP:    
-    LD #0 ; load cur_section_offset
-    
-    ; begin if cur_section_offset[15]
+    LD (LB__SEC_LEN_PTR)+
+    ; begin if cur_section_len[15]
     ROL
-    BCS LOAD_BIN_CODE_SEC
+    BCS LB__CODE_SEC
     ; begin branch if data sector
 
-      ; begin loop over commands
-      LOAD_BIN_DATA_CMD_LOOP:
-        CALL (LOAD_BIN_NEXT_INPUT_WORD)
-        ST (LOAD_BIN_LOAD_PTR)+
+      ; begin loop over data
+      LB__DATA_CMD_LOOP:
+        CALL (LB__NEXT_INPUT_WORD)
+        ST (LB__LOAD_PTR)+
 
-        LOOP &1
-        JUMP LOAD_BIN_DATA_CMD_LOOP
-      ; end loop over commands
+        LOOP &2
+        JUMP LB__DATA_CMD_LOOP
+      ; end loop over data
+      JUMP LB__SEC_RELOC_END
 
     ; begin branch if code sector
-    LOAD_BIN_CODE_SEC:
-    ; end if
+    LB__CODE_SEC:
+      ; begin loop over commands
+      LB__CODE_CMD_LOOP:
+        CALL (LB__NEXT_INPUT_WORD) ; load command
+        ST &0
 
-    LOOP &7
-    JUMP LOAD_BIN_SECT_LOOP
+        ; TODO set cur_section_org_delta
+
+        ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
+        CMP LB__ABS_CMD_MAX_VAL  
+        BGE LB__OTHER_CMD
+        CMP LB__ABS_CMD_MIN_VAL
+        BLT LB__OTHER_CMD
+        AND LB__CMD_ADDR_TYPE_MASK
+        BZC LB__OTHER_CMD_WITH_LD
+        ; begin branch absolute addressing
+          ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
+          LD &0
+          SUB &1 
+          JUMP LB__OTHER_CMD
+        ; begin branch not absolute addressing
+        LB__OTHER_CMD_WITH_LD:
+          LD &0
+        LB__OTHER_CMD:
+          ST (LB__LOAD_PTR)+ ; load command
+        ; end if
+
+        LOOP &2
+        JUMP LB__CODE_CMD_LOOP
+      ; end loop over commands
+
+    ; end if
+    LB__SEC_RELOC_END:
+
+    LD &8
+    SUB &5
+    CALL $ITOA_CHAR
+    CALL $PRINT_CHAR
+
+    LD $LB__STR_SECTION_LOADED_PTR
+    CALL $PRINT
+
+    LOOP &5
+    JUMP LB__SECT_LOOP
   ; end loop over sections
 
-LOAD_BIN_END:
+LB__END:
+
+  LD $LB__STR_FULL_LOADED_PTR
+  CALL $PRINT
+
+  LD &7
+  ST &9
+
 ; begin epilogue
     POP
+  POP
   POP
   POP
   POP
@@ -285,10 +529,16 @@ LOAD_BIN_END:
 ; end epilogue
 
 ; begin globals strings 
-LOAD_BIN_STR_NO_SPACE: WORD 0x6F6E, 0x2074, 0x6E65, 0x756F, 0x6867, 0x5220, 0x4D41, 0x7420, 0x206F, 0x6F6C, 0x6461, 0x7020, 0x6F72, 0x7267, 0x6D61, 0x000A
-      LOAD_BIN_STR_NO_SPACE_PTR: WORD $LOAD_BIN_STR_NO_SPACE
-LOAD_BIN_STR_HEADER_OK: WORD 0x6568, 0x6461, 0x7265, 0x7020, 0x7261, 0x6573, 0x2064, 0x6E61, 0x2064, 0x6176, 0x696C, 0x0A64
-      LOAD_BIN_STR_HEADER_OK_PTR: WORD $LOAD_BIN_STR_HEADER_OK
+LB__STR_STARTED: WORD 0x7453, 0x7261, 0x6574, 0x2064, 0x6F6C, 0x6461, 0x6E69, 0x2067, 0x7270, 0x676F, 0x6172, 0x0A6D, 0x000D
+      LB__STR_STARTED_PTR: WORD $LB__STR_STARTED
+LB__STR_NO_SPACE: WORD 0x6F4E, 0x2074, 0x6E65, 0x756F, 0x6867, 0x5220, 0x4D41, 0x7420, 0x206F, 0x6F6C, 0x6461, 0x7020, 0x6F72, 0x7267, 0x6D61, 0x0D0A
+      LB__STR_NO_SPACE_PTR: WORD $LB__STR_NO_SPACE
+LB__STR_HEADER_OK: WORD 0x6548, 0x6461, 0x7265, 0x7020, 0x7261, 0x6573, 0x2064, 0x6E61, 0x2064, 0x6176, 0x696C, 0x0A64, 0x000D
+      LB__STR_HEADER_OK_PTR: WORD $LB__STR_HEADER_OK
+LB__STR_SECTION_LOADED: WORD 0x7320, 0x6365, 0x6974, 0x6E6F, 0x6C20, 0x616F, 0x6564, 0x0A64, 0x000D
+      LB__STR_SECTION_LOADED_PTR: WORD $LB__STR_SECTION_LOADED
+LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365, 0x7566, 0x0A6C, 0x000D
+      LB__STR_FULL_LOADED_PTR: WORD $LB__STR_FULL_LOADED
 ; end globals
 ; end func LOAD_BIN
 
@@ -306,6 +556,7 @@ READ_WORD_DEMO:
   RET
 
 
-BIN: WORD 0x0004, 0x0100, 0x8000, 0x0002, 0x0100, 0x0002, 0x0001, 0x0200, 0x8003, 0x0003, 0x0201, 0x0006, 0x0001, 0x0300, 0xD201, 0x0100, 0x3445, 0xA300, 0x130C, 0x0A00, 0x0031
+; BIN: WORD 0x0004, 0x0100, 0x8000, 0x0002, 0x0100, 0x0002, 0x0001, 0x0200, 0x8003, 0x0003, 0x0201, 0x0006, 0x0001, 0x0300, 0xD201, 0x0100, 0x3445, 0xA300, 0x130C, 0x0A00, 0x0031
+BIN: WORD 0x0002, 0x0100, 0x0000, 0x8003, 0x0100, 0x0003, 0x0001, 0x0200, 0xAF31, 0x130C, 0x0100, 0x0031
 
 CODE_END_PTR: WORD 0

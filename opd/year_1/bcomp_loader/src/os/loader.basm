@@ -1,7 +1,13 @@
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
-; func LOAD_BIN:
+; func LOAD_BIN: loads programm from binary to RAM and relocates sectors sequentially.
+; Changes all absolute address commands to point into relocated addresses.
+; Indirect addressing should be used inside single sector only.
+; Remap of poiners created via "DATA $X" construction is not supported.
+; Uses LB__NEXT_INPUT_WORD as streaming source of 2b words for binary.
+; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
+; return: AC: start address of program  
 ; stack:
 ; &: cur_cmd
 ; &: cur_section_org_delta
@@ -22,8 +28,11 @@ LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
 ; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
 LB__LOAD_POINT: WORD 0x600
 LB__LOAD_PTR: WORD ?
-LB__SEC_LEN: WORD 0x8003, 0x1
+LB__SEC_LEN: WORD 0x8004, 0x1
 LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
+LB__SEC_DELTA: WORD 0xFBFC, 0x0, 0x0, 0xFB00, 0xFB00
+LB__SEC_DELTA_2: WORD 0xFB00
+LB__SEC_DELTA_PTR: WORD $LB__SEC_DELTA
 ; end globals
 ; begin func
 LOAD_BIN:
@@ -97,7 +106,6 @@ LOAD_BIN:
     ROL
     BCS LB__CODE_SEC
     ; begin branch if data sector
-
       ; begin loop over data
       LB__DATA_CMD_LOOP:
         CALL (LB__NEXT_INPUT_WORD)
@@ -112,6 +120,9 @@ LOAD_BIN:
     LB__CODE_SEC:
       ; begin loop over commands
       LB__CODE_CMD_LOOP:
+        LD (LB__SEC_DELTA_PTR)+
+        ST &cur_section_org_delta        
+
         CALL (LB__NEXT_INPUT_WORD) ; load command
         ST &cur_cmd
 
@@ -119,9 +130,9 @@ LOAD_BIN:
 
         ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
         CMP LB__ABS_CMD_MAX_VAL  
-        BGE LB__OTHER_CMD
+        BHIS LB__OTHER_CMD
         CMP LB__ABS_CMD_MIN_VAL
-        BLT LB__OTHER_CMD
+        BLO LB__OTHER_CMD
         AND LB__CMD_ADDR_TYPE_MASK
         BZC LB__OTHER_CMD_WITH_LD
         ; begin branch absolute addressing
@@ -160,8 +171,11 @@ LB__END:
   LD $LB__STR_FULL_LOADED_PTR
   CALL $PRINT
 
+  ; calculate new start address and return in AC
   LD &start_addr
-  ST &ret_addr
+  ; TODO: load delta
+  SUB $LB__SEC_DELTA_2
+  ST &section_cnt ; store to next stack item after ret addr so last POP will put it in AC
 
 ; begin epilogue
   POPA

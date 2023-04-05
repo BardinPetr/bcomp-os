@@ -2,11 +2,11 @@
 
 ORG 0x10
 
-; INCLUDE utils_math.basm
+; INCLUDE util/math.basm
 
 
 
-; --------------------INCLUDED FROM utils_string.basm--------------------
+; --------------------INCLUDED FROM util/string.basm--------------------
 ; ; func ATOI_HEX: (src) converts hex string to int 
 ; ; 
 ; ; params: AC src: pointer to NUL-ended string beginning
@@ -184,11 +184,11 @@ ITOA_CHAR__END:
   RET
 ; end func ITOA
 
-; --------------------INCLUDED END utils_string.basm--------------------
+; --------------------INCLUDED END util/string.basm--------------------
         
 
 
-; --------------------INCLUDED FROM utils_output.basm--------------------
+; --------------------INCLUDED FROM io/output.basm--------------------
 ; ----------------------------- TERMINAL OUTPUT -----------------------------
 
 ; func PRINT_CHAR: outputs one char to text printer with wait for device availability
@@ -244,11 +244,11 @@ PRINT_EXIT:
 ; end func PRINT
 
 
-; --------------------INCLUDED END utils_output.basm--------------------
+; --------------------INCLUDED END io/output.basm--------------------
         
 
 
-; --------------------INCLUDED FROM utils_input.basm--------------------
+; --------------------INCLUDED FROM io/input.basm--------------------
 ; ----------------------------- TERMINAL INPUT -----------------------------
 ; func READ_LINE: (dst: word) read text string from keyboard untill enter pressed(LF):
 ; 
@@ -335,15 +335,21 @@ RCH__LOOP:
   RET
 ; end func READ_CHAR
 
-; --------------------INCLUDED END utils_input.basm--------------------
+; --------------------INCLUDED END io/input.basm--------------------
         
 
 
-; --------------------INCLUDED FROM utils_loader.basm--------------------
+; --------------------INCLUDED FROM os/loader.basm--------------------
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
-; func LOAD_BIN:
+; func LOAD_BIN: loads programm from binary to RAM and relocates sectors sequentially.
+; Changes all absolute address commands to point into relocated addresses.
+; Indirect addressing should be used inside single sector only.
+; Remap of poiners created via "DATA $X" construction is not supported.
+; Uses LB__NEXT_INPUT_WORD as streaming source of 2b words for binary.
+; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
+; return: AC: start address of program  
 ; stack:
 ; &: cur_cmd
 ; &: cur_section_org_delta
@@ -364,8 +370,11 @@ LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
 ; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
 LB__LOAD_POINT: WORD 0x600
 LB__LOAD_PTR: WORD ?
-LB__SEC_LEN: WORD 0x8003, 0x1
+LB__SEC_LEN: WORD 0x8004, 0x1
 LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
+LB__SEC_DELTA: WORD 0xFBFC, 0x0, 0x0, 0xFB00, 0xFB00
+LB__SEC_DELTA_2: WORD 0xFB00
+LB__SEC_DELTA_PTR: WORD $LB__SEC_DELTA
 ; end globals
 ; begin func
 LOAD_BIN:
@@ -448,7 +457,6 @@ LOAD_BIN:
     ROL
     BCS LB__CODE_SEC
     ; begin branch if data sector
-
       ; begin loop over data
       LB__DATA_CMD_LOOP:
         CALL (LB__NEXT_INPUT_WORD)
@@ -463,6 +471,9 @@ LOAD_BIN:
     LB__CODE_SEC:
       ; begin loop over commands
       LB__CODE_CMD_LOOP:
+        LD (LB__SEC_DELTA_PTR)+
+        ST &1        
+
         CALL (LB__NEXT_INPUT_WORD) ; load command
         ST &0
 
@@ -470,9 +481,9 @@ LOAD_BIN:
 
         ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
         CMP LB__ABS_CMD_MAX_VAL  
-        BGE LB__OTHER_CMD
+        BHIS LB__OTHER_CMD
         CMP LB__ABS_CMD_MIN_VAL
-        BLT LB__OTHER_CMD
+        BLO LB__OTHER_CMD
         AND LB__CMD_ADDR_TYPE_MASK
         BZC LB__OTHER_CMD_WITH_LD
         ; begin branch absolute addressing
@@ -511,8 +522,11 @@ LB__END:
   LD $LB__STR_FULL_LOADED_PTR
   CALL $PRINT
 
+  ; calculate new start address and return in AC
   LD &7
-  ST &9
+  ; TODO: load delta
+  SUB $LB__SEC_DELTA_2
+  ST &8 ; store to next stack item after ret addr so last POP will put it in AC
 
 ; begin epilogue
     POP
@@ -537,16 +551,19 @@ LB__STR_HEADER_OK: WORD 0x6548, 0x6461, 0x7265, 0x7020, 0x7261, 0x6573, 0x2064, 
       LB__STR_HEADER_OK_PTR: WORD $LB__STR_HEADER_OK
 LB__STR_SECTION_LOADED: WORD 0x7320, 0x6365, 0x6974, 0x6E6F, 0x6C20, 0x616F, 0x6564, 0x0A64, 0x000D
       LB__STR_SECTION_LOADED_PTR: WORD $LB__STR_SECTION_LOADED
-LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365, 0x7566, 0x0A6C, 0x000D
+LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365, 0x6673, 0x6C75, 0x0D0A
       LB__STR_FULL_LOADED_PTR: WORD $LB__STR_FULL_LOADED
 ; end globals
 ; end func LOAD_BIN
 
 
-; --------------------INCLUDED END utils_loader.basm--------------------
+; --------------------INCLUDED END os/loader.basm--------------------
         
+JUMP_TARGET: WORD ?
 START:
   CALL $LOAD_BIN
+  ST JUMP_TARGET
+  JUMP (JUMP_TARGET)
   HLT
 
 
@@ -556,7 +573,6 @@ READ_WORD_DEMO:
   RET
 
 
-; BIN: WORD 0x0004, 0x0100, 0x8000, 0x0002, 0x0100, 0x0002, 0x0001, 0x0200, 0x8003, 0x0003, 0x0201, 0x0006, 0x0001, 0x0300, 0xD201, 0x0100, 0x3445, 0xA300, 0x130C, 0x0A00, 0x0031
-BIN: WORD 0x0002, 0x0100, 0x0000, 0x8003, 0x0100, 0x0003, 0x0001, 0x0200, 0xAF31, 0x130C, 0x0100, 0x0031
+BIN: WORD 0x0002, 0x0100, 0x0000, 0x8004, 0x0100, 0x0004, 0x0001, 0x0200, 0xA200, 0x0000, 0x130C, 0x0100, 0x00E8
 
 CODE_END_PTR: WORD 0

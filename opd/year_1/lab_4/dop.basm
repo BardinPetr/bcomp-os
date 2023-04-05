@@ -1,0 +1,101 @@
+ORG 0x2BB
+START:
+  CLA
+  ST SUM ; (IP+25)
+  
+  ;
+  LD Y ; (IP+22)
+  PUSH 
+  CALL $A
+  
+  DEC
+  SUB SUM ; (IP+19)
+  ST SUM ; (IP+18)
+
+  POP ; cleanup
+
+
+  ;
+  LD Z ; (IP+14)
+  DEC
+  PUSH
+  CALL $FUNC
+
+  DEC
+  ADD SUM ; (IP+11)
+  ST SUM ; (IP+10)
+
+  POP 
+
+
+  ; X
+  LD X ; (IP+8)
+  PUSH
+  CALL $FUNC
+
+  ADD SUM ; (IP+5)
+  ST SUM ; (IP+4)
+
+  POP
+
+
+  HLT
+
+ORG 0x02D3
+  Z: WORD 0xFF06
+  Y: WORD 0xFF9D
+  X: WORD 0x17
+  SUM: WORD ?
+
+ORG 0x737
+FUNC: ; arg on stack; result on stack
+  LD &1
+  BPL CALCULATE; IP+3
+  CMP LOW_LIMIT ; (IP+10)
+  BMI CALCULATE; IP+1
+  JUMP RET_CONST; IP+5
+CALCULATE:
+  ASL
+  ASL
+  ADD &1
+  SUB SUB_VAL ; (IP+5)
+  JUMP EXIT; IP+1
+RET_CONST:  
+  LD LOW_LIMIT; (IP+2)
+EXIT:  
+  ST &1
+  RET
+
+ORG 0x744
+  LOW_LIMIT: WORD 0xFF44
+  SUB_VAL: WORD 0x00CA
+
+
+; ret_b
+; arg_for_func|ret_from_func
+; ret_c
+; arg_for_b
+
+B: ; stdcall; arg on stack, result on AC
+  POP ; ret in c -> AC
+  SWAP ; ret on stack top, arg in AC 
+
+  PUSH 
+  CALL $FUNC
+  POP ; result in AC
+
+  RET
+
+
+C: ; fastcall; arg in AC, result in AC
+  ; arg in AC
+  PUSH 
+  CALL $B ; res in AC
+  ; result in AC
+  RET
+
+
+A: ; cdecl; arg on stack; res in AC
+  LD &1
+  CALL $C
+  RET

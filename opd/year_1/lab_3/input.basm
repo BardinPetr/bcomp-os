@@ -1,0 +1,59 @@
+ORG 04AA:
+	04BE			;(04AA: 04BE)
+	LD	0000	;(04AB: A000)
+	ADD	0000	;(04AC: 4000)
+	ST	0000	;(04AD: E000)
+START: CLA  ;(04AE: 0200)
+	ST	0EFD	;(04AF: EEFD)
+	LD	0F05	;(04B0: AF05)
+	ST	0EFA	;(04B1: EEFA)
+	LD	0EF7	;(04B2: AEF7)
+	ST	0EF7	;(04B3: EEF7)
+	LD	0AF6	;(04B4: AAF6)
+	ROR			  ;(04B5: 0480)
+	CMC			  ;(04B6: 0380)
+	BCS	0003	;(04B7: F403)
+	CMC			  ;(04B8: 0380)
+	ROL		 	  ;(04B9: 0400)
+	LD	 0AF2	;(04BA: AAF2)
+	LOOP 4AC ;(04BB: 84AC)
+	JUMP (IP+F7);(04BC: CEF7)     0b00001001  IP-9
+	HLT			  ;(04BD: 0100)
+	SWAM 04B7 ;(04BE: B4B7)??
+	JUMP 0    ;(04BF: CE00)
+	0901			;(04C0: 0901)
+	0301			;(04C1: 0301)
+	BGE  0001	;(04C2: F901)
+
+
+
+/*
+AC = 0
+Z = AC
+AC = 0x5
+Y = AC
+AC = X
+I = AC (pointer)
+/eq/ Z=0, Y=5, AC=I=X=0x04BE=1214
+
+LOOP:
+AC = MEM(I++)
+
+AC = ROR(AC)
+
+/eq/
+C = ~C
+IF C == 1: GOTO L0
+C = ~C
+/eq/ IF (C == 0): C=1, GOTO L0
+
+AC = ROL(AC)
+
+AC = MEM(Z++)
+
+L0:
+AC <-> Y
+
+
+
+*/

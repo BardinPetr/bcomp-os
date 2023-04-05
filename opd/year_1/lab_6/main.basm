@@ -1,0 +1,141 @@
+ORG 0x0
+V0: WORD $OUTPUT_INT, 0x180
+V1: WORD $AND_INT, 0x180
+V2: WORD $DEFAULT_INT, 0x180
+V3: WORD $DEFAULT_INT, 0x180
+V4: WORD $DEFAULT_INT, 0x180
+V5: WORD $DEFAULT_INT, 0x180
+V6: WORD $DEFAULT_INT, 0x180
+V7: WORD $DEFAULT_INT, 0x180
+
+ORG 0x37
+X: WORD ?
+
+START:
+  DI
+
+  ; disable ints for dev 0,3,4
+  CLA     
+  OUT 1
+  OUT 5
+  OUT 7
+  
+  LD #8   ; enable | interrupt vector #0 (OUTPUT_INT)
+  OUT 0x3 ; dev 1
+
+  LD #9   ; enable | interrupt vector #1 (AND_INT)
+  OUT 0x5 ; dev 2
+
+  EI
+
+; func MAIN: decreases $X by 1 and sets it to 65 when not in range of [-62, 65]
+; X = X-1 in [-62, 65] ? X-1 : 65
+; begin func MAIN
+MAIN:
+  LD #65
+  ST $X
+MAIN_LOOP:
+  ; disable interrupts to make sure 
+  ; that interrupt for IOdev 2 won't change X value before it is saved here
+  ; otherwise will lose value updated by user  
+  DI 
+
+  LD $X
+  DEC
+
+  CALL WRITE_CHECKED ; check X bounds and write
+
+  EI ; restore interrupts
+  
+  BR MAIN_LOOP
+; begin func MAIN
+
+
+; func DEFAULT_INT: for no-operation int vector
+; begin func 
+DEFAULT_INT:
+  IRET
+; end func OUTPUT_INT
+
+
+; func OUTPUT_INT: outputs value of f(AC) to IOdev #1
+; begin func 
+OUTPUT_INT:
+  DI ; disable interrupts to prevent X being changed in progress
+  PUSH ; save AC
+  _dbg_intv0_begin: NOP
+  
+  ; calculate formula and output
+  LD $X
+  CALL CALC
+  _dbg_intv0_calc: NOP
+  OUT 2
+
+  POP ; restore AC
+  EI  ; restore interrupts
+  IRET
+; end func OUTPUT_INT
+
+
+; func AND_INT: reads value from IOdev 2 and sets X to (X & io)
+; affects: AC 
+; begin func
+AND_INT:
+  ; disable interrupts to prevent X from being changed 
+  ; somewhere else after it is loaded but not updated
+  DI 
+  PUSH ; save AC
+  _dbg_intv1_begin: NOP
+
+  ; clear AC reading is only to lower byte
+  CLA
+  ; read from device 1 data byte to lower byte of AC and extend sign
+  IN 4
+  SXTB  
+
+  ; update X
+  AND $X
+  CALL WRITE_CHECKED ; check X bounds and write
+
+  _dbg_intv1_end: NOP
+
+  POP ; restore AC
+  EI ; restore interrupts
+  IRET
+; end func AND_INT
+
+
+; func CALC: f(x) = 4*x-8
+; params: AC: X
+; return: AC: f(X)
+; begin func CALC
+CALC:
+  ASL
+  ASL
+  SUB #8
+  RET
+; end func CALC
+
+
+; func WRITE_CHECKED: checks that AC in range [-62, 65] and writes it to X
+; params: AC: input X
+; return: mem(X)
+; begin func
+WRITE_CHECKED:
+  ; begin if
+  CMP #66
+  BGE INVALID_VAL
+  CMP #-62
+  BLT INVALID_VAL
+  JUMP WRITE
+  ; begin branch AC not in [-62, 65]
+  INVALID_VAL:
+    LD #65
+  ; begin branch AC in [-62, 65]
+  WRITE:
+    ST $X
+  ; end if
+  
+  RET
+; end func WRITE_CHECKED
+

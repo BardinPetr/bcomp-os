@@ -1,0 +1,65 @@
+
+ORG 0x0
+TEST: WORD 0xFAD5
+START:
+  LD 16
+  PUSH
+  LD STR_PTR
+  PUSH
+  LD TEST
+  PUSH
+  CALL $ITOA
+  POP
+  POP
+  POP
+  HLT
+
+
+ORG 0x20
+STR: WORD 255 DUP (0)
+STR_PTR: WORD $STR
+
+
+; func ITOA: (value, dest, radix) converts integer to its string representation in specified radix 
+; 
+; params: STACK: &1 - value: 2byte signed integer
+;                &2 - dest: pointer to output memory fragment
+;                &3 - radix: counting system to output to    
+; return: string at mem from dest to dest+len
+; stack: 
+; begin globals
+ITOA_PTR: WORD ? ; pointer to current output char
+; end globals
+; begin func
+ITOA:
+; begin prologue
+
+; end prologue
+
+  LD &2
+  ST ITOA_PTR
+
+  LD &1
+
+
+; begin epilogue
+  RET
+; end func ITOA
+
+
+
+; func ITOA_DIGIT: converts one digit from int to its character representation
+; uses following sequence: [0, 1, 2, ..., 9, A, ..., Z]
+; requires: radix <= 36 = (10 + 26)
+; params: AC: digit as int
+; return: AC: ASCII character in lower byte
+; begin func
+ITOA_DIGIT: 
+  CMP #0xA
+  BLT ITOA_DIGIT_NOTLETTER
+  ADD #0x37 ; +0x41-0xA
+  RET
+ITOA_DIGIT_NOTLETTER:
+  ADD #0x30
+  RET
+; end func

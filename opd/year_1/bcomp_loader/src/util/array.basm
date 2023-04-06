@@ -1,0 +1,105 @@
+; ----------------------------- ARRAYS SUPPORT LIBRARY -----------------------------
+
+; Array is managed via functions from this library using single pointer created by
+; Data is placed on heap. Any array have header before the array pointer followed by data cells
+
+
+
+; func ARRAY_GET_FC: (src, id) get array item by index
+; 
+; conv: fastcall
+; params: AC: src
+;         STACK: id (from 0)
+; return: value
+; stack:
+; &: ret_addr
+; &: id
+; begin globals
+ARRAY_GET__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_GET_FC:
+  ; array start in AC
+  ADD &id
+  ST ARRAY_GET__CUR_PTR
+  LD (ARRAY_GET__CUR_PTR)
+
+; begin epilogue
+  POP
+  SWAP
+  LD (ARRAY_GET__CUR_PTR)
+; end epilogue
+  RET
+; end func ARRAY_GET_FC
+
+
+; func ARRAY_SET: (src, id, val) set array item by index
+;
+; params: AC: src
+;         STACK: id (from 0)
+;         STACK: val
+; return: value
+; stack:
+; &: ret_addr
+; &: id
+; &: val
+; begin globals
+ARRAY_SET__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_SET:
+  ; array start in AC
+  ADD &id
+  ST ARRAY_SET__CUR_PTR
+  LD &val
+  ST (ARRAY_SET__CUR_PTR)
+
+  RET
+; end func ARRAY_SET
+
+
+; func ARRAY_LOWER_BOUND: (addr, val) lineary searches for lower bound of number in sorted array
+; (maximum element that is lower than val or 0 if no such exist)
+; 
+; params: AC: addr
+;         STACK: val
+; return: lower bound of element as array index
+; stack:
+; &: pos
+; &: ret_addr
+; &: val
+; begin globals
+ALB__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_LOWER_BOUND:
+; begin prologue
+  APUSH
+; end prologue
+
+  ; addr in AC
+  ST ALB__CUR_PTR
+
+  ; get last element index  
+  CALL $MSIZE
+  ST &pos
+
+  ; move pointer to the element after the last
+  ADD ALB__CUR_PTR
+  ST ALB__CUR_PTR
+
+  ; begin loop
+  ALB__LOOP: 
+    LD &val
+    CMP -(ALB__CUR_PTR)
+    BHIS ALB__END
+    LOOP &pos
+    JUMP ALB__LOOP
+  ; end loop
+
+ALB__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func ARRAY_LOWER_BOUND

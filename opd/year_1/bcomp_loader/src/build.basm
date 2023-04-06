@@ -252,6 +252,115 @@ ITOA_CHAR__END:
 
 ; --------------------INCLUDED END util/string.basm--------------------
 
+; --------------------INCLUDED FROM util/array.basm--------------------
+; ----------------------------- ARRAYS SUPPORT LIBRARY -----------------------------
+
+; Array is managed via functions from this library using single pointer created by
+; Data is placed on heap. Any array have header before the array pointer followed by data cells
+
+
+
+; func ARRAY_GET_FC: (src, id) get array item by index
+; 
+; conv: fastcall
+; params: AC: src
+;         STACK: id (from 0)
+; return: value
+; stack:
+; &: ret_addr
+; &: id
+; begin globals
+ARRAY_GET__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_GET_FC:
+  ; array start in AC
+  ADD &1
+  ST ARRAY_GET__CUR_PTR
+  LD (ARRAY_GET__CUR_PTR)
+
+; begin epilogue
+  POP
+  SWAP
+  LD (ARRAY_GET__CUR_PTR)
+; end epilogue
+  RET
+; end func ARRAY_GET_FC
+
+; func ARRAY_SET: (src, id, val) set array item by index
+;
+; params: AC: src
+;         STACK: id (from 0)
+;         STACK: val
+; return: value
+; stack:
+; &: ret_addr
+; &: id
+; &: val
+; begin globals
+ARRAY_SET__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_SET:
+  ; array start in AC
+  ADD &1
+  ST ARRAY_SET__CUR_PTR
+  LD &2
+  ST (ARRAY_SET__CUR_PTR)
+
+  RET
+; end func ARRAY_SET
+
+; func ARRAY_LOWER_BOUND: (addr, val) lineary searches for lower bound of number in sorted array
+; (maximum element that is lower than val or 0 if no such exist)
+; 
+; params: AC: addr
+;         STACK: val
+; return: lower bound of element as array index
+; stack:
+; &: pos
+; &: ret_addr
+; &: val
+; begin globals
+ALB__CUR_PTR: WORD ?
+; end globals
+; begin func
+ARRAY_LOWER_BOUND:
+; begin prologue
+    PUSH
+
+; end prologue
+
+  ; addr in AC
+  ST ALB__CUR_PTR
+
+  ; get last element index  
+  CALL $MSIZE
+  ST &0
+
+  ; move pointer to the element after the last
+  ADD ALB__CUR_PTR
+  ST ALB__CUR_PTR
+
+  ; begin loop
+  ALB__LOOP: 
+    LD &2
+    CMP -(ALB__CUR_PTR)
+    BHIS ALB__END
+    LOOP &0
+    JUMP ALB__LOOP
+  ; end loop
+
+ALB__END:
+; begin epilogue
+    POP
+
+  RET
+; end epilogue
+; end func ARRAY_LOWER_BOUND
+
+; --------------------INCLUDED END util/array.basm--------------------
+
 ; --------------------INCLUDED FROM io/output.basm--------------------
 ; ----------------------------- TERMINAL OUTPUT -----------------------------
 
@@ -559,6 +668,24 @@ MFREE__END:
 ; end epilogue
 ; end func MFREE
 
+
+; func MSIZE: (addr) returns length of allocated memory segment
+; 
+; params: AC: addr
+; return: AC: length
+; stack:
+; 
+; begin globals
+MSIZE__READ_PTR: WORD ?
+; end globals
+; begin func
+MSIZE:
+  DEC
+  ST MSIZE__READ_PTR
+  LD (MSIZE__READ_PTR)
+  RET
+; end func MSIZE
+
 ; --------------------INCLUDED END os/memory.basm--------------------
 
 ; --------------------INCLUDED FROM os/loader.basm--------------------
@@ -585,6 +712,7 @@ MFREE__END:
 ; &: ret_addr
 ; begin globals
 LB__CMD_ADDR_TYPE_MASK: WORD 0x0800 ; (0000 1000 0000 0000)
+LB__CMD_ADDRESS_MASK: WORD 0x7FF
 LB__ABS_CMD_MIN_VAL: WORD 0x2000
 LB__ABS_CMD_MAX_VAL: WORD 0xF000
 LB__USERSPACE_END: WORD 0x700
@@ -699,8 +827,6 @@ LOAD_BIN:
         CALL (LB__NEXT_INPUT_WORD) ; load command
         ST &0
 
-        ; TODO set cur_section_org_delta
-
         ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
         CMP LB__ABS_CMD_MAX_VAL  
         BHIS LB__OTHER_CMD
@@ -709,6 +835,12 @@ LOAD_BIN:
         AND LB__CMD_ADDR_TYPE_MASK
         BZC LB__OTHER_CMD_WITH_LD
         ; begin branch absolute addressing
+          ; TODO set cur_section_org_delta
+          LD &0
+          AND LB__CMD_ADDRESS_MASK
+          
+           
+          
           ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
           LD &0
           SUB &1 
@@ -780,50 +912,50 @@ LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365
 
 ; --------------------INCLUDED END os/loader.basm--------------------
 JUMP_TARGET: WORD ?
-LENS: WORD 0x4, 0x5, 0x6, 0x7, 0x8, 0x2
+LENS: WORD 0x1F, 0x20, 0x21
 LENSP: WORD $LENS
 ALCS: WORD 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 ALCSP: WORD $ALCS
 START:
-  LD (LENSP)+
+  LD #0x4
   CALL $MALLOC
-  ST (ALCSP)+
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
+  ST ALCS
 
   LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
+  HLT
 
 
   LD (LENSP)+
-  CALL $MALLOC
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
+  HLT
 
+  LD (LENSP)+
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
+  HLT
+
+  LD (LENSP)+
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
+  HLT
+
+  LD (LENSP)+
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
+  HLT
+
+  LD (LENSP)+
+  PUSH
+  LD ALCS
+  CALL $ARRAY_LOWER_BOUND
   HLT
   
   ; CALL $LOAD_BIN
@@ -845,6 +977,6 @@ _SYS_CODE_END_PTR: WORD 0
 
 ; begin globals
 ORG 0x700
-_SYS_HEAP: WORD 224 DUP (0x0)
+_SYS_HEAP: WORD 0x0000, 0x000A, 0x0020, 0x0092, 0x00BB, 0x00CC, 0xDD, 0xEE, 0x00FF ; 224 DUP (0x0)
 ; end globals
 

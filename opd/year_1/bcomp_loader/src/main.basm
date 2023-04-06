@@ -4,58 +4,18 @@ ORG 0x10
 
 INCLUDE util/math.basm
 INCLUDE util/string.basm
+INCLUDE util/array.basm
 INCLUDE io/output.basm
 INCLUDE io/input.basm
 INCLUDE os/memory.basm
 INCLUDE os/loader.basm
 
 JUMP_TARGET: WORD ?
-LENS: WORD 0x4, 0x5, 0x6, 0x7, 0x8, 0x2
+LENS: WORD 0x1F, 0x20, 0x21
 LENSP: WORD $LENS
 ALCS: WORD 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 ALCSP: WORD $ALCS
 START:
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD (LENSP)+
-  CALL $MALLOC
-  ST (ALCSP)+
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-  LD -(ALCSP)
-  CALL $MFREE
-
-
-  LD (LENSP)+
-  CALL $MALLOC
-
-  HLT
-  
   ; CALL $LOAD_BIN
   ; ST JUMP_TARGET
   ; JUMP (JUMP_TARGET)

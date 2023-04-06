@@ -152,3 +152,22 @@ MFREE__END:
   RET
 ; end epilogue
 ; end func MFREE
+
+
+
+; func MSIZE: (addr) returns length of allocated memory segment
+; 
+; params: AC: addr
+; return: AC: length
+; stack:
+; 
+; begin globals
+MSIZE__READ_PTR: WORD ?
+; end globals
+; begin func
+MSIZE:
+  DEC
+  ST MSIZE__READ_PTR
+  LD (MSIZE__READ_PTR)
+  RET
+; end func MSIZE

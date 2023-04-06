@@ -1,0 +1,21 @@
+; func : ()
+; 
+; params: AC:
+; return: 
+; stack:
+; 
+; begin globals
+; end globals
+; begin func
+:
+; begin prologue
+  APUSH
+; end prologue
+
+
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func 

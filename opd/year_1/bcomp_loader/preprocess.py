@@ -3,6 +3,8 @@
 import sys
 import re
 
+DEBUG = '--debug' in sys.argv
+
 ESCAPE_TABLE = {
   repr(i)[1:-1]: i for i in ['\\', '\n', '\t', '\b', '\f', '\r', '\v', '\'', '\"']
 }
@@ -11,9 +13,9 @@ def encode_string(text: str, encoding="koi8-r", little_endian=True):
     text = text.replace(txt, escape)
 
   enc = bytearray(text.encode(encoding))
-  enc += b'\0' * (2 - len(enc) % 2) # add EOS byte(-s)
+  enc += b'\0' * (2 - len(text) % 2) # add EOS byte(-s)
 
-  words = (enc[i:i+2][::(-1 if little_endian else 1)] for i in range(0, len(text), 2))
+  words = (enc[i:i+2][::(-1 if little_endian else 1)] for i in range(0, len(enc), 2))
   return [f"0x{w[0]:02X}{w[1]:02X}" for w in words]
 
 
@@ -34,7 +36,7 @@ def preprocess_includes(data: str):
     with open(path, "r") as included_file:
       text = included_file.read()
 
-      if "ORG" in text:
+      if len(re.findall(r"ORG\s+0x", text)):
         sys.stderr.write("Use of ORG in includes is prohibited!")
         exit(1)
       
@@ -49,21 +51,23 @@ f"""\n\n; {'-'*20}INCLUDED FROM {path}{'-'*20}
 
 def preprocess_stack_names(data: str):
   output_str = list(data)
-  for function in re.finditer(r"; func (\w+)", data, re.M):
+  for function in re.finditer(r"; func (\w+):", data, re.M):
     name, = function.groups()
+    if DEBUG: print("func: ", name)
     
-    func_start = function.span()[0]
+    func_start = data.find(f"; func {name}:")
 
     body_pos = [re.search(f"^{name}:", data, re.M),
-                re.search(f";\s+end\s+func\s+{name}", data)]
+                re.search(f";\s+end\s+func\s+{name}(?=\s)", data)]
     body_pos = [i.span() for i in body_pos if i is not None]
     if len(body_pos) != 2:
       continue
+
     body_pos = [body_pos[0][0], body_pos[1][1]]
 
     func_header = data[func_start:body_pos[0]]
     func_body = data[body_pos[0]:body_pos[1]]
-    
+
     cur_stack_id = 0
     upper_than_ret = 0
     for i in re.finditer(r"; *&(\d*): *(\w+)", func_header):
@@ -79,7 +83,17 @@ def preprocess_stack_names(data: str):
         number = int(number)
         cur_stack_id = number
 
-      func_body = re.sub(f"&{name}(?=\s)", f"&{number}", func_body)
+      if DEBUG: print(name, number)
+      
+      for sub in re.finditer(f"&{name}(\+\d+)?(?=\s)", func_body):
+        shift, = sub.groups()
+        txt = sub.group()
+        num_delta = 0
+        if shift is not None:
+          num_delta = int(shift[1:])
+        # print(sub, fr"{txt}(?=\s)", shift, f"&{number + num_delta}")
+        func_body = re.sub(f"{re.escape(txt)}(?=\s)", f"&{number + num_delta}", func_body)
+      
       cur_stack_id += 1
 
     cur_stack_id -= upper_than_ret # working with local variables only
@@ -102,7 +116,9 @@ def main():
     data = preprocess_includes(data)
     data = preprocess_strings(data)
     data = preprocess_stack_names(data)
-    print(data)
+
+    if not DEBUG:
+      print(data)
 
 
 if __name__ == "__main__":

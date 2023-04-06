@@ -1,0 +1,154 @@
+; ----------------------------- DYNAMIC MEMORY MANAGEMENT -----------------------------
+
+; memory allocation:
+; 0x000 - 0x010: interrupt vectors
+; 0x010 - 0xXXX: OS (loader + libs)
+; 0xXXX - 0x700: user code
+; 0x700 - 0x7DF: heap 224 words, 448B
+; 0x7DF - 0x7FF: stack 32 words, 64B
+
+; heap is allocated via stack allocator
+
+; begin globals
+_SYS__HEAP_BEGIN: WORD 0x700
+_SYS__HEAP_END: WORD 0x7DF
+_SYS__HEAP_POINTER: WORD ?
+_SYS__STACK_BEGIN: WORD 0x7E0
+_SYS__STACK_END: WORD 0x7FF 
+; end globals
+
+
+
+; func MALLOC: (size): allocates size*2b memory on heap
+; memory chunk is prepended with 2b word header with chunk length, returned address is the next after header
+; last position in memory is tracked via pointer to the next free word after last segment
+; 
+; params: AC: size < 0xDF
+; return: AC: allocated start address or 0 if could not allocate
+; stack:
+; &: size
+; &: segment_addr
+; &: ret_addr
+; begin globals
+MALLOC__HEAP_BEGIN_PTR: WORD $_SYS__HEAP_BEGIN
+MALLOC__HEAP_END_PTR: WORD $_SYS__HEAP_END
+MALLOC__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
+MALLOC__WRITE_PTR: WORD ?
+; end globals
+; begin func
+MALLOC:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &size
+
+  ; begin if first run
+  LD (MALLOC__CUR_POINTER_PTR)
+  BZC MALLOC__RUN
+    LD (MALLOC__HEAP_BEGIN_PTR)
+    ST (MALLOC__CUR_POINTER_PTR)
+  MALLOC__RUN:
+  ; end if
+
+  ; check availability
+  ; begin if 
+  LD (MALLOC__HEAP_END_PTR)
+  SUB (MALLOC__CUR_POINTER_PTR)
+  CMP &size
+  BHIS MALLOC__ENOUGH_MEM
+  ; begin branch (heap_end - cur_pointer) < requeted_size
+  CLA
+  ST &segment_addr
+  JUMP MALLOC__END
+  ; end if
+
+MALLOC__ENOUGH_MEM:  
+  ; prepare pointer for header
+  LD (MALLOC__CUR_POINTER_PTR)
+  ST MALLOC__WRITE_PTR
+  INC
+
+  ; save segment start address 
+  ST &segment_addr ; will be last POP and put in AC
+
+  ; move pointer by size
+  ADD &size
+  ST (MALLOC__CUR_POINTER_PTR)
+
+  ; store header
+  LD &size
+  ST (MALLOC__WRITE_PTR)
+
+
+MALLOC__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func MALLOC
+
+
+
+; func MFREE: (addr) deallocates memory segment from heap
+; No checks done except that this segment belongs to heap and it points to last segment, 
+;   therefore user should call this method with only valid pointers allocated via MALLOC,
+;   otherwise any heap data could get overriten
+; params: AC: 0 for OK, 1 invalid address or when this is not a heap top
+; stack:
+; &: size
+; &: ptr
+; &: ret_addr
+; begin globals
+MFREE__HEAP_BEGIN_PTR: WORD $_SYS__HEAP_BEGIN
+MFREE__HEAP_END_PTR: WORD $_SYS__HEAP_END
+MFREE__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
+MFREE__RW_PTR: WORD ?
+; end globals
+; begin func
+MFREE:
+; begin prologue
+  APUSH
+; end prologue
+
+  ; ptr in AC
+  ST &ptr
+  DEC
+  ST MFREE__RW_PTR
+
+  ; read header
+  LD (MFREE__RW_PTR)
+  ST &size    
+
+  ; begin if
+  LD &ptr
+  CMP (MFREE__HEAP_BEGIN_PTR)
+  BLO MFREE__INVALID_PTR
+
+  ADD &size
+  CMP (MFREE__CUR_POINTER_PTR)
+  BNE MFREE__INVALID_PTR
+  JUMP MFREE__CONTINUE
+  ; begin branch if ptr < _SYS__HEAP_BEGIN || (ptr+size) != _SYS__HEAP_POINTER
+  MFREE__INVALID_PTR:
+    LD #1
+    ST &ptr
+    JUMP MFREE__END
+  ; end if
+
+MFREE__CONTINUE:
+  ; update global pointer
+  LD &ptr
+  DEC
+  ST (MFREE__CUR_POINTER_PTR)
+
+  ; ok ret code
+  CLA
+  ST &ptr
+
+MFREE__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func MFREE

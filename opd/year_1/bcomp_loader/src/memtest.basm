@@ -1,5 +1,3 @@
-; string format: (char[1] char[0]) ... (char[i+1]@1b char[i]@1b) (0x00, 0x00/char[2n-1])
-
 ORG 0x10
 
 INCLUDE util/math.basm
@@ -7,7 +5,6 @@ INCLUDE util/string.basm
 INCLUDE io/output.basm
 INCLUDE io/input.basm
 INCLUDE os/memory.basm
-INCLUDE os/loader.basm
 
 JUMP_TARGET: WORD ?
 LENS: WORD 0x4, 0x5, 0x6, 0x7, 0x8, 0x2
@@ -56,21 +53,6 @@ START:
 
   HLT
   
-  ; CALL $LOAD_BIN
-  ; ST JUMP_TARGET
-  ; JUMP (JUMP_TARGET)
-  HLT
-
-
-READ_WORD_DEMO_PTR: WORD $BIN
-READ_WORD_DEMO:
-  LD (READ_WORD_DEMO_PTR)+
-  RET
-
-
-BIN: WORD 0x0002, 0x0100, 0x0000, 0x8004, 0x0100, 0x0004, 0x0001, 0x0200, 0xA200, 0x0000, 0x130C, 0x0100, 0x00E8
-
-
 _SYS_CODE_END_PTR: WORD 0
 
 ; begin globals

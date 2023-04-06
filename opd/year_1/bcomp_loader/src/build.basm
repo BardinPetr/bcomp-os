@@ -10,7 +10,7 @@ ORG 0x10
 ; func MUL: (a, b) unsigned numbers multiplication
 ; 
 ; params: AC a
-;         STACK b
+;         STACK b (should be less than a for performance increase)
 ; return: a*b
 ; requires: a, b in range TODO
 ; stack: 
@@ -27,6 +27,7 @@ MUL:
 ; end prologue
 
   ST &0
+  CMP &3
 
   CLC
   CLA   
@@ -395,6 +396,171 @@ RCH__LOOP:
 ; end func READ_CHAR
 ; --------------------INCLUDED END io/input.basm--------------------
 
+; --------------------INCLUDED FROM os/memory.basm--------------------
+; ----------------------------- DYNAMIC MEMORY MANAGEMENT -----------------------------
+
+; memory allocation:
+; 0x000 - 0x010: interrupt vectors
+; 0x010 - 0xXXX: OS (loader + libs)
+; 0xXXX - 0x700: user code
+; 0x700 - 0x7DF: heap 224 words, 448B
+; 0x7DF - 0x7FF: stack 32 words, 64B
+
+; heap is allocated via stack allocator
+
+; begin globals
+_SYS__HEAP_BEGIN: WORD 0x700
+_SYS__HEAP_END: WORD 0x7DF
+_SYS__HEAP_POINTER: WORD ?
+_SYS__STACK_BEGIN: WORD 0x7E0
+_SYS__STACK_END: WORD 0x7FF 
+; end globals
+
+
+
+; func MALLOC: (size): allocates size*2b memory on heap
+; memory chunk is prepended with 2b word header with chunk length, returned address is the next after header
+; last position in memory is tracked via pointer to the next free word after last segment
+; 
+; params: AC: size < 0xDF
+; return: AC: allocated start address or 0 if could not allocate
+; stack:
+; &: size
+; &: segment_addr
+; &: ret_addr
+; begin globals
+MALLOC__HEAP_BEGIN_PTR: WORD $_SYS__HEAP_BEGIN
+MALLOC__HEAP_END_PTR: WORD $_SYS__HEAP_END
+MALLOC__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
+MALLOC__WRITE_PTR: WORD ?
+; end globals
+; begin func
+MALLOC:
+; begin prologue
+    PUSH
+  PUSH
+
+; end prologue
+
+  ST &0
+
+  ; begin if first run
+  LD (MALLOC__CUR_POINTER_PTR)
+  BZC MALLOC__RUN
+    LD (MALLOC__HEAP_BEGIN_PTR)
+    ST (MALLOC__CUR_POINTER_PTR)
+  MALLOC__RUN:
+  ; end if
+
+  ; check availability
+  ; begin if 
+  LD (MALLOC__HEAP_END_PTR)
+  SUB (MALLOC__CUR_POINTER_PTR)
+  CMP &0
+  BHIS MALLOC__ENOUGH_MEM
+  ; begin branch (heap_end - cur_pointer) < requeted_size
+  CLA
+  ST &1
+  JUMP MALLOC__END
+  ; end if
+
+MALLOC__ENOUGH_MEM:  
+  ; prepare pointer for header
+  LD (MALLOC__CUR_POINTER_PTR)
+  ST MALLOC__WRITE_PTR
+  INC
+
+  ; save segment start address 
+  ST &1 ; will be last POP and put in AC
+
+  ; move pointer by size
+  ADD &0
+  ST (MALLOC__CUR_POINTER_PTR)
+
+  ; store header
+  LD &0
+  ST (MALLOC__WRITE_PTR)
+
+
+MALLOC__END:
+; begin epilogue
+    POP
+  POP
+
+  RET
+; end epilogue
+; end func MALLOC
+
+
+; func MFREE: (addr) deallocates memory segment from heap
+; No checks done except that this segment belongs to heap and it points to last segment, 
+;   therefore user should call this method with only valid pointers allocated via MALLOC,
+;   otherwise any heap data could get overriten
+; params: AC: 0 for OK, 1 invalid address or when this is not a heap top
+; stack:
+; &: size
+; &: ptr
+; &: ret_addr
+; begin globals
+MFREE__HEAP_BEGIN_PTR: WORD $_SYS__HEAP_BEGIN
+MFREE__HEAP_END_PTR: WORD $_SYS__HEAP_END
+MFREE__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
+MFREE__RW_PTR: WORD ?
+; end globals
+; begin func
+MFREE:
+; begin prologue
+    PUSH
+  PUSH
+
+; end prologue
+
+  ; ptr in AC
+  ST &1
+  DEC
+  ST MFREE__RW_PTR
+
+  ; read header
+  LD (MFREE__RW_PTR)
+  ST &0    
+
+  ; begin if
+  LD &1
+  CMP (MFREE__HEAP_BEGIN_PTR)
+  BLO MFREE__INVALID_PTR
+
+  ADD &0
+  CMP (MFREE__CUR_POINTER_PTR)
+  BNE MFREE__INVALID_PTR
+  JUMP MFREE__CONTINUE
+  ; begin branch if ptr < _SYS__HEAP_BEGIN || (ptr+size) != _SYS__HEAP_POINTER
+  MFREE__INVALID_PTR:
+    LD #1
+    ST &1
+    JUMP MFREE__END
+  ; end if
+
+MFREE__CONTINUE:
+  ; update global pointer
+  LD &1
+  DEC
+  ST (MFREE__CUR_POINTER_PTR)
+
+  ; ok ret code
+  CLA
+  ST &1
+
+MFREE__END:
+; begin epilogue
+    POP
+  POP
+
+  RET
+; end epilogue
+; end func MFREE
+
+; --------------------INCLUDED END os/memory.basm--------------------
+
 ; --------------------INCLUDED FROM os/loader.basm--------------------
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
@@ -424,7 +590,7 @@ LB__ABS_CMD_MAX_VAL: WORD 0xF000
 LB__USERSPACE_END: WORD 0x700
 LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
 ; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
-LB__LOAD_POINT: WORD 0x600
+; LB__LOAD_POINT: WORD 0x600
 LB__LOAD_PTR: WORD ?
 LB__SEC_LEN: WORD 0x8004, 0x1
 LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
@@ -456,7 +622,7 @@ LOAD_BIN:
   CALL (LB__NEXT_INPUT_WORD)
   ST &7
 
-  LD LB__LOAD_POINT
+  LD $_SYS_CODE_END_PTR
   ST LB__LOAD_PTR
   ST &6
 
@@ -614,17 +780,56 @@ LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365
 
 ; --------------------INCLUDED END os/loader.basm--------------------
 JUMP_TARGET: WORD ?
+LENS: WORD 0x4, 0x5, 0x6, 0x7, 0x8, 0x2
+LENSP: WORD $LENS
+ALCS: WORD 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+ALCSP: WORD $ALCS
 START:
-  LD #0x70 ; 11
-  PUSH
-  LD #0x50 ; 111
-  CALL $MUL
-  HLT
+  LD (LENSP)+
+  CALL $MALLOC
+  ST (ALCSP)+
 
+  LD (LENSP)+
+  CALL $MALLOC
+  ST (ALCSP)+
+
+  LD (LENSP)+
+  CALL $MALLOC
+  ST (ALCSP)+
+
+  LD -(ALCSP)
+  CALL $MFREE
+
+  LD -(ALCSP)
+  CALL $MFREE
+
+  LD (LENSP)+
+  CALL $MALLOC
+  ST (ALCSP)+
+
+  LD (LENSP)+
+  CALL $MALLOC
+  ST (ALCSP)+
+
+  LD -(ALCSP)
+  CALL $MFREE
+
+  LD -(ALCSP)
+  CALL $MFREE
+
+  LD -(ALCSP)
+  CALL $MFREE
+
+
+  LD (LENSP)+
+  CALL $MALLOC
+
+  HLT
+  
   ; CALL $LOAD_BIN
   ; ST JUMP_TARGET
   ; JUMP (JUMP_TARGET)
-  ; HLT
+  HLT
 
 
 READ_WORD_DEMO_PTR: WORD $BIN
@@ -635,4 +840,11 @@ READ_WORD_DEMO:
 
 BIN: WORD 0x0002, 0x0100, 0x0000, 0x8004, 0x0100, 0x0004, 0x0001, 0x0200, 0xA200, 0x0000, 0x130C, 0x0100, 0x00E8
 
-CODE_END_PTR: WORD 0
+
+_SYS_CODE_END_PTR: WORD 0
+
+; begin globals
+ORG 0x700
+_SYS_HEAP: WORD 224 DUP (0x0)
+; end globals
+

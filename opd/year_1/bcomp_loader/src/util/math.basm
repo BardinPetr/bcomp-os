@@ -4,7 +4,7 @@
 ; 
 ; params: AC a
 ;         STACK b (should be less than a for performance increase)
-; return: a*b
+; return: AC: a*b
 ; requires: a, b in range TODO
 ; stack: 
 ; &: a

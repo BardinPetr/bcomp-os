@@ -1,0 +1,9 @@
+ORG 0x100
+START:
+  CALL $READ_CHAR
+  CALL $PRINT_CHAR
+  JUMP START
+
+ORG 0x400
+INCLUDE io/input.basm
+INCLUDE io/output.basm

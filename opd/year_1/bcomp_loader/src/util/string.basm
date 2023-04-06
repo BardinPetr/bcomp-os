@@ -1,130 +1,106 @@
-; ; func ATOI_HEX: (src) converts hex string to int 
-; ; 
-; ; params: AC src: pointer to NUL-ended string beginning
-; ; return: AC: unsigned 2byte integer
-; ; stack:  &0: current sum value
-; ;         &1: current char index (from 0)
-; ;         &2: ret addr
-; ; begin globals
-; ATOI_HEX__STR_PTR: DATA ?
-; ATOI_HEX__LOW_MASK: DATA 0xFF
-; ; end globals
-; ; begin func
-; ATOI_HEX:
-; ; begin prologue
-;   PUSH
-;   PUSH
-; ; end prologue
+; ----------------------------- STRING UTILITIES LIBRARY -----------------------------
 
-;   ST ATOI_STR_PTR
+; func ATOI: (src, radix) converts string number to int 
+; 
+; params: AC src: pointer to NUL-ended string
+;         STACK radix: number radix
+; return: AC: unsigned 2byte integer
+; stack:  
+; &: cur_radix_pow
+; &: index
+; &: byte_cnt
+; &: src
+; &: sum
+; &: ret_addr
+; &: radix
+; begin globals
+ATOI__STR_PTR: WORD ?
+ATOI__LOW_MASK: WORD 0xFF
+; end globals
+; begin func
+ATOI:
+; begin prologue
+  APUSH
+; end prologue
 
-;   CLA 
-;   ST &0
-;   ST &1
+  ST &src
+  CALL $STRING_LEN
+  ST &byte_cnt
 
-;   ; begin loop
-;   ATOI_HEX__LOOP:
-;     LD &1
+  ; start interation from last symbol
+  INC 
+  ASR ; divide by 2 with rounding to higher number
+  INC ; to put pointer after last digit
+  ADD &src
+  ST ATOI__STR_PTR
 
-    
-;     LD (ATOI_STR_PTR)
-;     AND ATOI_LOW_MASK
-;     CALL ATOI_CHAR
+  LD &byte_cnt ; symbol number
+  ADD #2
+  ASR
+  ASL 
+  ST &byte_cnt ; count zero bytes (one or two NUL due char count partity)
 
-;     BZS ATOI_END
-    
-;     ; begin loop
-;     ; ATOI_HEX__MULT:
-;     ;   ASL
-;     ;   ASL
-;     ;   ASL
-;     ;   ASL
+  CLA 
+  ST &sum
+  ST &index
+  INC
+  ; 1, radix, radix^2, ...
+  ST &cur_radix_pow
 
+  ; reading from back. high then low bytes
+  ; begin loop
+  ATOI__LOOP:
+    LD &index
+    CMP &byte_cnt
+    BEQ ATOI__END        
+    INC
+    ST &index
 
-;     JUMP ATOI_HEX__LOOP
-;   ; end loop
+    ; begin if index % 2
+    ROR
+    BCC ATOI__ODD_ITER
+    ; begin branch even iter -> high byte
+      LD -(ATOI__STR_PTR)
+      SWAB
+      AND ATOI__LOW_MASK
+      BZS ATOI__LOOP
+      JUMP ATOI__PROCESS_CHAR
+    ; begin branch odd iter -> low byte
+    ATOI__ODD_ITER:
+      LD (ATOI__STR_PTR)
+      AND ATOI__LOW_MASK
+      BZS ATOI__LOOP
+    ; end if
 
-;   ATOI_HEX__END:
-; ; begin epilogue
-;   POP
-;   POP
-;   RET
-; ; end epilogue
-; ; end func ATOI_HEX
+    ATOI__PROCESS_CHAR:
+    CALL $ATOI_CHAR
 
+    ; sum += cur_radix_pow * ATOI(char[i])
+    PUSH  
+    LD &cur_radix_pow+1
+    CALL $MUL 
+    ; save sum
+    ADD &sum+1
+    ST &sum+1   
+    POP
 
-; ; func ATOI: (src, radix) converts string number to int 
-; ; 
-; ; params: STACK src: pointer to NUL-ended string beginning
-; ;         STACK radix: number radix
-; ; return: AC: unsigned 2byte integer
-; ; stack:  &0: radix in current power (from power 0)
-; ;         &1: current sum value
-; ;         &2: current char index
-; ;         &3: ret addr
-; ;         &4: src
-; ;         &5: radix
-; ; begin globals
-; ATOI_STR_PTR: DATA ?
-; ATOI_LOW_MASK: DATA 0xFF
-; ; end globals
-; ; begin func
-; ATOI:
-; ; begin prologue
-;   PUSH
-;   PUSH
-; ; end prologue
+    ; cur_radix_pow *= radix
+    LD &radix
+    PUSH
+    LD &cur_radix_pow+1
+    CALL $MUL
+    ST &cur_radix_pow+1
+    POP
+    JUMP ATOI__LOOP
+  ; end loop
 
-;   LD &4
-;   ST ATOI_STR_PTR
-
-;   CLA 
-;   ST &1
-;   ST &2
-;   INC
-;   ST &0
-
-;   ; begin loop
-;   ATOI_LOOP:
-;     LD &2
-
-;     LD (ATOI_STR_PTR)+
-;     AND ATOI_LOW_MASK
-;     CALL ATOI_CHAR
-
-;     BZS ATOI_END
-    
-;     PUSH
-;     LD &0 ; radix in power
-;     PUSH  
-;     CALL $MUL ; ATOI(char[i]) * (radix ^ i)
-;     POP
-;     POP
-
-;     ; save sum
-;     ADD &1
-;     ST &1
-
-;     ; increase power
-;     LD &0
-;     PUSH
-;     LD &4
-;     PUSH  
-;     CALL $MUL
-;     POP
-;     POP
-;     ST &0
-
-;     JUMP ATOI_LOOP
-;   ; end loop
-
-;   ATOI_END:
-; ; begin epilogue
-;   POP
-;   POP
-;   RET
-; ; end epilogue
-; ; end func ATOI
+  ATOI__END:
+; begin epilogue
+  ; sum is last pop so in AC
+  APOP
+  RET
+; end epilogue
+; end func ATOI
 
 
 ; func ATOI_CHAR: (char) returns integer representation of character with radix up to 36
@@ -173,4 +149,60 @@ ITOA_CHAR:
   ; end if
 ITOA_CHAR__END:
   RET
-; end func ITOA
+; end func ITOA_CHAR
+
+
+
+; func STRING_LEN: (ptr) get length of nul-ended string
+; 
+; params: AC: ptr: ponter 
+; return: AC: length in symbols
+; stack:
+; &: cnt
+; &: ret_addr
+; begin globals
+SLEN__CUR_PTR: WORD ?
+SLEN__HMASK: WORD 0xFF00
+SLEN__LMASK: WORD 0xFF
+; end globals
+; begin func
+STRING_LEN:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST SLEN__CUR_PTR
+  CLA
+  ST &cnt
+
+  ; begin loop
+  SLEN__LOOP:
+    LD (SLEN__CUR_PTR)
+    AND SLEN__LMASK
+    BZS SLEN__END
+
+    LD (SLEN__CUR_PTR)+
+    ; begin if 
+    AND SLEN__HMASK
+    BZS SLEN__ADD_ONE
+    ; begin branch if 0xYYZZ
+      LD &cnt
+      ADD #2
+      ST &cnt
+      JUMP SLEN__LOOP
+    ; begin branch if 0x00ZZ
+    SLEN__ADD_ONE:
+      LD &cnt
+      INC
+      ST &cnt
+      JUMP SLEN__END
+    ; end if
+  ; end loop
+
+  SLEN__END:
+; begin epilogue
+  ; cnt is last pop, put into AC
+  APOP
+  RET
+; end epilogue
+; end func STRING_LEN

@@ -1,0 +1,24 @@
+ORG 0x10
+
+INCLUDE util/math.basm
+INCLUDE util/string.basm
+INCLUDE util/array.basm
+INCLUDE io/output.basm
+INCLUDE io/input.basm
+INCLUDE os/memory.basm
+
+JUMP_TARGET: WORD ?
+TEST: WORD 10 DUP (0x0)
+TEST_PTR: WORD $TEST
+
+START:
+  LD TEST_PTR
+  CALL $READ_LINE
+
+  LD #16
+  PUSH
+  LD TEST_PTR
+  CALL $ATOI  
+  HLT
+  POP
+  JUMP START

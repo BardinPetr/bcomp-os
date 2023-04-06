@@ -10,6 +10,8 @@
 ; heap is allocated via stack allocator
 
 ; begin globals
+_SYS__USERSPACE_BEGIN: WORD $_SYS__CODE_END
+_SYS__USERSPACE_END: WORD 0x6FF
 _SYS__HEAP_BEGIN: WORD 0x700
 _SYS__HEAP_END: WORD 0x7DF
 _SYS__HEAP_POINTER: WORD ?

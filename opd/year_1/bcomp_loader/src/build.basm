@@ -312,7 +312,7 @@ ARRAY_SET:
 ; end func ARRAY_SET
 
 ; func ARRAY_LOWER_BOUND: (addr, val) lineary searches for lower bound of number in sorted array
-; (maximum element that is lower than val or 0 if no such exist)
+; (maximum element that is lower than val or 0xFFFF if no such exist)
 ; 
 ; params: AC: addr
 ;         STACK: val
@@ -352,6 +352,10 @@ ARRAY_LOWER_BOUND:
   ; end loop
 
 ALB__END:
+  LD &0
+  DEC
+  ST &0 ; pos is last POP
+
 ; begin epilogue
     POP
 
@@ -518,6 +522,8 @@ RCH__LOOP:
 ; heap is allocated via stack allocator
 
 ; begin globals
+_SYS__USERSPACE_BEGIN: WORD $_SYS__CODE_END
+_SYS__USERSPACE_END: WORD 0x6FF
 _SYS__HEAP_BEGIN: WORD 0x700
 _SYS__HEAP_END: WORD 0x7DF
 _SYS__HEAP_POINTER: WORD ?
@@ -695,36 +701,31 @@ MSIZE:
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
 ; Remap of poiners created via "DATA $X" construction is not supported.
-; Uses LB__NEXT_INPUT_WORD as streaming source of 2b words for binary.
+; Uses LB__NEXT_INPUT_WORD_PTR as streaming source of 2b words for binary.
 ; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
 ; return: AC: start address of program  
 ; stack:
+; &: org_array
+; &: len_array
+; &: delta_array
 ; &: cur_cmd
 ; &: cur_section_org_delta
 ; &: cur_section_len
-; &: cur_section_offset
-; &: cur_section_org
 ; &: cur_section_cnt
 ; &: real_org
 ; &: start_addr
 ; &: section_cnt
 ; &: ret_addr
 ; begin globals
-LB__CMD_ADDR_TYPE_MASK: WORD 0x0800 ; (0000 1000 0000 0000)
-LB__CMD_ADDRESS_MASK: WORD 0x7FF
-LB__ABS_CMD_MIN_VAL: WORD 0x2000
-LB__ABS_CMD_MAX_VAL: WORD 0xF000
-LB__USERSPACE_END: WORD 0x700
-LB__NEXT_INPUT_WORD: WORD $READ_WORD_DEMO
-; LB__LOAD_POINT: WORD $CODE_END_PTR ; address of userspace memory beginning  
-; LB__LOAD_POINT: WORD 0x600
+LB__NEXT_INPUT_WORD_PTR: WORD $READ_WORD_DEMO
+LB__USERSPACE_BEGIN_PTR: WORD $_SYS__USERSPACE_BEGIN
+LB__USERSPACE_END_PTR: WORD $_SYS__USERSPACE_END
 LB__LOAD_PTR: WORD ?
-LB__SEC_LEN: WORD 0x8004, 0x1
-LB__SEC_LEN_PTR: WORD $LB__SEC_LEN
-LB__SEC_DELTA: WORD 0xFBFC, 0x0, 0x0, 0xFB00, 0xFB00
-LB__SEC_DELTA_2: WORD 0xFB00
-LB__SEC_DELTA_PTR: WORD $LB__SEC_DELTA
+LB__LEN_ARRAY_PTR: WORD ?
+LB__ORG_ARRAY_PTR: WORD ?
+LB__DELTA_ARRAY_PTR: WORD ?
+LB__START_CMD_FIX: WORD 0x2000
 ; end globals
 ; begin func
 LOAD_BIN:
@@ -738,152 +739,185 @@ LOAD_BIN:
   PUSH
   PUSH
   PUSH
+  PUSH
 
   ; end prologue
   LD $LB__STR_STARTED_PTR
   CALL $PRINT
 
-  CALL (LB__NEXT_INPUT_WORD)
-  ST &8
-  ST &5
-
-  CALL (LB__NEXT_INPUT_WORD)
-  ST &7
-
-  LD $_SYS_CODE_END_PTR
-  ST LB__LOAD_PTR
+  CALL (LB__NEXT_INPUT_WORD_PTR)
+  ST &9
   ST &6
+
+  ; allocate arrays
+  CALL $MALLOC
+  ST &1
+  ST LB__LEN_ARRAY_PTR
+
+  LD &9
+  CALL $MALLOC
+  ST &2
+  ST LB__DELTA_ARRAY_PTR
+
+  LD &9
+  CALL $MALLOC
+  ST &0
+  ST LB__ORG_ARRAY_PTR
+  ; end alloc
+
+  CALL (LB__NEXT_INPUT_WORD_PTR)
+  ST &8
+
+  LD (LB__USERSPACE_BEGIN_PTR)
+  ST LB__LOAD_PTR
+  ST &7
 
   ; begin loop over sections
   LB__LOAD_SECT_LOOP:    
-    CALL (LB__NEXT_INPUT_WORD)
-    ST &3
+    CALL (LB__NEXT_INPUT_WORD_PTR)
+    ; offset not used
 
-    CALL (LB__NEXT_INPUT_WORD)
-    ST &2
-  
-    CALL (LB__NEXT_INPUT_WORD)
-    ST &4
+    CALL (LB__NEXT_INPUT_WORD_PTR)
+    ST (LB__LEN_ARRAY_PTR)+
+    ASL
+    ASR
+    ST &5
+
+    CALL (LB__NEXT_INPUT_WORD_PTR)
+    ST (LB__ORG_ARRAY_PTR)+
+
     ; calculate org delta (section_org - real_section_org)
-    SUB &6
-    ST &1
+    SUB &7
+    ST (LB__DELTA_ARRAY_PTR)+
 
     ; increase targer org counter
-    LD &6
-    ADD &2
-    ST &6
+    LD &7
+    ADD &5
+    ST &7
 
     ; begin if check memory availability
-    CMP LB__USERSPACE_END
+    CMP (LB__USERSPACE_END_PTR)
     BLT LB__SECTION_VALID 
     ; begin branch section out of space
-      ; LD $LB__STR_NO_SPACE_PTR
-      ; CALL $PRINT
+      LD $LB__STR_NO_SPACE_PTR
+      CALL $PRINT
       JUMP LB__END
     ; end if
 
     LB__SECTION_VALID:
-    LOOP &5
+    LOOP &6
     JUMP LB__LOAD_SECT_LOOP
   ; end loop over sections
 
+  ; inform
   LD $LB__STR_HEADER_OK_PTR
   CALL $PRINT
 
   ; restart sections iteration
-  LD &8
-  ST &5
+  LD &9
+  ST &6
+
+  ; restart len array iterator
+  LD &1
+  ST LB__LEN_ARRAY_PTR
 
   ; begin loop over sections
   LB__SECT_LOOP:    
-    ; TODO: load cur_section_len
-    LD (LB__SEC_LEN_PTR)
-    ASL
-    ASR
-    ST &2
-
-    LD (LB__SEC_LEN_PTR)+
+    LD (LB__LEN_ARRAY_PTR)+
+    ST &5
+    
     ; begin if cur_section_len[15]
     ROL
     BCS LB__CODE_SEC
     ; begin branch if data sector
+      ; remove executable marker
+      LD &5
+      ASL
+      ASR
+      ST &5
+
       ; begin loop over data
       LB__DATA_CMD_LOOP:
-        CALL (LB__NEXT_INPUT_WORD)
+        CALL (LB__NEXT_INPUT_WORD_PTR)
         ST (LB__LOAD_PTR)+
 
-        LOOP &2
+        LOOP &5
         JUMP LB__DATA_CMD_LOOP
       ; end loop over data
       JUMP LB__SEC_RELOC_END
-
+    ; end branch
     ; begin branch if code sector
     LB__CODE_SEC:
       ; begin loop over commands
+      ; remove executable marker
+      LD &5
+      ASL
+      ASR
+      ST &5
       LB__CODE_CMD_LOOP:
-        LD (LB__SEC_DELTA_PTR)+
-        ST &1        
+        CALL (LB__NEXT_INPUT_WORD_PTR) ; load command
+        ST &3
 
-        CALL (LB__NEXT_INPUT_WORD) ; load command
-        ST &0
+        LD &0
+        PUSH 
+        LD &3
+        PUSH 
+        LD &5
+        CALL $LOAD_BIN_FIX_CMD
 
-        ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
-        CMP LB__ABS_CMD_MAX_VAL  
-        BHIS LB__OTHER_CMD
-        CMP LB__ABS_CMD_MIN_VAL
-        BLO LB__OTHER_CMD
-        AND LB__CMD_ADDR_TYPE_MASK
-        BZC LB__OTHER_CMD_WITH_LD
-        ; begin branch absolute addressing
-          ; TODO set cur_section_org_delta
-          LD &0
-          AND LB__CMD_ADDRESS_MASK
-          
-           
-          
-          ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
-          LD &0
-          SUB &1 
-          JUMP LB__OTHER_CMD
-        ; begin branch not absolute addressing
-        LB__OTHER_CMD_WITH_LD:
-          LD &0
-        LB__OTHER_CMD:
-          ST (LB__LOAD_PTR)+ ; load command
-        ; end if
+        ST (LB__LOAD_PTR)+ 
 
-        LOOP &2
+        POP
+        POP        
+
+        LOOP &5
         JUMP LB__CODE_CMD_LOOP
       ; end loop over commands
 
     ; end if
     LB__SEC_RELOC_END:
 
-    LD &8
-    SUB &5
+    LD &9
+    SUB &6
     CALL $ITOA_CHAR
     CALL $PRINT_CHAR
 
     LD $LB__STR_SECTION_LOADED_PTR
     CALL $PRINT
 
-    LOOP &5
+    LOOP &6
     JUMP LB__SECT_LOOP
   ; end loop over sections
 
 LB__END:
-
   LD $LB__STR_FULL_LOADED_PTR
   CALL $PRINT
 
+  ; deallocate arrays
+  LD &0
+  CALL $MFREE
+  LD &2
+  CALL $MFREE
+  LD &1
+  CALL $MFREE
+
   ; calculate new start address and return in AC
-  LD &7
-  ; TODO: load delta
-  SUB $LB__SEC_DELTA_2
-  ST &8 ; store to next stack item after ret addr so last POP will put it in AC
+  LD &0
+  PUSH 
+  LD &3
+  PUSH 
+  LD &10
+  OR LB__START_CMD_FIX ; make it look like absolute addressed command for reuse
+  CALL $LOAD_BIN_FIX_CMD
+  
+  SUB LB__START_CMD_FIX
+  ST &11 ; store to next stack item after ret addr so last POP will put it in AC
+  POP
+  POP
 
 ; begin epilogue
     POP
+  POP
   POP
   POP
   POP
@@ -899,16 +933,88 @@ LB__END:
 ; begin globals strings 
 LB__STR_STARTED: WORD 0x7453, 0x7261, 0x6574, 0x2064, 0x6F6C, 0x6461, 0x6E69, 0x2067, 0x7270, 0x676F, 0x6172, 0x0A6D, 0x000D
       LB__STR_STARTED_PTR: WORD $LB__STR_STARTED
-LB__STR_NO_SPACE: WORD 0x6F4E, 0x2074, 0x6E65, 0x756F, 0x6867, 0x5220, 0x4D41, 0x7420, 0x206F, 0x6F6C, 0x6461, 0x7020, 0x6F72, 0x7267, 0x6D61, 0x0D0A
+LB__STR_NO_SPACE: WORD 0x6F4E, 0x2074, 0x6E65, 0x756F, 0x6867, 0x5220, 0x4D41, 0x7420, 0x206F, 0x6F6C, 0x6461, 0x7020, 0x6F72, 0x7267, 0x6D61, 0x0D0A, 0x0000
       LB__STR_NO_SPACE_PTR: WORD $LB__STR_NO_SPACE
 LB__STR_HEADER_OK: WORD 0x6548, 0x6461, 0x7265, 0x7020, 0x7261, 0x6573, 0x2064, 0x6E61, 0x2064, 0x6176, 0x696C, 0x0A64, 0x000D
       LB__STR_HEADER_OK_PTR: WORD $LB__STR_HEADER_OK
 LB__STR_SECTION_LOADED: WORD 0x7320, 0x6365, 0x6974, 0x6E6F, 0x6C20, 0x616F, 0x6564, 0x0A64, 0x000D
       LB__STR_SECTION_LOADED_PTR: WORD $LB__STR_SECTION_LOADED
-LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365, 0x6673, 0x6C75, 0x0D0A
+LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365, 0x6673, 0x6C75, 0x0D0A, 0x0000
       LB__STR_FULL_LOADED_PTR: WORD $LB__STR_FULL_LOADED
 ; end globals
 ; end func LOAD_BIN
+
+
+
+; func LOAD_BIN_FIX_CMD: (cmd, delta_array, org_array)
+; 
+; params: AC: cmd
+;         STACK: org_array: pointer to array of section ORGs
+;         STACK: delta_array: pointer to array of section ORG deltas
+; return:
+; stack:
+; &: org_delta
+; &: cur_cmd
+; &: ret_addr
+; &: delta_array
+; &: org_array
+; begin globals
+LBFC__CMD_ADDR_TYPE_MASK: WORD 0x0800 ; (0000 1000 0000 0000)
+LBFC__CMD_ADDRESS_MASK: WORD 0x7FF
+LBFC__ABS_CMD_MIN_VAL: WORD 0x2000
+LBFC__ABS_CMD_MAX_VAL: WORD 0xF000
+; end globals
+; begin func
+LOAD_BIN_FIX_CMD:
+; begin prologue
+    PUSH
+  PUSH
+
+; end prologue
+
+  ST &1
+
+  ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
+  CMP LBFC__ABS_CMD_MAX_VAL  
+  BHIS LBFC__OTHER_CMD
+  CMP LBFC__ABS_CMD_MIN_VAL
+  BLO LBFC__OTHER_CMD
+  AND LBFC__CMD_ADDR_TYPE_MASK
+  BZC LBFC__OTHER_CMD_DO_RELOAD
+  ; begin branch absolute addressing
+    LD &1
+    AND LBFC__CMD_ADDRESS_MASK
+    
+    PUSH ; cmd's address part
+    LD &5
+    CALL $ARRAY_LOWER_BOUND
+    ST &1 ; index
+    POP
+
+    LD &0
+    PUSH 
+    LD &4
+    CALL $ARRAY_GET_FC
+    ST &0 ; real delta
+
+    ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
+    LD &1
+    SUB &0
+    ST &1 
+    JUMP LBFC__OTHER_CMD
+  ; begin branch not absolute addressing
+  LBFC__OTHER_CMD_DO_RELOAD:
+    LD &1
+  LBFC__OTHER_CMD:
+  ; end if
+
+; begin epilogue
+    POP
+  POP
+
+  RET
+; end epilogue
+; end func LOAD_BIN_FIX_CMD
 
 ; --------------------INCLUDED END os/loader.basm--------------------
 JUMP_TARGET: WORD ?
@@ -917,50 +1023,9 @@ LENSP: WORD $LENS
 ALCS: WORD 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 ALCSP: WORD $ALCS
 START:
-  LD #0x4
-  CALL $MALLOC
-  ST ALCS
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-
-  LD (LENSP)+
-  PUSH
-  LD ALCS
-  CALL $ARRAY_LOWER_BOUND
-  HLT
-  
-  ; CALL $LOAD_BIN
-  ; ST JUMP_TARGET
-  ; JUMP (JUMP_TARGET)
+  CALL $LOAD_BIN
+  ST JUMP_TARGET
+  JUMP (JUMP_TARGET)
   HLT
 
 
@@ -973,10 +1038,5 @@ READ_WORD_DEMO:
 BIN: WORD 0x0002, 0x0100, 0x0000, 0x8004, 0x0100, 0x0004, 0x0001, 0x0200, 0xA200, 0x0000, 0x130C, 0x0100, 0x00E8
 
 
-_SYS_CODE_END_PTR: WORD 0
-
-; begin globals
-ORG 0x700
-_SYS_HEAP: WORD 0x0000, 0x000A, 0x0020, 0x0092, 0x00BB, 0x00CC, 0xDD, 0xEE, 0x00FF ; 224 DUP (0x0)
-; end globals
+_SYS__CODE_END: WORD 0
 

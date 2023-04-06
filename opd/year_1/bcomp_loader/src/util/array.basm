@@ -59,7 +59,7 @@ ARRAY_SET:
 
 
 ; func ARRAY_LOWER_BOUND: (addr, val) lineary searches for lower bound of number in sorted array
-; (maximum element that is lower than val or 0 if no such exist)
+; (maximum element that is lower than val or 0xFFFF if no such exist)
 ; 
 ; params: AC: addr
 ;         STACK: val
@@ -98,6 +98,10 @@ ARRAY_LOWER_BOUND:
   ; end loop
 
 ALB__END:
+  LD &pos
+  DEC
+  ST &pos ; pos is last POP
+
 ; begin epilogue
   APOP
   RET

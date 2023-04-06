@@ -39,11 +39,9 @@ def preprocess_includes(data: str):
         exit(1)
       
       include = \
-        f"""\n\n
-; {'-'*20}INCLUDED FROM {path}{'-'*20}
+f"""\n\n; {'-'*20}INCLUDED FROM {path}{'-'*20}
 {text}\n
-; {'-'*20}INCLUDED END {path}{'-'*20}
-        """
+; {'-'*20}INCLUDED END {path}{'-'*20}"""
       data = data.replace(match.group(), include)
 
   return data
@@ -58,39 +56,42 @@ def preprocess_stack_names(data: str):
 
     body_pos = [re.search(f"^{name}:", data, re.M),
                 re.search(f";\s+end\s+func\s+{name}", data)]
-    body_pos = [i.span()[0] for i in body_pos if i is not None]
+    body_pos = [i.span() for i in body_pos if i is not None]
     if len(body_pos) != 2:
       continue
+    body_pos = [body_pos[0][0], body_pos[1][1]]
 
     func_header = data[func_start:body_pos[0]]
     func_body = data[body_pos[0]:body_pos[1]]
-
+    
     cur_stack_id = 0
-    has_ret = False
+    upper_than_ret = 0
     for i in re.finditer(r"; *&(\d*): *(\w+)", func_header):
       number, name = i.groups()
-      if 'ret' in name:
-        has_ret = True
+
+      if 'ret' in name or upper_than_ret > 0:
+        upper_than_ret += 1
 
       # autonumbering or fixed
       if len(number) == 0:
         number = cur_stack_id
-        cur_stack_id += 1
       else:
         number = int(number)
         cur_stack_id = number
-      func_body = func_body.replace(f"&{name}", f"&{number}")
 
-    if has_ret:
-      cur_stack_id -= 1 # not pushing additional ret addr
+      func_body = re.sub(f"&{name}(?=\s)", f"&{number}", func_body)
+      cur_stack_id += 1
+
+    cur_stack_id -= upper_than_ret # working with local variables only
     # generate prologue and epilogue
     func_body = func_body\
-      .replace(f"PUSHA", "  PUSH\n" * cur_stack_id)\
-      .replace(f"POPA", "  POP\n" * cur_stack_id)
+      .replace(f"APUSH", "  PUSH\n" * cur_stack_id)\
+      .replace(f"APOP", "  POP\n" * cur_stack_id)
 
-    output_str[body_pos[0]:body_pos[1]] = func_body
+    output_str = output_str[:body_pos[0]] + list(func_body) + output_str[body_pos[1]+1:] 
+    data = ''.join(output_str)
 
-  return ''.join(output_str)
+  return data
 
 
 def main():

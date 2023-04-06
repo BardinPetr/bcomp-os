@@ -2,7 +2,7 @@
 
 ORG 0x10
 
-; INCLUDE util/math.basm
+INCLUDE util/math.basm
 INCLUDE util/string.basm
 INCLUDE io/output.basm
 INCLUDE io/input.basm

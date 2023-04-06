@@ -2,9 +2,75 @@
 
 ORG 0x10
 
-; INCLUDE util/math.basm
 
 
+; --------------------INCLUDED FROM util/math.basm--------------------
+; ----------------------------- MATHEMATICS LIBRARY -----------------------------
+
+; func MUL: (a, b) unsigned numbers multiplication
+; 
+; params: AC a
+;         STACK b
+; return: a*b
+; requires: a, b in range TODO
+; stack: 
+; &: a
+; &: sum
+; &: ret_addr
+; &: b
+; begin func
+MUL:
+; begin prologue
+    PUSH
+  PUSH
+
+; end prologue
+
+  ST &0
+
+  CLC
+  CLA   
+  ST &1
+
+  ; begin loop
+  MUL__LOOP:  
+    LD &3
+    BZS MUL__END
+
+    CLC
+    ROR
+    ST &3
+    
+    ; begin if 
+    BCC MUL__IF_NOT_USED
+    ; begin branch if multiplier is 1 (sum)
+      LD &0
+      ADD &1
+      ST &1
+
+      JUMP MUL__SHIFT_A
+    ; begin branch if multiplier is 0 (skip sum)
+    MUL__IF_NOT_USED:
+    ; end if
+
+  MUL__SHIFT_A:  
+    LD &0
+    ASL
+    ST &0
+
+    JUMP MUL__LOOP
+  ; end loop
+
+  MUL__END:
+; begin epilogue
+    POP
+  POP
+
+  ; sum returned in ac automatically as &1 is last pop
+  RET
+; end func MUL
+
+; --------------------INCLUDED END util/math.basm--------------------
 
 ; --------------------INCLUDED FROM util/string.basm--------------------
 ; ; func ATOI_HEX: (src) converts hex string to int 
@@ -163,7 +229,6 @@ ATOI_CHAR__END:
   RET
 ; end func ATOI_CHAR
 
-
 ; func ITOA_CHAR: (val) returns character representation of one digit in some radix up to 36
 ; uses sequence 0,1,...,9,A,B,...,Z
 ; params: AC val: integer input digit
@@ -185,8 +250,6 @@ ITOA_CHAR__END:
 ; end func ITOA
 
 ; --------------------INCLUDED END util/string.basm--------------------
-        
-
 
 ; --------------------INCLUDED FROM io/output.basm--------------------
 ; ----------------------------- TERMINAL OUTPUT -----------------------------
@@ -243,10 +306,7 @@ PRINT_EXIT:
   RET
 ; end func PRINT
 
-
 ; --------------------INCLUDED END io/output.basm--------------------
-        
-
 
 ; --------------------INCLUDED FROM io/input.basm--------------------
 ; ----------------------------- TERMINAL INPUT -----------------------------
@@ -318,7 +378,6 @@ RL__EOL:
   ; end epilogue
 ; end func READ_LINE
 
-
 ; func READ_CHAR: pool keyboard for ready and read 1 char from it
 ;
 ; params: none
@@ -334,10 +393,7 @@ RCH__LOOP:
   IN 0x18
   RET
 ; end func READ_CHAR
-
 ; --------------------INCLUDED END io/input.basm--------------------
-        
-
 
 ; --------------------INCLUDED FROM os/loader.basm--------------------
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
@@ -556,15 +612,19 @@ LB__STR_FULL_LOADED: WORD 0x6F4C, 0x6461, 0x6E69, 0x2067, 0x7573, 0x6363, 0x7365
 ; end globals
 ; end func LOAD_BIN
 
-
 ; --------------------INCLUDED END os/loader.basm--------------------
-        
 JUMP_TARGET: WORD ?
 START:
-  CALL $LOAD_BIN
-  ST JUMP_TARGET
-  JUMP (JUMP_TARGET)
+  LD #0x70 ; 11
+  PUSH
+  LD #0x50 ; 111
+  CALL $MUL
   HLT
+
+  ; CALL $LOAD_BIN
+  ; ST JUMP_TARGET
+  ; JUMP (JUMP_TARGET)
+  ; HLT
 
 
 READ_WORD_DEMO_PTR: WORD $BIN

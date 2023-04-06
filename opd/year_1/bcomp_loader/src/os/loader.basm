@@ -37,7 +37,7 @@ LB__SEC_DELTA_PTR: WORD $LB__SEC_DELTA
 ; begin func
 LOAD_BIN:
   ; begin prologue
-  PUSHA
+  APUSH
   ; end prologue
   LD $LB__STR_STARTED_PTR
   CALL $PRINT
@@ -178,7 +178,7 @@ LB__END:
   ST &section_cnt ; store to next stack item after ret addr so last POP will put it in AC
 
 ; begin epilogue
-  POPA
+  APOP
   RET
 ; end epilogue
 

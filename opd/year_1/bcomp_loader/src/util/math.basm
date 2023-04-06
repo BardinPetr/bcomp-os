@@ -1,14 +1,60 @@
-; func MUL: (a, b) multiply numbers
+; ----------------------------- MATHEMATICS LIBRARY -----------------------------
+
+; func MUL: (a, b) unsigned numbers multiplication
 ; 
 ; params: AC a
 ;         STACK b
 ; return: a*b
-; requires: a, b in ???
-; stack: &0: ret
-;        &1: a
-;        &2: b
+; requires: a, b in range TODO
+; stack: 
+; &: a
+; &: sum
+; &: ret_addr
+; &: b
 ; begin func
 MUL:
-  RET
+; begin prologue
+  APUSH
+; end prologue
 
-; end func
+  ST &a
+
+  CLC
+  CLA   
+  ST &sum
+
+  ; begin loop
+  MUL__LOOP:  
+    LD &b
+    BZS MUL__END
+
+    CLC
+    ROR
+    ST &b
+    
+    ; begin if 
+    BCC MUL__IF_NOT_USED
+    ; begin branch if multiplier is 1 (sum)
+      LD &a
+      ADD &sum
+      ST &sum
+
+      JUMP MUL__SHIFT_A
+    ; begin branch if multiplier is 0 (skip sum)
+    MUL__IF_NOT_USED:
+    ; end if
+
+  MUL__SHIFT_A:  
+    LD &a
+    ASL
+    ST &a
+
+    JUMP MUL__LOOP
+  ; end loop
+
+  MUL__END:
+; begin epilogue
+  APOP
+  ; sum returned in ac automatically as &sum is last pop
+  RET
+; end func MUL

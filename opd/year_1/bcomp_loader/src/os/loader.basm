@@ -1,12 +1,13 @@
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
-; func LOAD_BIN: loads programm from binary to RAM and relocates sectors sequentially.
+; func LOAD_BIN: (read_func) loads programm from binary to RAM and relocates sectors sequentially.
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
 ; Remap of poiners created via "DATA $X" construction is not supported.
 ; Uses LB__NEXT_INPUT_WORD_PTR as streaming source of 2b words for binary.
 ; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
+; params: AC: read_func: function returning 1 word from binarry each time called
 ; return: AC: start address of program  
 ; stack:
 ; &: org_array
@@ -21,7 +22,7 @@
 ; &: section_cnt
 ; &: ret_addr
 ; begin globals
-LB__NEXT_INPUT_WORD_PTR: WORD $READ_WORD_DEMO
+LB__NEXT_INPUT_WORD_PTR: WORD ?
 LB__USERSPACE_BEGIN_PTR: WORD $_SYS__USERSPACE_BEGIN
 LB__USERSPACE_END_PTR: WORD $_SYS__USERSPACE_END
 LB__LOAD_PTR: WORD ?
@@ -35,8 +36,10 @@ LOAD_BIN:
   ; begin prologue
   APUSH
   ; end prologue
+  ST LB__NEXT_INPUT_WORD_PTR
+
   LD $LB__STR_STARTED_PTR
-  CALL $PRINT
+  CALL $PRINTLN
 
   CALL (LB__NEXT_INPUT_WORD_PTR)
   ST &section_cnt
@@ -93,7 +96,7 @@ LOAD_BIN:
     BLT LB__SECTION_VALID 
     ; begin branch section out of space
       LD $LB__STR_NO_SPACE_PTR
-      CALL $PRINT
+      CALL $PRINTLN
       JUMP LB__END
     ; end if
 
@@ -105,6 +108,11 @@ LOAD_BIN:
   ; inform
   LD $LB__STR_HEADER_OK_PTR
   CALL $PRINT
+
+  LD &section_cnt
+  CALL $ITOA_CHAR ; TODO ITOA
+  CALL $PRINT_CHAR
+  CALL $PRINT_ENDL
 
   ; restart sections iteration
   LD &section_cnt
@@ -172,11 +180,10 @@ LOAD_BIN:
 
     LD &section_cnt
     SUB &cur_section_cnt
-    CALL $ITOA_CHAR
+    CALL $ITOA_CHAR ; TODO: use ITOA
     CALL $PRINT_CHAR
-
     LD $LB__STR_SECTION_LOADED_PTR
-    CALL $PRINT
+    CALL $PRINTLN
 
     LOOP &cur_section_cnt
     JUMP LB__SECT_LOOP
@@ -184,7 +191,7 @@ LOAD_BIN:
 
 LB__END:
   LD $LB__STR_FULL_LOADED_PTR
-  CALL $PRINT
+  CALL $PRINTLN
 
   ; deallocate arrays
   LD &org_array
@@ -214,11 +221,11 @@ LB__END:
 ; end epilogue
 
 ; begin globals strings 
-LB__STR_STARTED: WORD "Started loading program\n\r"
-LB__STR_NO_SPACE: WORD "Not enough RAM to load program\n\r"
-LB__STR_HEADER_OK: WORD "Header parsed and valid\n\r"
-LB__STR_SECTION_LOADED: WORD " section loaded\n\r"
-LB__STR_FULL_LOADED: WORD "Loading successful\n\r"
+LB__STR_STARTED: WORD "Started loading program"
+LB__STR_NO_SPACE: WORD "Not enough RAM to load program"
+LB__STR_HEADER_OK: WORD "Header parsed and valid. Sections count: "
+LB__STR_SECTION_LOADED: WORD " section loaded"
+LB__STR_FULL_LOADED: WORD "Loading successful"
 ; end globals
 ; end func LOAD_BIN
 
@@ -290,3 +297,20 @@ LOAD_BIN_FIX_CMD:
   RET
 ; end epilogue
 ; end func LOAD_BIN_FIX_CMD
+
+
+
+; func LOAD_BIN_RUN: loads binary to ram and starts program
+; 
+; begin globals
+LOAD_BIN_RUN__JUMP_TARGET: WORD ?
+LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+; end globals
+; begin func
+LOAD_BIN_RUN:
+  LD LOAD_BIN_RUN__READER
+  CALL $LOAD_BIN
+  ST LOAD_BIN_RUN__JUMP_TARGET
+  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
+  RET
+; end func LOAD_BIN_RUN

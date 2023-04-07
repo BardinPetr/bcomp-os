@@ -7,9 +7,17 @@ start_addr@2b
 [section_desc@6b] * sections_cnt
 ; section_desc: (offset@2b, (is_code@1, 0000, len@11)@2b, org@2b)@6b
 [cmd@2b] * len
-
-; For WORD $X directives, cmd should have bit 15 set
 ```
+
+### Limitations
+- working:
+  - absolute direct addressing
+  - relative direct addressing
+  - basm WORD $ directive 
+- not working:
+  - relative indirect addressing
+
+ 
 
 ## Usage
 > BComp assembly is used with addons, preprocessing is required

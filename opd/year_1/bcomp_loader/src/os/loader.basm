@@ -1,5 +1,31 @@
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
+
+; func LOAD_BIN_RUN: loads binary to ram and starts program
+; 
+; begin globals
+LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
+LOAD_BIN_RUN__JUMP_TARGET: WORD ?
+LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
+; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+; end globals
+; begin func
+LOAD_BIN_RUN:
+  LD LOAD_BIN_RUN__READER
+  CALL $LOAD_BIN
+  BZS LOAD_BIN_RUN__EXIT
+  ST LOAD_BIN_RUN__JUMP_TARGET
+  
+  LD LOAD_BIN_RUN__STR_RUN_PTR
+  CALL $PRINTLN
+  
+  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
+LOAD_BIN_RUN__EXIT:
+  RET
+; end func LOAD_BIN_RUN
+
+
+
 ; func LOAD_BIN: (read_func) loads programm from binary to RAM and relocates sectors sequentially.
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
@@ -14,6 +40,7 @@
 ; &: len_array
 ; &: delta_array
 ; &: cur_cmd
+; &: cur_original_addr
 ; &: cur_section_org_delta
 ; &: cur_section_len
 ; &: cur_section_cnt
@@ -124,11 +151,18 @@ LOAD_BIN:
   LD &len_array
   ST LB__LEN_ARRAY_PTR
 
+  ; restart org array iterator
+  LD &org_array
+  ST LB__ORG_ARRAY_PTR
+
   ; begin loop over sections
   LB__SECT_LOOP:    
+    LD (LB__ORG_ARRAY_PTR)+
+    ST &cur_original_addr
+    
     LD (LB__LEN_ARRAY_PTR)+
     ST &cur_section_len
-    
+
     ; begin if cur_section_len[15]
     ROL
     BCS LB__CODE_SEC
@@ -165,11 +199,21 @@ LOAD_BIN:
         PUSH 
         LD &delta_array+1
         PUSH 
-        LD &cur_cmd+2
+        LD LB__LOAD_PTR
+        PUSH 
+      
+        LD &cur_original_addr+3
+        PUSH 
+        INC
+        ST &cur_original_addr+4
+        
+        LD &cur_cmd+4
         CALL $LOAD_BIN_FIX_CMD
 
         ST (LB__LOAD_PTR)+ 
 
+        POP
+        POP
         POP
         POP        
 
@@ -200,13 +244,15 @@ LOAD_BIN:
   LD &delta_array+1
   PUSH 
   LD &start_addr+2
-  OR LB__START_CMD_FIX ; make it look like absolute addressed command for reuse
-  CALL $LOAD_BIN_FIX_CMD
-  
-  SUB LB__START_CMD_FIX
-  ST &section_cnt+2 ; store to next stack item after ret addr so last POP will put it in AC
+  CALL $CALC_ADDR_SHIFT
+
+  ST &section_cnt+2 ; org delta
   POP
   POP
+
+  LD &start_addr
+  SUB &section_cnt
+  ST &section_cnt ; store to next stack item after ret addr so last POP will put it in AC
 
 LB__END:
   ; deallocate arrays
@@ -234,16 +280,20 @@ LB__STR_FULL_LOADED: WORD "Loading successful"
 
 
 
-; func LOAD_BIN_FIX_CMD: (cmd, delta_array, org_array)
+; func LOAD_BIN_FIX_CMD: (cmd, original_pos, real_pos, delta_array, org_array)
 ; 
 ; params: AC: cmd
 ;         STACK: org_array: pointer to array of section ORGs
 ;         STACK: delta_array: pointer to array of section ORG deltas
+;         STACK: real_pos: target address of command
 ; return:
 ; stack:
 ; &: org_delta
+; &: addr_shifted
 ; &: cur_cmd
 ; &: ret_addr
+; &: original_pos
+; &: real_pos
 ; &: delta_array
 ; &: org_array
 ; begin globals
@@ -251,47 +301,103 @@ LBFC__CMD_ADDR_TYPE_MASK: WORD 0x0800 ; (0000 1000 0000 0000)
 LBFC__CMD_ADDRESS_MASK: WORD 0x7FF
 LBFC__ABS_CMD_MIN_VAL: WORD 0x2000
 LBFC__ABS_CMD_MAX_VAL: WORD 0xF000
+LBFC__CMD_MASK_10: WORD 0x0400
+LBFC__CMD_MASK_9: WORD 0x0200
+LBFC__CMD_ADDR_MODE_MASK: WORD 0x0700
+LBFC__LOW_MASK: WORD 0x00FF
 ; end globals
 ; begin func
 LOAD_BIN_FIX_CMD:
 ; begin prologue
   APUSH
 ; end prologue
-
   ST &cur_cmd
 
   ; begin if addressed : CMD >= 0x2000, CMD < 0xF000,  absolute: CMD[11]=0
   CMP LBFC__ABS_CMD_MAX_VAL  
-  BHIS LBFC__OTHER_CMD
+  BHIS LBFC__END
   CMP LBFC__ABS_CMD_MIN_VAL
-  BLO LBFC__OTHER_CMD
+  BLO LBFC__END
+  ; begin branch addressed command
   AND LBFC__CMD_ADDR_TYPE_MASK
-  BZC LBFC__OTHER_CMD_DO_RELOAD
+  BZC LBFC__ADDRESSED_OTHER_TYPE
   ; begin branch absolute addressing
-    LD &cur_cmd
+
+    LD &org_array
+    PUSH
+    LD &delta_array+1
+    PUSH
+    LD &cur_cmd+2
     AND LBFC__CMD_ADDRESS_MASK
     
-    PUSH ; cmd's address part
-    LD &org_array+1
-    CALL $ARRAY_LOWER_BOUND
-    ST &org_delta+1 ; index
+    CALL CALC_ADDR_SHIFT  
+    
+    ST &org_delta+2
+    POP
     POP
 
-    LD &org_delta
-    PUSH 
-    LD &delta_array+1
-    CALL $ARRAY_GET_FC
-    ST &org_delta ; real delta
-
-    ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
+    ; apply delta
     LD &cur_cmd
     SUB &org_delta
-    ST &cur_cmd 
-    JUMP LBFC__OTHER_CMD
+    ST &cur_cmd
+
+    JUMP LBFC__END
   ; begin branch not absolute addressing
-  LBFC__OTHER_CMD_DO_RELOAD:
+  LBFC__ADDRESSED_OTHER_TYPE:
     LD &cur_cmd
-  LBFC__OTHER_CMD:
+    AND LBFC__CMD_ADDR_MODE_MASK
+
+    ; begin if
+    CMP LBFC__CMD_MASK_10
+    BLO LBFC__INDIRECT_RELATIVE_CMD
+    ; begin branch stack or direct relative (100 or 110)
+      ; begin if
+      AND LBFC__CMD_MASK_9
+      BZS LBFC__STACK_CMD
+      ; begin branch direct relative cmd
+        LD &org_array
+        PUSH
+        LD &delta_array+1
+        PUSH
+
+        LD &cur_cmd+2
+        AND LBFC__LOW_MASK
+        SXTB ; 1 byte signed shift to 2 byte 
+        INC ; ST + 1 + shift
+        ADD &original_pos+2
+        ST &addr_shifted+2
+        
+        AND LBFC__CMD_ADDRESS_MASK
+        
+        CALL CALC_ADDR_SHIFT  
+        ST &org_delta+2
+        POP
+        POP
+
+        LD &addr_shifted
+        SUB &org_delta
+        SUB &real_pos
+        DEC
+        AND LBFC__LOW_MASK
+        ST &org_delta ; relocated ip shift
+
+        LD LBFC__LOW_MASK
+        SWAB
+        AND &cur_cmd
+        OR &org_delta
+        ST &cur_cmd
+        JUMP LBFC__END
+      ; begin branch stack relative cmd
+      LBFC__STACK_CMD:
+        LD &cur_cmd
+        JUMP LBFC__END  
+      ; end if
+    ; begin branch indirect relative (000, 010, 011)
+    LBFC__INDIRECT_RELATIVE_CMD:
+      LD &cur_cmd
+    ; end if 
+
+  LBFC__END:
   ; end if
 
 ; begin epilogue
@@ -302,25 +408,46 @@ LOAD_BIN_FIX_CMD:
 
 
 
-; func LOAD_BIN_RUN: loads binary to ram and starts program
+
+; func CALC_ADDR_SHIFT: (addr, delta_array, org_array) 
+; finds corresponding relocated address for addr based on orgs and org_deltas of sectors and returns difference
 ; 
+; params: AC: addr
+;         STACK: org_array: pointer to array of section ORGs
+;         STACK: delta_array: pointer to array of section ORG deltas
+; return: AC: relocated_addr-addr (i.e. org_delta)
+; stack:
+; &: org_delta
+; &: ret_addr
+; &: delta_array
+; &: org_array
 ; begin globals
-LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
-LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
-; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
 ; end globals
 ; begin func
-LOAD_BIN_RUN:
-  LD LOAD_BIN_RUN__READER
-  CALL $LOAD_BIN
-  BZS LOAD_BIN_RUN__EXIT
-  ST LOAD_BIN_RUN__JUMP_TARGET
-  
-  LD LOAD_BIN_RUN__STR_RUN
-  CALL $PRINTLN
-  
-  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
-LOAD_BIN_RUN__EXIT:
+CALC_ADDR_SHIFT:
+; begin prologue
+  APUSH
+; end prologue
+  ; addr in AC
+
+  PUSH
+  LD &org_array+1
+  CALL $ARRAY_LOWER_BOUND
+  ST &org_delta+1 ; index
+  POP
+
+  LD &org_delta
+  PUSH 
+  LD &delta_array+1
+  CALL $ARRAY_GET_FC
+
+  ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
+  ST &org_delta ; last POP
+
+; begin epilogue
+  APOP
   RET
-; end func LOAD_BIN_RUN
+; end epilogue
+; end func CALC_ADDR_SHIFT
+
+

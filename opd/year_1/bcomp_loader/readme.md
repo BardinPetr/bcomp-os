@@ -7,6 +7,8 @@ start_addr@2b
 [section_desc@6b] * sections_cnt
 ; section_desc: (offset@2b, (is_code@1, 0000, len@11)@2b, org@2b)@6b
 [cmd@2b] * len
+
+; For WORD $X directives, cmd should have bit 15 set
 ```
 
 ## Usage

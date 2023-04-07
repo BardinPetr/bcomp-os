@@ -1,4 +1,6 @@
 ; ----------------------------- STRING UTILITIES LIBRARY -----------------------------
+; string format: (char[1] char[0]) ... (char[i+1]@1b char[i]@1b) (0x00, 0x00/char[2n-1])
+
 
 ; func ATOI: (src, radix) converts string number to int 
 ; 

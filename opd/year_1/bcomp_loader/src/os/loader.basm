@@ -3,12 +3,12 @@
 ; func LOAD_BIN: (read_func) loads programm from binary to RAM and relocates sectors sequentially.
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
-; Remap of poiners created via "DATA $X" construction is not supported.
+; Remap of poiners created via "DATA $X" construction is supported only when they have 15 bit set.
 ; Uses LB__NEXT_INPUT_WORD_PTR as streaming source of 2b words for binary.
 ; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
 ; params: AC: read_func: function returning 1 word from binarry each time called
-; return: AC: start address of program  
+; return: AC: start address of program or 0x0 if failed
 ; stack:
 ; &: org_array
 ; &: len_array
@@ -97,6 +97,8 @@ LOAD_BIN:
     ; begin branch section out of space
       LD $LB__STR_NO_SPACE_PTR
       CALL $PRINTLN
+      CLA ; err return code
+      ST &section_cnt
       JUMP LB__END
     ; end if
 
@@ -189,17 +191,8 @@ LOAD_BIN:
     JUMP LB__SECT_LOOP
   ; end loop over sections
 
-LB__END:
   LD $LB__STR_FULL_LOADED_PTR
   CALL $PRINTLN
-
-  ; deallocate arrays
-  LD &org_array
-  CALL $MFREE
-  LD &delta_array
-  CALL $MFREE
-  LD &len_array
-  CALL $MFREE
 
   ; calculate new start address and return in AC
   LD &org_array
@@ -214,6 +207,15 @@ LB__END:
   ST &section_cnt+2 ; store to next stack item after ret addr so last POP will put it in AC
   POP
   POP
+
+LB__END:
+  ; deallocate arrays
+  LD &org_array
+  CALL $MFREE
+  LD &delta_array
+  CALL $MFREE
+  LD &len_array
+  CALL $MFREE
 
 ; begin epilogue
   APOP
@@ -303,14 +305,22 @@ LOAD_BIN_FIX_CMD:
 ; func LOAD_BIN_RUN: loads binary to ram and starts program
 ; 
 ; begin globals
+LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
 LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
+; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
 ; end globals
 ; begin func
 LOAD_BIN_RUN:
   LD LOAD_BIN_RUN__READER
   CALL $LOAD_BIN
+  BZS LOAD_BIN_RUN__EXIT
   ST LOAD_BIN_RUN__JUMP_TARGET
+  
+  LD LOAD_BIN_RUN__STR_RUN
+  CALL $PRINTLN
+  
   JUMP (LOAD_BIN_RUN__JUMP_TARGET)
+LOAD_BIN_RUN__EXIT:
   RET
 ; end func LOAD_BIN_RUN

@@ -11,6 +11,7 @@
 ;          &1 - ret addr
 ; begin globals:
 RL__CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
+RL__PROMPT: WORD "> "
 ; end globals
 ; begin func
 READ_LINE:
@@ -19,11 +20,14 @@ READ_LINE:
 ; end prologue
 
   ; set base output address from AC
-  ST $RL__CUR_POINTER
+  ST RL__CUR_POINTER
 
   ; set character id to zero 
   CLA
   ST &0
+
+  LD RL__PROMPT_PTR
+  CALL $PRINT
 
   ; begin loop
   RL__LOOP: 
@@ -36,6 +40,7 @@ READ_LINE:
     BZS RL__HIGH_BYTE
     ; begin branch char_id % 2 == 0
       CALL $READ_CHAR
+      CALL $PRINT_CHAR
 
       CMP #0x0A ; LF (NUL is full next word)
       BEQ RL__EOL_APPEND_NUL
@@ -45,6 +50,7 @@ READ_LINE:
     ; begin branch char_id % 2 == 1
     RL__HIGH_BYTE:
       CALL $READ_CHAR
+      CALL $PRINT_CHAR
 
       CMP #0x0A ; LF, NUL is this word high byte
       ; no need to set NUL as it is automatically set when writing low byte
@@ -56,6 +62,9 @@ READ_LINE:
       JUMP RL__LOOP
     ; end if
   ; end loop
+
+  LD #0x0A
+  CALL $PRINT_CHAR
 
 RL__EOL_APPEND_NUL:
   CLA ; put EOS

@@ -19,6 +19,19 @@ PRINT_CHAR:
 ; end func PUT_CHAR
 
 
+; func PRINT_ENDL: prints CR+LF
+; 
+; begin func
+PRINT_ENDL:
+  LD #0xD
+  CALL $PRINT_CHAR
+  LD #0xA
+  CALL $PRINT_CHAR
+  RET
+; end func PRINT_ENDL
+
+
+
 ; func PRINT: outputs string to text printer 
 ; 
 ; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
@@ -51,3 +64,16 @@ PRINT_LOOP:
 PRINT_EXIT:
   RET
 ; end func PRINT
+
+
+
+; func PRINTLN: outputs string to text printer and adds CRLF 
+; 
+; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
+; params: AC - pointer to first string data address
+; begin func
+PRINTLN:
+  CALL $PRINT
+  CALL $PRINT_ENDL
+  RET
+; end func PRINTLN

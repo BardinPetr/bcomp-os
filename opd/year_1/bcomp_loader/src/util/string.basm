@@ -27,18 +27,16 @@ ATOI:
   CALL $STRING_LEN
   ST &byte_cnt
 
-  ; start interation from last symbol
-  INC 
-  ASR ; divide by 2 with rounding to higher number
-  INC ; to put pointer after last digit
-  ADD &src
-  ST ATOI__STR_PTR
-
   LD &byte_cnt ; symbol number
   ADD #2
   ASR
   ASL 
   ST &byte_cnt ; count zero bytes (one or two NUL due char count partity)
+  
+  ; start interation from last symbol (last byte) 
+  ASR ; bytes to words
+  ADD &src
+  ST ATOI__STR_PTR
 
   CLA 
   ST &sum
@@ -81,7 +79,7 @@ ATOI:
     CALL $MUL 
     ; save sum
     ADD &sum+1
-    ST &sum+1   
+    ST &sum+1
     POP
 
     ; cur_radix_pow *= radix

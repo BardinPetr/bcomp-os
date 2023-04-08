@@ -1,32 +1,6 @@
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
-
-; func LOAD_BIN_RUN: loads binary to ram and starts program
-; 
-; begin globals
-LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
-LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
-; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
-; end globals
-; begin func
-LOAD_BIN_RUN:
-  LD LOAD_BIN_RUN__READER
-  CALL $LOAD_BIN
-  BZS LOAD_BIN_RUN__EXIT
-  ST LOAD_BIN_RUN__JUMP_TARGET
-  
-  LD LOAD_BIN_RUN__STR_RUN_PTR
-  CALL $PRINTLN
-  
-  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
-LOAD_BIN_RUN__EXIT:
-  RET
-; end func LOAD_BIN_RUN
-
-
-
-; func LOAD_BIN: (read_func) loads programm from binary to RAM and relocates sectors sequentially.
+; func LOAD_BIN: (read_func, target_addr) loads programm from binary to RAM and relocates sectors sequentially.
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
 ; Remap of poiners created via "DATA $X" construction is supported only when they have 15 bit set.
@@ -34,6 +8,7 @@ LOAD_BIN_RUN__EXIT:
 ; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
 ; 
 ; params: AC: read_func: function returning 1 word from binarry each time called
+;         STACK: target_addr: address to start loading to
 ; return: AC: start address of program or 0x0 if failed
 ; stack:
 ; &: org_array
@@ -48,6 +23,7 @@ LOAD_BIN_RUN__EXIT:
 ; &: start_addr
 ; &: section_cnt
 ; &: ret_addr
+; &: target_addr
 ; begin globals
 LB__NEXT_INPUT_WORD_PTR: WORD ?
 LB__USERSPACE_BEGIN_PTR: WORD $_SYS__USERSPACE_BEGIN
@@ -91,7 +67,19 @@ LOAD_BIN:
   CALL (LB__NEXT_INPUT_WORD_PTR)
   ST &start_addr
 
-  LD (LB__USERSPACE_BEGIN_PTR)
+  LD &target_addr
+  ; begin if
+  CMP (LB__USERSPACE_BEGIN_PTR)
+  BHIS LB__START
+  ; begin branch if target addr not in valid range 
+    LD $LB__STR_NO_SPACE_PTR
+    CALL $PRINTLN
+    CLA ; err return code
+    ST &section_cnt
+    JUMP LB__END
+  ; end if
+
+  LB__START:
   ST LB__LOAD_PTR
   ST &real_org
 
@@ -120,7 +108,7 @@ LOAD_BIN:
 
     ; begin if check memory availability
     CMP (LB__USERSPACE_END_PTR)
-    BLT LB__SECTION_VALID 
+    BLO LB__SECTION_VALID 
     ; begin branch section out of space
       LD $LB__STR_NO_SPACE_PTR
       CALL $PRINTLN

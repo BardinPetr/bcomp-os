@@ -1,0 +1,34 @@
+; ----------------------------- OS -----------------------------
+
+; func INIT: OS start procedure
+; 
+; params:
+; return: 
+; stack:
+; 
+; begin globals
+; end globals
+; begin func
+INIT:
+; begin prologue
+  APUSH
+; end prologue
+
+  ; reserve processes array
+  LD $_SYS_PROC__PROCESSES_MAX
+  CALL $MALLOC
+  ST $_SYS_PROC__PROCESSES_LIST_PTR
+
+  ; set userspace begin
+  LD $_SYS__USERSPACE_BEGIN
+  ST $_SYS_PROC__FREE_MEM_START
+
+  CALL $INTERRUPTS_INIT
+
+  CALL $LOAD_BIN_RUN
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func INIT

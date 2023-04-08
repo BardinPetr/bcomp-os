@@ -1,0 +1,59 @@
+; ----------------------------- PROCESS MANAGEMENT SYSTEM -----------------------------
+
+; begin globals
+_SYS_PROC__PROCESSES_MAX: WORD 0x2
+_SYS_PROC__PROCESSES_LIST_PTR: WORD 0x0
+_SYS_PROC__FREE_MEM_START: WORD 0x0
+; end globals
+
+
+; func SPAWN: ()
+; 
+; params: AC:
+; return: 
+; stack:
+; 
+; begin globals
+; end globals
+; begin func
+SPAWN:
+; begin prologue
+  APUSH
+; end prologue
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func SPAWN
+
+
+
+
+; func LOAD_BIN_RUN: loads binary to ram and starts program
+; Loads program at _SYS_PROC__FREE_MEM_START
+; 
+; begin globals
+LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
+LOAD_BIN_RUN__JUMP_TARGET: WORD ?
+LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
+; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+; end globals
+; begin func
+LOAD_BIN_RUN:
+  LD $_SYS_PROC__FREE_MEM_START
+  PUSH
+  LD LOAD_BIN_RUN__READER
+  CALL $LOAD_BIN
+  BZS LOAD_BIN_RUN__EXIT
+  ST LOAD_BIN_RUN__JUMP_TARGET
+  POP
+
+  LD LOAD_BIN_RUN__STR_RUN_PTR
+  CALL $PRINTLN
+  
+  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
+LOAD_BIN_RUN__EXIT:
+  RET
+; end func LOAD_BIN_RUN
+

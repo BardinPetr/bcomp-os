@@ -34,6 +34,7 @@ START:
 MAIN:
   LD #65
   ST $X
+  HLT
 MAIN_LOOP:
   ; disable interrupts to make sure 
   ; that interrupt for IOdev 2 won't change X value before it is saved here
@@ -61,18 +62,16 @@ DEFAULT_INT:
 ; func OUTPUT_INT: outputs value of f(AC) to IOdev #1
 ; begin func 
 OUTPUT_INT:
-  DI ; disable interrupts to prevent X being changed in progress
   PUSH ; save AC
-  _dbg_intv0_begin: NOP
   
   ; calculate formula and output
   LD $X
+  _dbg_intv0_begin: HLT
   CALL CALC
-  _dbg_intv0_calc: NOP
   OUT 2
+  _dbg_intv0_calc: HLT
 
   POP ; restore AC
-  EI  ; restore interrupts
   IRET
 ; end func OUTPUT_INT
 
@@ -83,24 +82,22 @@ OUTPUT_INT:
 AND_INT:
   ; disable interrupts to prevent X from being changed 
   ; somewhere else after it is loaded but not updated
-  DI 
   PUSH ; save AC
-  _dbg_intv1_begin: NOP
 
   ; clear AC reading is only to lower byte
   CLA
   ; read from device 1 data byte to lower byte of AC and extend sign
   IN 4
   SXTB  
+  _dbg_intv1_begin: HLT
 
   ; update X
   AND $X
+  _dbg_intv1_end: HLT
   CALL WRITE_CHECKED ; check X bounds and write
 
-  _dbg_intv1_end: NOP
 
   POP ; restore AC
-  EI ; restore interrupts
   IRET
 ; end func AND_INT
 

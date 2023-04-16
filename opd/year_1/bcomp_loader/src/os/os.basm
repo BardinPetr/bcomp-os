@@ -1,18 +1,25 @@
 ; ----------------------------- OS -----------------------------
 
-; func INIT: OS start procedure
+
+; func OS__INIT: OS start procedure
 ; 
 ; params:
 ; return: 
 ; stack:
-; 
+; &: ret_addr
 ; begin globals
+OSI__INIT_STR: WORD "Initializing..."
+OSI__START_STR: WORD "System started"
 ; end globals
 ; begin func
-INIT:
+OS__INIT:
 ; begin prologue
   APUSH
 ; end prologue
+
+  CALL $PRINT_CLEAR
+  LD OSI__INIT_STR_PTR
+  CALL $PRINTLN
 
   ; reserve processes array
   LD $_SYS_PROC__PROCESSES_MAX
@@ -23,7 +30,18 @@ INIT:
   LD $_SYS__USERSPACE_BEGIN
   ST $_SYS_PROC__FREE_MEM_START
 
-  CALL $INTERRUPTS_INIT
+
+  ; begin block setup interrupts section
+  CALL $INT__INIT
+
+  LD #1 ; 10Hz
+  CALL $OS__SETUP_SWITCH_TIMER
+  EI
+  ; end block ints
+
+  LD OSI__START_STR_PTR
+  CALL $PRINTLN
+  CALL $PRINT_ENDL
 
   CALL $LOAD_BIN_RUN
 
@@ -31,4 +49,71 @@ INIT:
   APOP
   RET
 ; end epilogue
-; end func INIT
+; end func OS__INIT
+
+
+
+; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context for multitasking
+; Should be called with timer
+; 
+; stack:
+; 
+; begin globals
+OS__CONTEXT_SWITCH_INT_PTR: WORD $OS__CONTEXT_SWITCH_INT
+OS__CSI__TEXT: WORD "switch"
+; end globals
+; begin func
+OS__CONTEXT_SWITCH_INT:
+; begin prologue
+  PUSH
+  APUSH
+; end prologue
+
+  LD OS__CSI__TEXT_PTR
+  CALL $PRINTLN
+
+  IN 0 ; reset timer
+
+; begin epilogue
+  APOP
+  POP
+  IRET
+; end epilogue
+; end func OS__CONTEXT_SWITCH_INT
+
+
+
+; func OS__SETUP_SWITCH_TIMER: (period)
+; 
+; params: AC: period (real period = period * 100ms)
+; stack:
+; &: period
+; &: ret_addr
+; begin func
+OS__SETUP_SWITCH_TIMER:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &period
+
+  LD $OS__CONTEXT_SWITCH_INT_PTR
+  CALL $INT__REGISTER_HANDLER
+
+  PUSH
+  CLA ; timer DEV#0
+  CALL $DEV__INT_ON
+  POP
+  
+  CLA ; DEV#0 DR = 0
+  PUSH
+  LD &period+1
+  CALL $DEV__OUT
+  POP
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func OS__SETUP_SWITCH_TIMER
+

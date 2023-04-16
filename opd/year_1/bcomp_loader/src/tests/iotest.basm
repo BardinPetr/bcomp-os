@@ -1,0 +1,37 @@
+ORG 0x10
+
+CHR: WORD 0x20
+MX: WORD 0xFF
+START:
+  ; CALL TEST
+
+  INWAIT: 
+    IN 0xA
+    AND #0x40
+    BZS INWAIT
+
+  IN 0x8
+  ST CHR
+
+  OUTWAIT: 
+    IN 0xA
+    AND #0x20
+    BZS OUTWAIT
+  
+  LD CHR
+  OUT 0x9 
+
+  JUMP START
+
+
+TEST:
+  LD CHR
+  INC
+  ST CHR
+  OUT 0x9 
+
+  CMP MX
+  BNE TEST
+
+  LD #0x21
+  ST CHR

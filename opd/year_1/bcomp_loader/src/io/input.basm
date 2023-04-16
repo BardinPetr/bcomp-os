@@ -78,7 +78,8 @@ RL__EOL:
 
 
 ; func READ_CHAR: pool keyboard for ready and read 1 char from it
-;
+; 0x19,0x18 for keyboard; 0xA,0x8 for serial port
+; 
 ; params: none
 ; return: AC: data read from dev in low byte
 ; affects: AC higher byte is cleared
@@ -86,9 +87,11 @@ RL__EOL:
 READ_CHAR:
 RCH__LOOP:
   CLA
-  IN 0x19
+  ; IN 0x19
+  IN 0xA
   AND #0x40
   BZS RCH__LOOP
-  IN 0x18
+  ; IN 0x18
+  IN 0x8
   RET
 ; end func READ_CHAR

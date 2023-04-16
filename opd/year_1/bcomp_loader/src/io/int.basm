@@ -13,7 +13,7 @@ _SYS_INT__DEFAULT_HANDLER:
 ; end func
 
 
-; func REGISTER_INT_HANDLER: (addr) registers interrupt vector for first free slot
+; func INT__REGISTER_HANDLER: (addr) registers interrupt vector for first free slot
 ; 
 ; params: AC: addr: handler addr 
 ; return: vector number if OK, 0xFFFF if no handlers left
@@ -22,10 +22,10 @@ _SYS_INT__DEFAULT_HANDLER:
 ; &: cur_id
 ; &: ret_addr
 ; begin globals
-RIH__HANDLERS_PTR: WORD 0x0
+IRH__HANDLERS_PTR: WORD 0x0
 ; end globals
 ; begin func
-REGISTER_INT_HANDLER:
+INT__REGISTER_HANDLER:
 ; begin prologue
   APUSH
 ; end prologue
@@ -34,71 +34,71 @@ REGISTER_INT_HANDLER:
   LD #0
   ST &cur_id
 
-  RIH__LOOP:
+  IRH__LOOP:
     LD &cur_id
     CMP #8
-    BHIS RIH__NO_FREE
+    BHIS IRH__NO_FREE
 
     ASL
-    ST RIH__HANDLERS_PTR
-    LD (RIH__HANDLERS_PTR)
+    ST IRH__HANDLERS_PTR
+    LD (IRH__HANDLERS_PTR)
     CMP $_SYS_INT__DEFAULT_HANDLER_PTR
-    BEQ RIH__SET
+    BEQ IRH__SET
 
     LD &cur_id
     INC
     ST &cur_id
-    JUMP RIH__LOOP
+    JUMP IRH__LOOP
 
   ; no free handlers
-RIH__NO_FREE:
+IRH__NO_FREE:
   LD #0xFF
   ST &cur_id
-  JUMP RIH__EXIT
+  JUMP IRH__EXIT
 
-RIH__SET:  
+IRH__SET:  
   LD &target ; set vector
-  ST (RIH__HANDLERS_PTR)+
+  ST (IRH__HANDLERS_PTR)+
 
   LD $_SYS_INT__DEFAULT_PS
-  ST (RIH__HANDLERS_PTR)
+  ST (IRH__HANDLERS_PTR)
   
-RIH__EXIT:
+IRH__EXIT:
 ; begin epilogue
   ; cur_id is last pop
   APOP
   RET
 ; end epilogue
-; end func REGISTER_INT_HANDLER
+; end func INT__REGISTER_HANDLER
 
 
 
-; func UNREGISTER_INT_HANDLER: (id) unregister interrupt vector
+; func INT__UNREGISTER_HANDLER: (id) unregister interrupt vector
 ; 
 ; params: AC: id: id of vector
 ; begin globals
-UIH__HANDLERS_PTR: WORD ?
+IUH__HANDLERS_PTR: WORD ?
 ; end globals
 ; begin func
-UNREGISTER_INT_HANDLER:
+INT__UNREGISTER_HANDLER:
   ASL
-  ST UIH__HANDLERS_PTR
+  ST IUH__HANDLERS_PTR
 
   LD $_SYS_INT__DEFAULT_HANDLER_PTR
-  ST (UIH__HANDLERS_PTR)+
+  ST (IUH__HANDLERS_PTR)+
 
   LD $_SYS_INT__DEFAULT_PS
-  ST (UIH__HANDLERS_PTR)
+  ST (IUH__HANDLERS_PTR)
   RET
-; end func UNREGISTER_INT_HANDLER
+; end func INT__UNREGISTER_HANDLER
 
 
 
-; func INTERRUPTS_INIT: () initializes interrupts to default values.
+; func INT__INIT: () initializes interrupts to default values.
 ; stack:
 ; &: cur_id
 ; begin func
-INTERRUPTS_INIT:
+INT__INIT:
 ; begin prologue
   APUSH
 ; end prologue
@@ -109,7 +109,7 @@ INTERRUPTS_INIT:
   INTI__LOOP:
     LD &cur_id
     DEC
-    CALL $UNREGISTER_INT_HANDLER
+    CALL $INT__UNREGISTER_HANDLER
     LOOP &cur_id
     JUMP INTI__LOOP
 
@@ -118,4 +118,4 @@ INTI__END:
   APOP
   RET
 ; end epilogue
-; end func INTERRUPTS_INIT
+; end func INT__INIT

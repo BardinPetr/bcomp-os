@@ -1,0 +1,142 @@
+; ----------------------------- DEVICE MANAGEMENT -----------------------------
+
+; func DEV__INT_ON: (dev_num, int_vect_id) 
+; enables interrupts for device number dev_num and sets interrupt vector
+; 
+; params: AC: dev_num
+;         STACK: int_vect_id
+; return: 
+; stack:
+; &: ret_addr
+; &: int_vect_id
+; begin globals
+; end globals
+; begin func
+DEV__INT_ON:
+; begin prologue
+  APUSH
+; end prologue
+
+  CALL $DEV__GET_MR
+
+  PUSH
+  LD &int_vect_id+1
+  OR #0x8 ; int enable 
+  CALL $DEV__OUT
+  POP
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func DEV__INT_ON
+
+
+; func DEV__INT_OFF: (dev_num) disables interrupts from IO device dev_num
+; 
+; params: AC: dev_num
+; begin func
+DEV__INT_OFF:
+  CALL $DEV__GET_MR
+
+  PUSH
+  CLA
+  CALL $DEV__OUT
+  POP
+
+  RET
+; end func DEV__INT_OFF
+
+
+; func DEV__OUT: (value, io_reg_num) OUT instruction with register number as parameter
+; 
+; params: AC: value
+;         STACK: io_reg_num
+; affects: os code (rewrites its own OUT instrunction with value supplied)
+; stack:
+; &: value
+; &: ret_addr
+; &: io_reg_num
+; begin globals
+DEV__OUT__MASK: WORD 0xFF00
+; end globals
+; begin func
+DEV__OUT:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &value
+
+  ; set reg for OUT instruction
+  LD DEV__OUT__TARGET_INSTR
+  AND DEV__OUT__MASK
+  OR &io_reg_num
+  ST DEV__OUT__TARGET_INSTR
+
+  LD &value
+DEV__OUT__TARGET_INSTR:
+  OUT 0x0  
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func DEV__OUT
+
+
+
+; func DEV__GET_MR: (dev_id) get MR register number of device 
+; 
+; params: AC: dev_id
+; return: 
+; stack:
+; begin globals
+; end globals
+; begin func
+DEV__GET_MR:
+; begin prologue
+  APUSH
+; end prologue
+
+  ; begin if on device id
+  CMP #4
+  BLO DEV__GET_MR__ADD1
+  BEQ DEV__GET_MR__ADD3
+  ; begin branch dev 5-9
+    ADD #2
+    JUMP DEV__GET_MR__END
+  ; begin branch dev 0-3
+  DEV__GET_MR__ADD1:
+    INC
+    JUMP DEV__GET_MR__END
+  ; begin branch dev 4
+  DEV__GET_MR__ADD3:
+    ADD #3
+  ; end if
+
+DEV__GET_MR__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func DEV__GET_MR
+
+
+
+; func DEV__GET_SR: (dev_id) get SR register number of device 
+; 
+; params: AC: dev_id
+; begin func
+DEV__GET_SR:
+  ; begin if on device id
+  CMP #4
+  BEQ DEV__GET_SR__DEV4
+  ; begin branch dev != 4
+    INC
+  ; begin branch dev =4
+  DEV__GET_SR__DEV4:
+    INC
+  ; end if
+  RET
+; end func DEV__GET_SR

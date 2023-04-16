@@ -1,0 +1,61 @@
+; ----------------------------- ANSI TERMINAL ESCAPE CODES SUPPORT LIBRARY -----------------------------
+
+; begin globals
+; _ANSI__CSI: WORD "\u001b[31m"
+_ANSI__CSI: WORD 0x5B
+; end globals
+
+
+; func ANSI_CSI: ()
+; 
+; begin globals
+; end globals
+; begin func
+ANSI_CSI:
+  LD #0x1B
+  CALL $PRINT_CHAR
+
+  LD _ANSI__CSI
+  CALL $PRINT_CHAR
+
+  ; LD #0x4
+  ; CALL $PRINT_CHAR
+
+  ; LD #0x31
+  ; CALL $PRINT_CHAR
+
+  ; LD #0x6d
+  ; CALL $PRINT_CHAR
+
+  RET
+; end func ANSI_CSI
+
+
+
+; func ANSI_SGR: ()
+; 
+; begin globals
+; end globals
+; begin func
+ANSI_SGR:
+  LD #0x1B
+  CALL $PRINT_CHAR
+
+  LD _ANSI__CSI
+  CALL $PRINT_CHAR
+
+  ; LD #0x4
+  ; CALL $PRINT_CHAR
+
+  ; LD #0x31
+  ; CALL $PRINT_CHAR
+
+  ; LD #0x6d
+  ; CALL $PRINT_CHAR
+
+  ; LD TEST_STR_PTR
+  ; CALL $PRINT
+
+  RET
+; end epilogue
+; end func ANSI_SGR

@@ -1,6 +1,7 @@
 ; ----------------------------- TERMINAL OUTPUT -----------------------------
 
 ; func PRINT_CHAR: outputs one char to text printer with wait for device availability
+; 0x19,0x18 for printer; 0xA,0x9 for serial port
 ; 
 ; params: AC - 1b character in low byte
 ; return: none
@@ -9,12 +10,15 @@ PRINT_CHAR:
   PUSH ; store target char
 
   PCH__LOOP:
-    IN 0xD
-    AND #0x40
+    ; IN 0xD
+    IN 0xA
+    ; AND #0x40
+    AND #0x20
     BZS PCH__LOOP
 
   POP
-  OUT 0xC
+  ; OUT 0xC
+  OUT 0x9
   RET
 ; end func PUT_CHAR
 
@@ -30,6 +34,15 @@ PRINT_ENDL:
   RET
 ; end func PRINT_ENDL
 
+
+; func PRINT_CLEAR: clears screen (Form Feed)
+; 
+; begin func
+PRINT_CLEAR:
+  LD #0x0C
+  CALL $PRINT_CHAR
+  RET
+; end func PRINT_CLEAR
 
 
 ; func PRINT: outputs string to text printer 

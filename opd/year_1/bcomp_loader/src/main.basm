@@ -6,6 +6,8 @@ INCLUDE util/array.basm
 INCLUDE io/output.basm
 INCLUDE io/input.basm
 INCLUDE io/int.basm
+INCLUDE io/dev.basm
+INCLUDE io/ansi.basm
 INCLUDE os/memory.basm
 INCLUDE os/loader_sources.basm
 INCLUDE os/loader.basm
@@ -13,7 +15,7 @@ INCLUDE os/proc.basm
 INCLUDE os/os.basm
 
 START:
-  CALL $INIT
+  CALL $OS__INIT
   HLT
 
 _SYS__CODE_END: WORD 0

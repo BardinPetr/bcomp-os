@@ -7,7 +7,7 @@ _SYS_PROC__FREE_MEM_START: WORD 0x0
 ; end globals
 
 
-; func SPAWN: ()
+; func PROC__SPAWN: ()
 ; 
 ; params: AC:
 ; return: 
@@ -16,7 +16,7 @@ _SYS_PROC__FREE_MEM_START: WORD 0x0
 ; begin globals
 ; end globals
 ; begin func
-SPAWN:
+PROC__SPAWN:
 ; begin prologue
   APUSH
 ; end prologue
@@ -25,7 +25,7 @@ SPAWN:
   APOP
   RET
 ; end epilogue
-; end func SPAWN
+; end func PROC__SPAWN
 
 
 
@@ -36,8 +36,8 @@ SPAWN:
 ; begin globals
 LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
 LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
-; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+; LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
+LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
 ; end globals
 ; begin func
 LOAD_BIN_RUN:

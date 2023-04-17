@@ -13,6 +13,7 @@ INCLUDE os/loader_sources.basm
 INCLUDE os/loader.basm
 INCLUDE os/proc.basm
 INCLUDE os/os.basm
+INCLUDE apps/shell.basm
 
 START:
   CALL $OS__INIT

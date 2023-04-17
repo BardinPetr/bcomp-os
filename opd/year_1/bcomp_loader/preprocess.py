@@ -98,9 +98,14 @@ def preprocess_stack_names(data: str):
 
     cur_stack_id -= upper_than_ret # working with local variables only
     # generate prologue and epilogue
+    
+    if cur_stack_id > 127:
+      sys.stderr.write(f"func {name} have {cur_stack_id} local vars, hovewer SPADD supports up to 127 only")
+      exit(1)
+
     func_body = func_body\
-      .replace(f"APUSH", "  PUSH\n" * cur_stack_id)\
-      .replace(f"APOP", "  POP\n" * cur_stack_id)
+      .replace(f"APUSH", f"SPADD #{256 - cur_stack_id}" if cur_stack_id > 0 else "")\
+      .replace(f"APOP", f"SPADD #{cur_stack_id}" if cur_stack_id > 0 else "")
 
     output_str = output_str[:body_pos[0]] + list(func_body) + output_str[body_pos[1]+1:] 
     data = ''.join(output_str)

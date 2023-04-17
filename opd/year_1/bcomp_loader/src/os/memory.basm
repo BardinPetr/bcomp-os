@@ -214,3 +214,39 @@ MEMCMP:
     LD #1
     RET
 ; end func MEMCMP
+
+
+
+; func MEMCPY: (dst, src, cnt) copy memory segment of cnt length starting from src to dst
+; 
+; params: AC: cnt
+;         STACK: src
+;         STACK: dst
+; return: 0 if equal, 1 if not equal
+; stack:
+; &: ret_addr
+; &: dst
+; &: src
+; begin globals
+MEMCPY__PTR1: WORD 0x0
+MEMCPY__PTR2: WORD 0x0
+MEMCPY__CNT: WORD 0x0
+; end globals
+; begin func
+MEMCPY:
+  ST MEMCPY__CNT
+
+  LD &src
+  ST MEMCPY__PTR1
+  LD &dst
+  ST MEMCPY__PTR2
+
+  MEMCPY__LOOP:
+    LD (MEMCPY__PTR1)+
+    ST (MEMCPY__PTR2)+
+
+    LOOP MEMCPY__CNT
+    JUMP MEMCPY__LOOP
+
+  RET
+; end func MEMCPY

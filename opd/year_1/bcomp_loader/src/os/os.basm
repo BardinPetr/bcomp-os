@@ -10,6 +10,7 @@
 ; begin globals
 OSI__INIT_STR: WORD "Initializing..."
 OSI__START_STR: WORD "System started"
+OSI__END_STR: WORD "System halt"
 ; end globals
 ; begin func
 OS__INIT:
@@ -36,14 +37,17 @@ OS__INIT:
 
   LD #1 ; 10Hz
   CALL $OS__SETUP_SWITCH_TIMER
-  EI
+  ; EI
   ; end block ints
 
   LD OSI__START_STR_PTR
   CALL $PRINTLN
   CALL $PRINT_ENDL
 
-  CALL $LOAD_BIN_RUN
+  CALL $SHELL_MAIN
+
+  LD OSI__END_STR_PTR
+  CALL $PRINTLN
 
 ; begin epilogue
   APOP

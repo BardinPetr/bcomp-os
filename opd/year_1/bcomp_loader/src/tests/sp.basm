@@ -1,0 +1,32 @@
+ORG 0x10
+START:
+; LD #0x16
+; ADD #0xEF
+; HLT
+  POP
+  ; SPADD #0xF0
+  ; HLT
+  ; SPADD #0x0F
+  ; HLT
+  ; PUSH
+  ; PUSH
+  ; SPADD #0x2
+  ; HLT
+  ; SPADD #0xFD
+  ; POP
+  ; POP
+  ; POP
+  ; HLT
+;  LD X
+;  WPS
+;  RIP
+;  LD #0x10
+;  WIP
+;  WSP
+
+; 1158 with PUSH/POP;  1112 with SPADD    delta = 46
+; SPADD: 21 mci, PUSH/POP: 19 mci    delta = 2
+
+
+
+X: WORD 0x18B

@@ -1,0 +1,147 @@
+; ----------------------------- BASIC SHELL INTERPRETER -----------------------------
+
+; begin globals
+_SHELL__CMD1_NAME: WORD "exit"
+_SHELL__CMD2_NAME: WORD "help"
+_SHELL__CMD_NAME_PTR_LIST: WORD $_SHELL__CMD1_NAME, $_SHELL__CMD2_NAME
+_SHELL__CMD_NAME_PTR_LIST_PTR: WORD $_SHELL__CMD_NAME_PTR_LIST
+_SHELL__CMD_ADDR_LIST: WORD 0xFFFF, $SHELL_CMD_HELP
+_SHELL__CMD_ADDR_LIST_PTR: WORD $_SHELL__CMD_ADDR_LIST
+_SHELL__CMD_LIST_CNT: WORD 0x2
+; end globals
+
+
+
+; func SHELL_MAIN: () simple shell for execution of predefined commands.
+; Uses _SHELL__CMD_NAME_PTR_LIST as list of known command name strings, 
+; and _SHELL__CMD_NAME_PTR_LIST as list of CALL targets or 0xFFFF for exit
+; 
+; stack:
+; &: input_ptr
+; &: ret_addr
+; begin globals
+SHELL__START_STR: WORD "Hello. You are in shell"
+SHELL__NOTFOUND_STR: WORD "No such command."
+SHELL__PROMPT_STR: WORD "$ "
+SHELL__EXEC_PTR: WORD ?
+; end globals
+; begin func
+SHELL_MAIN:
+; begin prologue
+  APUSH
+; end prologue
+
+  LD SHELL__START_STR_PTR
+  CALL $PRINTLN
+
+  LD #30
+  CALL $MALLOC
+  ST &input_ptr
+
+  SHELL__LOOP:
+    LD SHELL__PROMPT_STR_PTR
+    CALL $PRINT
+
+    LD &input_ptr
+    CALL $READ_LINE
+
+    LD &input_ptr
+    CALL SHELL_SELECT_CMD
+
+    ; begin if command not found
+    BZC SHELL__LOOP_CONTINUE
+      LD SHELL__NOTFOUND_STR_PTR
+      CALL $PRINTLN 
+      JUMP SHELL__LOOP
+    ; begin branch command found
+    SHELL__LOOP_CONTINUE: 
+      BMI SHELL__EXIT
+
+      ST SHELL__EXEC_PTR
+      CALL (SHELL__EXEC_PTR)
+    ; end if
+
+    JUMP SHELL__LOOP
+
+SHELL__EXIT:
+  LD &input_ptr
+  CALL $MFREE
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func SHELL_MAIN
+
+
+
+; func SHELL_SELECT_CMD: (cmd_str_ptr)
+; 
+; params: AC: cmd_str_ptr - command text pointer
+; return: AC: cmd pointer to function to call or 0 if command not found
+; stack:
+; &: cnt
+; &: cmd_str_ptr
+; &: cmd
+; &: ret_addr
+; begin globals
+SSC__NAME_PTR: WORD ?
+SSC__ADDR_PTR: WORD ?
+; end globals
+; begin func
+SHELL_SELECT_CMD:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &cmd_str_ptr
+  
+  LD $_SHELL__CMD_LIST_CNT
+  ST &cnt
+
+  LD $_SHELL__CMD_ADDR_LIST_PTR
+  ST SSC__ADDR_PTR
+  LD $_SHELL__CMD_NAME_PTR_LIST_PTR
+  ST SSC__NAME_PTR
+
+  SSC__LOOP:
+    LD (SSC__NAME_PTR)+
+    PUSH 
+    LD &cmd_str_ptr+1
+    CALL $STRCMP
+    SWAP
+    POP
+
+    BZS SSC__FOUND
+    LD (SSC__ADDR_PTR)+
+
+    LOOP &cnt
+    JUMP SSC__LOOP
+
+  CLA
+  JUMP SSC__END
+
+  SSC__FOUND:
+    LD (SSC__ADDR_PTR)
+
+  SSC__END:    
+    ST &cmd
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func SHELL_SELECT_CMD
+
+
+
+; func SHELL_CMD_HELP: () prints shell help
+; begin globals
+SCH__TEXT: WORD "Interactive shell.\r\nCommands are case-sensitive, use of any other symbols (like spaces) is prohibited."
+; end globals
+; begin func
+SHELL_CMD_HELP:
+  LD SCH__TEXT_PTR
+  CALL $PRINTLN
+  RET
+; end func SHELL_CMD_HELP

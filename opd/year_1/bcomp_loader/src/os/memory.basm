@@ -173,3 +173,44 @@ MSIZE:
   LD (MSIZE__READ_PTR)
   RET
 ; end func MSIZE
+
+
+; func MEMCMP: (mem1, mem2, cnt) compare mem1 and mem2 segments of cnt length from beginning
+; 
+; params: AC: cnt
+;         STACK: mem2
+;         STACK: mem1
+; return: 0 if equal, 1 if not equal
+; stack:
+; &: ret_addr
+; &: mem1
+; &: mem2
+; begin globals
+MEMCMP__PTR1: WORD 0x0
+MEMCMP__PTR2: WORD 0x0
+MEMCMP__CNT: WORD 0x0
+; end globals
+; begin func
+MEMCMP:
+  ST MEMCMP__CNT
+
+  LD &mem1
+  ST MEMCMP__PTR1
+  LD &mem2
+  ST MEMCMP__PTR2
+
+  MEMCMP__LOOP:
+    LD (MEMCMP__PTR1)+
+    CMP (MEMCMP__PTR2)+
+    BNE MEMCMP__NOT_EQUAL
+
+    LOOP MEMCMP__CNT
+    JUMP MEMCMP__LOOP
+  
+  CLA
+  RET
+
+  MEMCMP__NOT_EQUAL:
+    LD #1
+    RET
+; end func MEMCMP

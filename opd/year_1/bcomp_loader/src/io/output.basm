@@ -87,6 +87,9 @@ PRINT_EXIT:
 ; begin func
 PRINTLN:
   CALL $PRINT
-  CALL $PRINT_ENDL
+  LD #0xD
+  CALL $PRINT_CHAR
+  LD #0xA
+  CALL $PRINT_CHAR
   RET
 ; end func PRINTLN

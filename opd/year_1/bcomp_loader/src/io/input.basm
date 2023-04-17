@@ -26,8 +26,8 @@ READ_LINE:
   CLA
   ST &0
 
-  LD RL__PROMPT_PTR
-  CALL $PRINT
+  ; LD RL__PROMPT_PTR
+  ; CALL $PRINT
 
   ; begin loop
   RL__LOOP: 
@@ -39,12 +39,21 @@ READ_LINE:
     AND #1
     BZS RL__HIGH_BYTE
     ; begin branch char_id % 2 == 0
+    RL__LOW_BYTE:
       CALL $READ_CHAR
       CALL $PRINT_CHAR
 
       CMP #0x0A ; LF (NUL is full next word)
       BEQ RL__EOL_APPEND_NUL
+      CMP #0x0D ; CR
+      BEQ RL__EOL_APPEND_NUL
+      CMP #0x08 ; BS
+      BNE RL__CONTINUE_L
+      ; begin branch on backspace pressed
+        LD -(RL__CUR_POINTER)
+        JUMP RL__HIGH_BYTE
 
+      RL__CONTINUE_L:
       ST (RL__CUR_POINTER)
       JUMP RL__LOOP
     ; begin branch char_id % 2 == 1
@@ -55,7 +64,16 @@ READ_LINE:
       CMP #0x0A ; LF, NUL is this word high byte
       ; no need to set NUL as it is automatically set when writing low byte
       BEQ RL__EOL
+      CMP #0x0D ; CR
+      BEQ RL__EOL
+      CMP #0x08 ; BS
+      BNE RL__CONTINUE_H
+      ; begin branch on backspace pressed
+        CLA
+        ST (RL__CUR_POINTER)
+        JUMP RL__LOW_BYTE
 
+      RL__CONTINUE_H:
       SWAB
       OR (RL__CUR_POINTER)
       ST (RL__CUR_POINTER)+
@@ -63,13 +81,12 @@ READ_LINE:
     ; end if
   ; end loop
 
-  LD #0x0A
-  CALL $PRINT_CHAR
-
 RL__EOL_APPEND_NUL:
   CLA ; put EOS
   ST (RL__CUR_POINTER)
 RL__EOL:
+  CALL $PRINT_ENDL
+  
   ; begin epilogue
     POP ; length as return in AC
     RET

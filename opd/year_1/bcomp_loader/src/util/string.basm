@@ -26,7 +26,7 @@ ATOI:
 ; end prologue
 
   ST &src
-  CALL $STRING_LEN
+  CALL $STRLEN
   ST &byte_cnt
 
   LD &byte_cnt ; symbol number
@@ -153,7 +153,7 @@ ITOA_CHAR__END:
 
 
 
-; func STRING_LEN: (ptr) get length of nul-ended string
+; func STRLEN: (ptr) get length of nul-ended string
 ; 
 ; params: AC: ptr: ponter 
 ; return: AC: length in symbols
@@ -166,7 +166,7 @@ SLEN__HMASK: WORD 0xFF00
 SLEN__LMASK: WORD 0xFF
 ; end globals
 ; begin func
-STRING_LEN:
+STRLEN:
 ; begin prologue
   APUSH
 ; end prologue
@@ -205,4 +205,71 @@ STRING_LEN:
   APOP
   RET
 ; end epilogue
-; end func STRING_LEN
+; end func STRLEN
+
+
+
+; func STRCMP: (str1, str2)
+; 
+; params: AC: str1 pointer
+;         STACK: str2 pointer
+; return: 0 if equal else not equal
+; stack:
+; &: char2
+; &: char1
+; &: ret_addr
+; &: str2
+; begin globals
+STRCMP__PTR1: WORD ?
+STRCMP__PTR2: WORD ?
+STRCMP__MASK: WORD 0xFF00
+; end globals
+; begin func
+STRCMP:
+; begin prologue
+  APUSH
+; end prologue
+  ST STRCMP__PTR1
+  LD &str2
+  ST STRCMP__PTR2
+
+  STRCMP__LOOP:
+    LD (STRCMP__PTR1)+
+    ST &char1
+    LD (STRCMP__PTR2)+
+    ST &char2
+
+    CMP &char1
+    BNE STRCMP__NOT_EQUAL
+    
+    ; AC=char2
+    AND STRCMP__MASK
+    BZS STRCMP__S2_END
+    LD &char1
+    AND STRCMP__MASK
+    BZS STRCMP__NOT_EQUAL ; diff length
+    ; begin branch char2!=NUL, char1!=NUL
+      JUMP STRCMP__LOOP
+    ; begin branch char2==NUL
+    STRCMP__S2_END:
+      LD &char1
+      AND STRCMP__MASK
+      BZC STRCMP__NOT_EQUAL ; diff length
+      ; begin branch char2==NUL, char1==NUL
+      JUMP STRCMP__EQUAL
+
+  STRCMP__EQUAL:
+    CLA
+    JUMP STRCMP__END
+
+  STRCMP__NOT_EQUAL:
+    LD #1
+
+  STRCMP__END:
+  ST &char1 ; last pop
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func STRCMP
+

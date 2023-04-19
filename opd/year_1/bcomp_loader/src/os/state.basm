@@ -1,7 +1,7 @@
 ; ----------------------------- STACK OPERATIONS -----------------------------
 
 ; thread control block (7words)
-; id@2b
+; state@2b    =0 - process alive, 0xFFFF - process dead/not exist, >0 - ???
 ; ac@2b
 ; ps@2b
 ; ip@2b
@@ -25,7 +25,69 @@
 ; begin globals
 _PROC__TCB_DESCR_BEGIN: WORD 0x700
 _PROC__TCB_STACK_BEGIN: WORD 0x715
+_PROC__TCB_STACK_SIZE: WORD 0x20
 ; end globals
+
+
+; func PROC_GET_NEXT_WITH_STATUS: (proc_id, status) get next after proc_id process from processes cycled list that have specific status 
+; 
+; params: AC: status
+;         STACK: proc_id
+; return: AC: proc_id or 0xFFFF if no such
+; stack:
+; &: proc_id
+; &: status
+; &: ret_addr
+; &: start_proc_id
+; begin globals
+PGNWS__PTR: WORD ?
+; end globals
+; begin func
+PROC_GET_NEXT_WITH_STATUS:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &status
+
+  LD &start_proc_id
+  INC
+  ST &proc_id
+
+  PGNWS__LOOP:
+    CMP $_SYS_PROC__PROCESSES_MAX
+    BLO PGNWS__CONTINUE
+    CLA
+    ST &proc_id
+  PGNWS__CONTINUE:
+
+    CMP &start_proc_id
+    BEQ PGNWS__INVALID
+
+    CALL $PROC_GET_TCB_PTR  
+    ST PGNWS__PTR
+    LD (PGNWS__PTR)
+    CMP &status
+    BEQ PGNWS__FOUND
+
+    LD &proc_id
+    INC
+    ST &proc_id
+
+    JUMP PGNWS__LOOP
+
+PGNWS__FOUND:
+  LD &proc_id
+  JUMP PGNWS__END
+
+PGNWS__INVALID:
+  LD #0xFF
+PGNWS__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func PROC_GET_NEXT_WITH_STATUS
 
 
 
@@ -46,7 +108,7 @@ PROC_GET_TCB_PTR:
 ; params: AC: id
 ; return: AC: address of stack memory segment for process
 PROC_GET_STACK_PTR:
-  MUL #32
+  MUL $_PROC__TCB_STACK_SIZE
   ADD _PROC__TCB_STACK_BEGIN
   RET
 ; end func PROC_GET_STACK_PTR

@@ -253,3 +253,41 @@ MEMCPY:
 
   RET
 ; end func MEMCPY
+
+
+
+; func MEMSET: (value, dst, cnt) set all memory words from dst up to dst+cnt to value
+; 
+; params: AC: value
+;         STACK: dst
+;         STACK: cnt
+; stack:
+; &: value
+; &: ret_addr
+; &: dst
+; &: cnt
+; begin globals
+MEMSET__PTR: WORD ?
+; end globals
+; begin func
+MEMSET:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &value
+
+  LD &dst
+  ST MEMSET__PTR
+
+  LD &value
+  MEMSET__LOOP:
+    ST (MEMSET__PTR)+
+    LOOP &cnt
+    JUMP MEMSET__LOOP
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func MEMSET

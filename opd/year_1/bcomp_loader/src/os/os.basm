@@ -39,6 +39,10 @@ OS__INIT:
   ; EI
   ; end block ints
 
+  ; prepare process manager
+  CALL $PROC__INIT_MANAGER
+
+  ; init end
   LD OSI__START_STR_PTR
   CALL $PRINTLN
   CALL $PRINT_ENDL
@@ -75,24 +79,19 @@ OS__CONTEXT_SWITCH_INT:
   LD $_SYS_PROC__RUNNING_PROCESS_ID  
   CALL $PROC_SAVE_STATE
   
-  ; round-robin
+  ; search for active process
   LD $_SYS_PROC__RUNNING_PROCESS_ID
-  INC
-  CMP $_SYS_PROC__CUR_PROCESSES_COUNT
-  BLO OSCSI__CONTINUE
-  CLA
-  OSCSI__CONTINUE:
-  ST $_SYS_PROC__RUNNING_PROCESS_ID
+  PUSH 
+  LD #0
+  CALL $PROC_GET_NEXT_WITH_STATUS
+  SWAP
+  POP
 
+  ST $_SYS_PROC__RUNNING_PROCESS_ID
   CALL $PROC_LOAD_STATE
 
-  IRET ; this instruction should not be reached in normal situaltion
-
-; begin epilogue
-  APOP
-  POP
+  ; this instruction should not be reached in normal process loading
   IRET
-; end epilogue
 ; end func OS__CONTEXT_SWITCH_INT
 
 

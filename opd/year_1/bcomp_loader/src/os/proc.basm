@@ -10,31 +10,155 @@ _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 
 
 
-; func PROC__CREATE: ()
-; 
-; params: AC:
-; return: 
+; func PROC__INIT_MANAGER: () prepares structures to hold processes
+;
 ; stack:
-; 
+; &: stack_data_ptr
+; &: sp_origin
+; &: cur_id
+; &: ret_addr
 ; begin globals
+PIM__TCB_PTR: WORD ?
 ; end globals
 ; begin func
-PROC__CREATE:
+PROC__INIT_MANAGER:
 ; begin prologue
   APUSH
 ; end prologue
 
-  LD _SYS_PROC__CUR_PROCESSES_COUNT
-  INC 
+  RSP
+  SUB #2
+  ST &sp_origin
 
+  LD $_PROC__TCB_DESCR_BEGIN
+  ST PIM__TCB_PTR
 
+  LD $_SYS_PROC__PROCESSES_MAX
+  ST &cur_id
+  
+  LD $_PROC__TCB_STACK_BEGIN
+  ST &stack_data_ptr
 
+  PIM__LOOP:
+    LD #0xFF ; free thread
+    ST (PIM__TCB_PTR)
+
+    LD PIM__TCB_PTR
+    ADD #4
+    ST PIM__TCB_PTR
+
+    LD &sp_origin
+    ST (PIM__TCB_PTR)
+
+    LD PIM__TCB_PTR
+    ADD #2
+    ST PIM__TCB_PTR
+
+    LD &stack_data_ptr
+    ST (PIM__TCB_PTR)+
+
+    LD &stack_data_ptr
+    ADD $_PROC__TCB_STACK_SIZE
+    ST &stack_data_ptr
+
+    LOOP &cur_id
+    JUMP PIM__LOOP
+
+PIM__END:
 ; begin epilogue
   APOP
   RET
 ; end epilogue
-; end func PROC__CREATE
+; end func PROC__INIT_MANAGER
 
+
+
+; func PROC_CREATE: (ip) create process TCB with entrypoint address ip
+; 
+; params: AC: ip
+; return: process id or 0xFFFF if could not be created
+; stack:
+; &: ip
+; &: proc_id
+; &: ret_addr
+; begin globals
+PCRT__PTR: WORD ?
+PCRT__BASE_PS: WORD 0x1A0 ; P | W | EI
+; end globals
+; begin func
+PROC_CREATE:
+; begin prologue
+  APUSH
+; end prologue
+  ST &ip
+  ; check count
+  LD $_SYS_PROC__CUR_PROCESSES_COUNT
+  CMP $_SYS_PROC__PROCESSES_MAX
+  BHIS PCRT__INVALID
+  INC 
+  ST $_SYS_PROC__CUR_PROCESSES_COUNT
+
+  ; search for free id
+  LD $_SYS_PROC__PROCESSES_MAX
+  PUSH 
+  LD #0xFF
+  CALL $PROC_GET_NEXT_WITH_STATUS
+  BMI PCRT__INVALID
+  ST &proc_id+1
+  CALL $PROC_GET_TCB_PTR
+  ST PCRT__PTR
+  POP
+
+  CLA 
+  ST (PCRT__PTR)+ ; state
+  ST (PCRT__PTR)+ ; AC
+  LD PCRT__BASE_PS
+  ST (PCRT__PTR)+ ; PS
+  LD &ip
+  ST (PCRT__PTR)+ ; IP
+  LD (PCRT__PTR)+ ; skip SPO
+  CLA
+  ST (PCRT__PTR)+ ; stack size
+
+  ; clear stack memory
+  LD $_PROC__TCB_STACK_SIZE   
+  PUSH
+  LD (PCRT__PTR)+ ; stack data ptr
+  PUSH
+  CLA
+  CALL $MEMSET
+  POP
+  POP
+
+  LD &proc_id
+  JUMP PCRT__END
+PCRT__INVALID:
+  LD #0xFF
+
+PCRT__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func PROC_CREATE
+
+
+
+; func PROC_KILL: (proc_id) kill process / stop execution
+; Do not do any clear to make it lighter (PROC_CREATE would do it for us)
+; 
+; params: AC: proc_id
+; begin globals
+PKL__PTR: WORD ?
+; end globals
+; begin func
+PROC_KILL:
+  CALL $PROC_GET_TCB_PTR
+  ST PKL__PTR
+  LD #0xFF
+  ST (PKL__PTR)
+  RET
+; end func PROC_KILL
 
 
 
@@ -44,8 +168,8 @@ PROC__CREATE:
 ; begin globals
 LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
 LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
-; LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
+; LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
+LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
 ; end globals
 ; begin func
 LOAD_BIN_RUN:

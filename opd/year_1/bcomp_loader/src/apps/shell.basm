@@ -3,11 +3,12 @@
 ; begin globals
 _SHELL__CMD1_NAME: WORD "exit"
 _SHELL__CMD2_NAME: WORD "help"
-_SHELL__CMD_NAME_PTR_LIST: WORD $_SHELL__CMD1_NAME, $_SHELL__CMD2_NAME
+_SHELL__CMD3_NAME: WORD "load"
+_SHELL__CMD_NAME_PTR_LIST: WORD $_SHELL__CMD1_NAME, $_SHELL__CMD2_NAME, $_SHELL__CMD3_NAME
 _SHELL__CMD_NAME_PTR_LIST_PTR: WORD $_SHELL__CMD_NAME_PTR_LIST
-_SHELL__CMD_ADDR_LIST: WORD 0xFFFF, $SHELL_CMD_HELP
+_SHELL__CMD_ADDR_LIST: WORD 0xFFFF, $SHELL_CMD_HELP, $LOAD_BIN_RUN
 _SHELL__CMD_ADDR_LIST_PTR: WORD $_SHELL__CMD_ADDR_LIST
-_SHELL__CMD_LIST_CNT: WORD 0x2
+_SHELL__CMD_LIST_CNT: WORD 0x3
 ; end globals
 
 
@@ -136,12 +137,37 @@ SHELL_SELECT_CMD:
 
 
 ; func SHELL_CMD_HELP: () prints shell help
+; stack:
+; &: iter
 ; begin globals
-SCH__TEXT: WORD "Interactive shell.\r\nCommands are case-sensitive, use of any other symbols (like spaces) is prohibited."
+SCH__TEXT: WORD "Interactive shell.\r\nCommands are case-sensitive, non-letter symbols are prohibited.\r\nList: "
+SCH__ITER: WORD ?
 ; end globals
 ; begin func
 SHELL_CMD_HELP:
+  APUSH
+
   LD SCH__TEXT_PTR
-  CALL $PRINTLN
+  CALL $PRINT
+
+  LD $_SHELL__CMD_LIST_CNT
+  ST &iter
+
+  LD $_SHELL__CMD_NAME_PTR_LIST_PTR
+  ST SCH__ITER
+
+  SCH__LOOP:
+    LD (SCH__ITER)+
+    CALL $PRINT
+    
+    LD #0x20
+    CALL $PRINT_CHAR
+
+    LOOP &iter
+    JUMP SCH__LOOP
+
+  CALL $PRINT_ENDL
+
+  APOP
   RET
 ; end func SHELL_CMD_HELP

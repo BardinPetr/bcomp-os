@@ -1,0 +1,23 @@
+ORG 0x10
+
+CHR: WORD 0x20
+MX: WORD 0xFF
+START:
+  OUTWAIT: 
+    IN 0xA
+    AND #0x20
+    BZS OUTWAIT
+  
+  LD CHR
+  OUT 0x9 
+  INC
+  ST CHR
+
+  CMP MX
+  BNE START
+
+  LD #0x0A
+  ST CHR
+
+  JUMP START
+  

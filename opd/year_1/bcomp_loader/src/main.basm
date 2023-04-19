@@ -1,6 +1,6 @@
 ORG 0x10
 
-INCLUDE util/math.basm
+; INCLUDE util/math.basm
 INCLUDE util/string.basm
 INCLUDE util/array.basm
 INCLUDE io/output.basm
@@ -21,7 +21,3 @@ START:
   HLT
 
 _SYS__CODE_END: WORD 0
-
-
-ORG 0x700
-TRASH: WORD 50 DUP (0xDEAD)

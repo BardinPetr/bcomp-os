@@ -1,32 +1,79 @@
-ORG 0x10
+OSI__TMP: WORD ?
+OSI__TMP3: WORD 0x710
+OSI__IP: WORD $PROC1
+OSI__PS: WORD 0x180
+; end globals
+; begin func
 START:
-; LD #0x16
-; ADD #0xEF
-; HLT
+; begin prologue
+  APUSH
+; end prologue
+
+  LD #0x20
+  CALL $MALLOC
+  ST &tcb
+  
+  ADD #4
+  ST OSI__TMP
+  RSP
+  ST (OSI__TMP)+
+  LD (OSI__TMP)+
+  LD OSI__TMP3
+  ST (OSI__TMP)
+
+  LD #1
+  PUSH
+  LD #2
+  PUSH
+  LD #3
+  PUSH
+  LD OSI__IP ; ip
+  INC
+  PUSH
+  LD OSI__PS ; ps
+  PUSH
+  LD #4 ; ac
+  PUSH
+
+  LD &tcb+6
+  CALL $PROC_SAVE_STATE
+
+  CLA
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  POP 
+  POP 
+  POP 
+  POP 
   POP
-  ; SPADD #0xF0
-  ; HLT
-  ; SPADD #0x0F
-  ; HLT
-  ; PUSH
-  ; PUSH
-  ; SPADD #0x2
-  ; HLT
-  ; SPADD #0xFD
-  ; POP
-  ; POP
-  ; POP
-  ; HLT
-;  LD X
-;  WPS
-;  RIP
-;  LD #0x10
-;  WIP
-;  WSP
-
-; 1158 with PUSH/POP;  1112 with SPADD    delta = 46
-; SPADD: 21 mci, PUSH/POP: 19 mci    delta = 2
+  POP 
+  POP 
+  POP 
+  POP 
+  POP
 
 
+  LD &tcb
+  CALL $PROC_LOAD_STATE
 
-X: WORD 0x18B
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func OS__INIT
+
+
+PROC1:
+  POP
+  HLT
+  POP
+  POP
+  POP

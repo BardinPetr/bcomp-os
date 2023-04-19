@@ -1,5 +1,6 @@
 ; ----------------------------- STACK OPERATIONS -----------------------------
-; thread control block
+
+; thread control block (7words)
 ; id@2b
 ; ac@2b
 ; ps@2b
@@ -16,9 +17,43 @@
 ; stack[SP+stack_size-1]
 
 
+; _SYS__TCB_BEGIN: WORD 0x700
+; _SYS__TCB_END: WORD 0x77F
+; _PROC__TCB_DESCR_PTRS: WORD 0x700, 0x707, 0x70E ; 0x700-0x715, each struct 7 words, from 0x700
+; _PROC__TCB_STACK_PTRS: WORD 0x715, 0x735, 0x755 ; 0x715-0x77F, each stack allocated with 32 words, from 0x715  
+
+; begin globals
+_PROC__TCB_DESCR_BEGIN: WORD 0x700
+_PROC__TCB_STACK_BEGIN: WORD 0x715
+; end globals
 
 
-; func PROC_SAVE_STATE: (tcb_ptr) saves state to TCB, moves stack and sets SP to the sp_origin (+this func ret addr)
+
+; func PROC_GET_TCB_PTR: (id) get TCB pointer for process with id 
+; 
+; params: AC: id
+; return: AC: address of the TCB of process
+PROC_GET_TCB_PTR:
+  MUL #7
+  ADD _PROC__TCB_DESCR_BEGIN
+  RET
+; end func PROC_GET_TCB_PTR
+
+
+
+; func PROC_GET_STACK_PTR: (id) get stack storage pointer for process with id 
+; 
+; params: AC: id
+; return: AC: address of stack memory segment for process
+PROC_GET_STACK_PTR:
+  MUL #32
+  ADD _PROC__TCB_STACK_BEGIN
+  RET
+; end func PROC_GET_STACK_PTR
+
+
+
+; func PROC_SAVE_STATE: (process_id) saves state to TCB, moves stack and sets SP to the sp_origin (+this func ret addr)
 ; intended to called when stack have following structure:
 ;     (top)
 ;   - ret addr of PROC_SAVE_STATE
@@ -28,7 +63,7 @@
 ;     (here stack of thread begins)
 ; affects: destroys SP and stack up to tcb.sp_origin
 ; convention: fastcall
-; params: AC: tcb_ptr - pointer to TCB to which store should be done
+; params: AC: process_id - process id which is going to be saved
 ; stack:
 ; &: stack_origin
 ; &: stack_size
@@ -43,6 +78,8 @@ PSS__RET: WORD ?
 ; begin func
 PROC_SAVE_STATE:
   APUSH
+
+  CALL PROC_GET_TCB_PTR
 
   INC ; skip id
   ST PSS__TCB_PTR
@@ -94,12 +131,13 @@ PROC_SAVE_STATE:
 
 
 
-; func PROC_LOAD_STATE: (tcb_ptr) restores full process state from TCB. 
+; func PROC_LOAD_STATE: (process_id) restores full process state from TCB. 
 ; After exit will jump into restored process!!!
 ; We down use memcpy as it would require it to be rewritten to be safe even with stack damaged what would slow it down.
 ; 
 ; affects: AC, SP, IP, PS, stack data - all restored to values right before PROC_SAVE_STATE according to TCB data
-; params: AC: tcb_ptr
+; convention: fastcall
+; params: AC: process_id - process id which should be loaded 
 ; stack: WARNING: use of stack (and APOP/APUSH) is prohibited here as function alters SP and rewrites stack region
 ; begin globals
 PLS__TCB_PTR: WORD ?
@@ -109,6 +147,8 @@ PLS__CNT: WORD ?
 ; end globals
 ; begin func
 PROC_LOAD_STATE:
+  CALL PROC_GET_TCB_PTR
+
   ST PLS__BASE_TCB_PTR
   
   ADD #6 ; tcb.stack_data_ptr
@@ -138,6 +178,8 @@ PROC_LOAD_STATE:
   SUB -(PLS__TCB_PTR) ; sp_origin
   NEG
   WSP
+
+  IN 0 ; reset context switch timer
 
   LD -(PLS__TCB_PTR) ; ip 
   PUSH

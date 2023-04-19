@@ -1,0 +1,11 @@
+ORG 0x0
+X: WORD 0x12F3
+Y: WORD 0xD
+START:
+  LD X
+  MUL Y
+  HLT
+
+  LD Y
+  MUL X
+  HLT

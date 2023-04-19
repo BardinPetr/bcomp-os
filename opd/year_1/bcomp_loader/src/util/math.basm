@@ -1,61 +1,61 @@
 ; ----------------------------- MATHEMATICS LIBRARY -----------------------------
 
-; func MUL: (a, b) unsigned numbers multiplication
-; 
-; params: AC a
-;         STACK b (should be less than a for performance increase)
-; return: AC: a*b
-; requires: a, b in range TODO
-; stack: 
-; &: a
-; &: sum
-; &: ret_addr
-; &: b
-; begin func
-MUL:
-; begin prologue
-  APUSH
-; end prologue
+; ; func MUL: (a, b) unsigned numbers multiplication
+; ; 
+; ; params: AC a
+; ;         STACK b (should be less than a for performance increase)
+; ; return: AC: a*b
+; ; requires: a, b in range TODO
+; ; stack: 
+; ; &: a
+; ; &: sum
+; ; &: ret_addr
+; ; &: b
+; ; begin func
+; MUL:
+; ; begin prologue
+;   APUSH
+; ; end prologue
 
-  ST &a
-  CMP &b
+;   ST &a
+;   CMP &b
 
-  CLC
-  CLA   
-  ST &sum
+;   CLC
+;   CLA   
+;   ST &sum
 
-  ; begin loop
-  MUL__LOOP:  
-    LD &b
-    BZS MUL__END
+;   ; begin loop
+;   MUL__LOOP:  
+;     LD &b
+;     BZS MUL__END
 
-    CLC
-    ROR
-    ST &b
+;     CLC
+;     ROR
+;     ST &b
     
-    ; begin if 
-    BCC MUL__IF_NOT_USED
-    ; begin branch if multiplier is 1 (sum)
-      LD &a
-      ADD &sum
-      ST &sum
+;     ; begin if 
+;     BCC MUL__IF_NOT_USED
+;     ; begin branch if multiplier is 1 (sum)
+;       LD &a
+;       ADD &sum
+;       ST &sum
 
-      JUMP MUL__SHIFT_A
-    ; begin branch if multiplier is 0 (skip sum)
-    MUL__IF_NOT_USED:
-    ; end if
+;       JUMP MUL__SHIFT_A
+;     ; begin branch if multiplier is 0 (skip sum)
+;     MUL__IF_NOT_USED:
+;     ; end if
 
-  MUL__SHIFT_A:  
-    LD &a
-    ASL
-    ST &a
+;   MUL__SHIFT_A:  
+;     LD &a
+;     ASL
+;     ST &a
 
-    JUMP MUL__LOOP
-  ; end loop
+;     JUMP MUL__LOOP
+;   ; end loop
 
-  MUL__END:
-; begin epilogue
-  LD &sum
-  APOP
-  RET
-; end func MUL
+;   MUL__END:
+; ; begin epilogue
+;   LD &sum
+;   APOP
+;   RET
+; ; end func MUL

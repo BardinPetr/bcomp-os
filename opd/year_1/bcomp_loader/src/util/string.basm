@@ -34,7 +34,7 @@ ATOI:
   ASR
   ASL 
   ST &byte_cnt ; count zero bytes (one or two NUL due char count partity)
-  
+
   ; start interation from last symbol (last byte) 
   ASR ; bytes to words
   ADD &src
@@ -76,21 +76,15 @@ ATOI:
     CALL $ATOI_CHAR
 
     ; sum += cur_radix_pow * ATOI(char[i])
-    PUSH  
-    LD &cur_radix_pow+1
-    CALL $MUL 
+    MUL &cur_radix_pow
     ; save sum
-    ADD &sum+1
-    ST &sum+1
-    POP
+    ADD &sum
+    ST &sum
 
     ; cur_radix_pow *= radix
     LD &radix
-    PUSH
-    LD &cur_radix_pow+1
-    CALL $MUL
-    ST &cur_radix_pow+1
-    POP
+    MUL &cur_radix_pow
+    ST &cur_radix_pow
     JUMP ATOI__LOOP
   ; end loop
 
@@ -194,12 +188,14 @@ STRLEN:
     SLEN__ADD_ONE:
       LD &cnt
       INC
+      ST &cnt
       JUMP SLEN__END
     ; end if
   ; end loop
-
+    
   SLEN__END:
 ; begin epilogue
+  LD &cnt
   ; ret cnt
   APOP
   RET

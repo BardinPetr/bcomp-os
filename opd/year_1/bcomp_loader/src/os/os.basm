@@ -6,16 +6,11 @@
 ; params:
 ; return: 
 ; stack:
-; &: tcb
 ; &: ret_addr
 ; begin globals
 OSI__INIT_STR: WORD "Initializing..."
 OSI__START_STR: WORD "System started"
 OSI__END_STR: WORD "System halt"
-OSI__TMP: WORD ?
-OSI__TMP3: WORD 0x710
-OSI__IP: WORD $PROC1
-OSI__PS: WORD 0x180
 ; end globals
 ; begin func
 OS__INIT:
@@ -48,66 +43,11 @@ OS__INIT:
   CALL $PRINTLN
   CALL $PRINT_ENDL
 
-  ; CALL $SHELL_MAIN
+  CALL $SHELL_MAIN
 
-  ; LD OSI__END_STR_PTR
-  ; CALL $PRINTLN
-
-  LD #0x20
-  CALL $MALLOC
-  ST &tcb
+  LD OSI__END_STR_PTR
+  CALL $PRINTLN
   
-  ADD #4
-  ST OSI__TMP
-  RSP
-  ST (OSI__TMP)+
-  LD (OSI__TMP)+
-  LD OSI__TMP3
-  ST (OSI__TMP)
-
-  LD #1
-  PUSH
-  LD #2
-  PUSH
-  LD #3
-  PUSH
-  LD OSI__IP ; ip
-  INC
-  PUSH
-  LD OSI__PS ; ps
-  PUSH
-  LD #4 ; ac
-  PUSH
-
-  LD &tcb+6
-  CALL $PROC_SAVE_STATE
-
-  CLA
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  PUSH 
-  POP 
-  POP 
-  POP 
-  POP 
-  POP
-  POP 
-  POP 
-  POP 
-  POP 
-  POP
-
-
-  LD &tcb
-  CALL $PROC_LOAD_STATE
-
 ; begin epilogue
   APOP
   RET
@@ -115,40 +55,38 @@ OS__INIT:
 ; end func OS__INIT
 
 
-PROC1:
-  POP
-  HLT
-  POP
-  POP
-  POP
 
-
-; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context for multitasking
+; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context.
+; Stores current process state to TCB and restores next process state then jumps to it
 ; Should be called with timer
 ; 
-; stack:
-; &: cur_acc
-; &: cur_prog_state
-; &: cur_ret_addr
 ; begin globals
 OS__CONTEXT_SWITCH_INT_PTR: WORD $OS__CONTEXT_SWITCH_INT
 OS__CSI__TEXT: WORD "switch"
 ; end globals
 ; begin func
 OS__CONTEXT_SWITCH_INT:
-; begin prologue
-; end prologue
-
-; here is PS on stack top an IP the next
+  ; here is PS on stack top an IP the next
   PUSH ; cur accumulator value
+
+  LD OS__CSI__TEXT_PTR
+  CALL $PRINTLN
+
+  LD $_SYS_PROC__RUNNING_PROCESS_ID  
   CALL $PROC_SAVE_STATE
   
+  ; round-robin
+  LD $_SYS_PROC__RUNNING_PROCESS_ID
+  INC
+  CMP $_SYS_PROC__CUR_PROCESSES_COUNT
+  BLO OSCSI__CONTINUE
+  CLA
+  OSCSI__CONTINUE:
+  ST $_SYS_PROC__RUNNING_PROCESS_ID
 
-  ; LD OS__CSI__TEXT_PTR
-  ; CALL $PRINTLN
+  CALL $PROC_LOAD_STATE
 
-  IN 0 ; reset timer
-
+  IRET ; this instruction should not be reached in normal situaltion
 
 ; begin epilogue
   APOP

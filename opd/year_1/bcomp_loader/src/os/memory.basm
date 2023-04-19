@@ -4,15 +4,18 @@
 ; 0x000 - 0x010: interrupt vectors
 ; 0x010 - 0xXXX: OS (loader + libs)
 ; 0xXXX - 0x700: user code
-; 0x700 - 0x7DF: heap 224 words, 448B
-; 0x7DF - 0x7FF: stack 32 words, 64B
+; 0x700 - 0x77F: TCB data 128w = (0x28=7 struct + 32 stack)words * 3proc = 0x78
+; 0x780 - 0x7DF: heap 96w
+; 0x7DF - 0x7FF: stack 32w, 64B
 
 ; heap is allocated via stack allocator
 
 ; begin globals
 _SYS__USERSPACE_BEGIN: WORD $_SYS__CODE_END
-_SYS__USERSPACE_END: WORD 0x6FF
-_SYS__HEAP_BEGIN: WORD 0x700
+_SYS__USERSPACE_END: WORD 0x5FF
+_SYS__TCB_BEGIN: WORD 0x700
+_SYS__TCB_END: WORD 0x77F
+_SYS__HEAP_BEGIN: WORD 0x780
 _SYS__HEAP_END: WORD 0x7DF
 _SYS__HEAP_POINTER: WORD ?
 _SYS__STACK_BEGIN: WORD 0x7E0

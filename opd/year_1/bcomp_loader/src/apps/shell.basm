@@ -125,7 +125,7 @@ SHELL_SELECT_CMD:
     LD (SSC__ADDR_PTR)
 
   SSC__END:    
-    ST &cmd
+    ; ST &cmd no need now
 
 ; begin epilogue
   APOP

@@ -99,8 +99,7 @@ ARRAY_LOWER_BOUND:
 
 ALB__END:
   LD &pos
-  DEC
-  ST &pos ; pos is last POP
+  DEC ; ret
 
 ; begin epilogue
   APOP

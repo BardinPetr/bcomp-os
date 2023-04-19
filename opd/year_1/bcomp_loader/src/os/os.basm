@@ -6,11 +6,15 @@
 ; params:
 ; return: 
 ; stack:
+; &: tcb
 ; &: ret_addr
 ; begin globals
 OSI__INIT_STR: WORD "Initializing..."
 OSI__START_STR: WORD "System started"
 OSI__END_STR: WORD "System halt"
+OSI__TMP: WORD ?
+OSI__TMP2: WORD 0x7FE
+OSI__TMP3: WORD 0x710
 ; end globals
 ; begin func
 OS__INIT:
@@ -31,7 +35,6 @@ OS__INIT:
   LD $_SYS__USERSPACE_BEGIN
   ST $_SYS_PROC__FREE_MEM_START
 
-
   ; begin block setup interrupts section
   CALL $INT__INIT
 
@@ -44,11 +47,39 @@ OS__INIT:
   CALL $PRINTLN
   CALL $PRINT_ENDL
 
-  CALL $SHELL_MAIN
+  ; CALL $SHELL_MAIN
 
-  LD OSI__END_STR_PTR
-  CALL $PRINTLN
+  ; LD OSI__END_STR_PTR
+  ; CALL $PRINTLN
 
+  LD #0x20
+  CALL $MALLOC
+  ST &tcb
+  
+  ADD #4
+  ST OSI__TMP
+  RSP
+  ST (OSI__TMP)+
+  LD (OSI__TMP)+
+  LD OSI__TMP3
+  ST (OSI__TMP)
+
+  LD #1
+  PUSH
+  LD #2
+  PUSH
+  LD #3
+  PUSH
+  LD #0x80 ; ip
+  PUSH
+  LD #0x90 ; ps
+  PUSH
+  LD #4 ; ac
+  PUSH
+
+  LD &tcb+6
+  CALL $PROC_SAVE_STATE
+  HLT
 ; begin epilogue
   APOP
   RET
@@ -61,7 +92,9 @@ OS__INIT:
 ; Should be called with timer
 ; 
 ; stack:
-; 
+; &: cur_acc
+; &: cur_prog_state
+; &: cur_ret_addr
 ; begin globals
 OS__CONTEXT_SWITCH_INT_PTR: WORD $OS__CONTEXT_SWITCH_INT
 OS__CSI__TEXT: WORD "switch"
@@ -69,14 +102,18 @@ OS__CSI__TEXT: WORD "switch"
 ; begin func
 OS__CONTEXT_SWITCH_INT:
 ; begin prologue
-  PUSH
-  APUSH
 ; end prologue
 
-  LD OS__CSI__TEXT_PTR
-  CALL $PRINTLN
+; here is PS on stack top an IP the next
+  PUSH ; cur accumulator value
+  CALL $PROC_SAVE_STATE
+  
+
+  ; LD OS__CSI__TEXT_PTR
+  ; CALL $PRINTLN
 
   IN 0 ; reset timer
+
 
 ; begin epilogue
   APOP

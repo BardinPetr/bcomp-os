@@ -96,7 +96,7 @@ ATOI:
 
   ATOI__END:
 ; begin epilogue
-  ; sum is last pop so in AC
+  LD &sum
   APOP
   RET
 ; end epilogue
@@ -194,14 +194,13 @@ STRLEN:
     SLEN__ADD_ONE:
       LD &cnt
       INC
-      ST &cnt
       JUMP SLEN__END
     ; end if
   ; end loop
 
   SLEN__END:
 ; begin epilogue
-  ; cnt is last pop, put into AC
+  ; ret cnt
   APOP
   RET
 ; end epilogue
@@ -266,7 +265,6 @@ STRCMP:
     LD #1
 
   STRCMP__END:
-  ST &char1 ; last pop
 ; begin epilogue
   APOP
   RET

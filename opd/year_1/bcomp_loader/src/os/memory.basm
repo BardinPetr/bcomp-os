@@ -61,7 +61,6 @@ MALLOC:
   BHIS MALLOC__ENOUGH_MEM
   ; begin branch (heap_end - cur_pointer) < requeted_size
   CLA
-  ST &segment_addr
   JUMP MALLOC__END
   ; end if
 
@@ -72,7 +71,7 @@ MALLOC__ENOUGH_MEM:
   INC
 
   ; save segment start address 
-  ST &segment_addr ; will be last POP and put in AC
+  ST &segment_addr 
 
   ; move pointer by size
   ADD &size
@@ -82,6 +81,7 @@ MALLOC__ENOUGH_MEM:
   LD &size
   ST (MALLOC__WRITE_PTR)
 
+  LD &segment_addr
 
 MALLOC__END:
 ; begin epilogue

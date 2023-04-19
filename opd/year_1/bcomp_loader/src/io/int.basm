@@ -65,7 +65,7 @@ IRH__SET:
   
 IRH__EXIT:
 ; begin epilogue
-  ; cur_id is last pop
+  LD &cur_id ; ret
   APOP
   RET
 ; end epilogue

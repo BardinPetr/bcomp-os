@@ -55,7 +55,7 @@ MUL:
 
   MUL__END:
 ; begin epilogue
+  LD &sum
   APOP
-  ; sum returned in ac automatically as &sum is last pop
   RET
 ; end func MUL

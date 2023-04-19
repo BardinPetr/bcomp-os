@@ -12,6 +12,7 @@ INCLUDE os/memory.basm
 INCLUDE os/loader_sources.basm
 INCLUDE os/loader.basm
 INCLUDE os/proc.basm
+INCLUDE os/state.basm
 INCLUDE os/os.basm
 INCLUDE apps/shell.basm
 
@@ -20,3 +21,7 @@ START:
   HLT
 
 _SYS__CODE_END: WORD 0
+
+
+ORG 0x700
+TRASH: WORD 50 DUP (0xDEAD)

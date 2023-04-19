@@ -1,0 +1,141 @@
+; ----------------------------- STACK OPERATIONS -----------------------------
+; thread control block
+; id@2b
+; ac@2b
+; ps@2b
+; ip@2b
+; sp_origin@2b (SP that was before target is started - points to memory cell before first process own stack cell)
+; stack_size@2b
+; stack_data_ptr@2b
+
+; Stack data descriptor (pointed by stack_data_ptr)
+; (stack stored with top as first element)
+; stack[SP]
+; stack[SP+1]
+; ...
+; stack[SP+stack_size-1]
+
+
+
+
+; func PROC_SAVE_STATE: (tcb_ptr) saves state to TCB, moves stack and sets SP to the sp_origin (+this func ret addr)
+; intended to called when stack have following structure:
+;     (top)
+;   - ret addr of PROC_SAVE_STATE
+;   - ac of stopped thread
+;   - ps 
+;   - ip 
+;     (here stack of thread begins)
+; affects: destroys SP and stack up to tcb.sp_origin
+; convention: fastcall
+; params: AC: tcb_ptr - pointer to TCB to which store should be done
+; stack:
+; &: stack_origin
+; &: stack_size
+; &: ret_addr
+; &: last_ac
+; &: last_ps
+; &: last_ip
+; begin globals
+PSS__TCB_PTR: WORD ?
+PSS__RET: WORD ?
+; end globals
+; begin func
+PROC_SAVE_STATE:
+  APUSH
+
+  INC ; skip id
+  ST PSS__TCB_PTR
+
+  LD &last_ac
+  ST (PSS__TCB_PTR)+
+  LD &last_ps
+  ST (PSS__TCB_PTR)+
+  LD &last_ip
+  ST (PSS__TCB_PTR)+
+
+  LD &ret_addr
+  ST PSS__RET
+
+  LD (PSS__TCB_PTR)+ ; stack origin
+  ST &stack_origin
+
+  RSP
+  ; update following number with (4 + $local variables count$)
+  ADD #6 ; points to top of thread stack
+  PUSH ; src
+
+  ; calculate length
+  SUB &stack_origin+1
+  NEG 
+  ST &stack_size+1
+  ST (PSS__TCB_PTR)+ ; save stack size
+
+  LD (PSS__TCB_PTR) ; stack_data_ptr
+  PUSH ; dst
+  
+  LD -(PSS__TCB_PTR) ; get stack size
+  ; cnt
+  CALL $MEMCPY 
+
+  POP
+  POP
+  
+  LD &stack_origin
+  WSP
+
+; begin epilogue
+  LD PSS__RET ; restore this function return address
+  PUSH 
+  RET
+; end func PROC_SAVE_STATE
+
+
+
+
+; ; func RESTORE_STACK: (stack_data_ptr, stack_origin) loads stack data from memory starting from stack_origin.
+; ; Also moves current return address on top before RET.
+; ; 
+; ; params: AC: stack_data_ptr
+; ;         STACK: stack_origin
+; ; stack:
+; ; &: size
+; ; &: ret_addr
+; ; &: stack_origin
+; ; begin globals
+; RST__PTR: WORD ?
+; RST__CNT: WORD ?
+; ; end globals
+; ; begin func
+; RESTORE_STACK:
+;   APUSH
+
+;   ST RST__PTR
+;   LD (RST__PTR)+ 
+;   ST RST__CNT
+;   ST &size
+
+;   ; RSP
+;   ; SUB RST__CNT
+;   ; INC
+;   ; ST RST__PTR
+;   ; POP
+
+;   LD RST__PTR ; src
+;   PUSH
+;   LD &stack_origin+1
+;   SUB &size+1 ; get stack segment end as memcpy runs forward, but stack - backward
+;   PUSH
+;   LD &size+2
+;   CALL $MEMCPY
+;   POP
+;   POP
+
+
+
+;   APOP
+;   RET
+; ; end func RESTORE_STACK
+
+
+

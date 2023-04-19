@@ -240,7 +240,7 @@ LOAD_BIN:
 
   LD &start_addr
   SUB &section_cnt
-  ST &section_cnt ; store to next stack item after ret addr so last POP will put it in AC
+  ST &section_cnt ; store to next stack item after ret addr
 
 LB__END:
   ; deallocate arrays
@@ -252,6 +252,7 @@ LB__END:
   CALL $MFREE
 
 ; begin epilogue
+  LD &section_cnt ; ret
   APOP
   RET
 ; end epilogue
@@ -377,7 +378,6 @@ LOAD_BIN_FIX_CMD:
         JUMP LBFC__END
       ; begin branch stack relative cmd
       LBFC__STACK_CMD:
-        LD &cur_cmd
         JUMP LBFC__END  
       ; end if
     ; begin branch indirect relative (000, 010, 011)
@@ -389,6 +389,7 @@ LOAD_BIN_FIX_CMD:
   ; end if
 
 ; begin epilogue
+  LD &cur_cmd
   APOP
   RET
 ; end epilogue
@@ -429,8 +430,7 @@ CALC_ADDR_SHIFT:
   LD &delta_array+1
   CALL $ARRAY_GET_FC
 
-  ; (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
-  ST &org_delta ; last POP
+  ; ret (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
 
 ; begin epilogue
   APOP

@@ -13,8 +13,9 @@ OSI__INIT_STR: WORD "Initializing..."
 OSI__START_STR: WORD "System started"
 OSI__END_STR: WORD "System halt"
 OSI__TMP: WORD ?
-OSI__TMP2: WORD 0x7FE
 OSI__TMP3: WORD 0x710
+OSI__IP: WORD $PROC1
+OSI__PS: WORD 0x180
 ; end globals
 ; begin func
 OS__INIT:
@@ -70,22 +71,56 @@ OS__INIT:
   PUSH
   LD #3
   PUSH
-  LD #0x80 ; ip
+  LD OSI__IP ; ip
+  INC
   PUSH
-  LD #0x90 ; ps
+  LD OSI__PS ; ps
   PUSH
   LD #4 ; ac
   PUSH
 
   LD &tcb+6
   CALL $PROC_SAVE_STATE
-  HLT
+
+  CLA
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  PUSH 
+  POP 
+  POP 
+  POP 
+  POP 
+  POP
+  POP 
+  POP 
+  POP 
+  POP 
+  POP
+
+
+  LD &tcb
+  CALL $PROC_LOAD_STATE
+
 ; begin epilogue
   APOP
   RET
 ; end epilogue
 ; end func OS__INIT
 
+
+PROC1:
+  POP
+  HLT
+  POP
+  POP
+  POP
 
 
 ; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context for multitasking

@@ -87,55 +87,68 @@ PROC_SAVE_STATE:
 ; begin epilogue
   LD PSS__RET ; restore this function return address
   PUSH 
+  ; warning: no pop/spadd/apop should be called as stack is cleared!
   RET
 ; end func PROC_SAVE_STATE
 
 
 
 
-; ; func RESTORE_STACK: (stack_data_ptr, stack_origin) loads stack data from memory starting from stack_origin.
-; ; Also moves current return address on top before RET.
-; ; 
-; ; params: AC: stack_data_ptr
-; ;         STACK: stack_origin
-; ; stack:
-; ; &: size
-; ; &: ret_addr
-; ; &: stack_origin
-; ; begin globals
-; RST__PTR: WORD ?
-; RST__CNT: WORD ?
-; ; end globals
-; ; begin func
-; RESTORE_STACK:
-;   APUSH
+; func PROC_LOAD_STATE: (tcb_ptr) restores full process state from TCB. 
+; After exit will jump into restored process!!!
+; We down use memcpy as it would require it to be rewritten to be safe even with stack damaged what would slow it down.
+; 
+; affects: AC, SP, IP, PS, stack data - all restored to values right before PROC_SAVE_STATE according to TCB data
+; params: AC: tcb_ptr
+; stack: WARNING: use of stack (and APOP/APUSH) is prohibited here as function alters SP and rewrites stack region
+; begin globals
+PLS__TCB_PTR: WORD ?
+PLS__BASE_TCB_PTR: WORD ?
+PLS__STACK_DATA_PTR: WORD ?
+PLS__CNT: WORD ?
+; end globals
+; begin func
+PROC_LOAD_STATE:
+  ST PLS__BASE_TCB_PTR
+  
+  ADD #6 ; tcb.stack_data_ptr
+  ST PLS__TCB_PTR
+  LD (PLS__TCB_PTR)
+  ST PLS__STACK_DATA_PTR
 
-;   ST RST__PTR
-;   LD (RST__PTR)+ 
-;   ST RST__CNT
-;   ST &size
+  LD -(PLS__TCB_PTR) ; tcb.stack_size
+  ST PLS__CNT
 
-;   ; RSP
-;   ; SUB RST__CNT
-;   ; INC
-;   ; ST RST__PTR
-;   ; POP
+  SUB -(PLS__TCB_PTR) ; tcb.sp_origin
+  NEG
+  ST PLS__TCB_PTR ; now used as stack memory pointer
 
-;   LD RST__PTR ; src
-;   PUSH
-;   LD &stack_origin+1
-;   SUB &size+1 ; get stack segment end as memcpy runs forward, but stack - backward
-;   PUSH
-;   LD &size+2
-;   CALL $MEMCPY
-;   POP
-;   POP
+  PLS__LOOP:
+    LD (PLS__STACK_DATA_PTR)+
+    ST (PLS__TCB_PTR)+
+    LOOP PLS__CNT
+    JUMP PLS__LOOP
 
+  ; restore register states and do jump back to process 
+  LD PLS__BASE_TCB_PTR
+  ADD #6; move to tcb.stack_data_ptr
+  ST PLS__TCB_PTR
+  
+  LD -(PLS__TCB_PTR) ; stack_size
+  SUB -(PLS__TCB_PTR) ; sp_origin
+  NEG
+  WSP
 
+  LD -(PLS__TCB_PTR) ; ip 
+  PUSH
+  LD -(PLS__TCB_PTR) ; ps
+  PUSH
+  LD -(PLS__TCB_PTR) ; ac 
+  IRET
 
-;   APOP
-;   RET
-; ; end func RESTORE_STACK
+  ; no other RET/POP/APOP/SPADD should be done as this should be last function 
+  ;   before control will be passed to restored process
+; end func PROC_LOAD_STATE
 
 
 

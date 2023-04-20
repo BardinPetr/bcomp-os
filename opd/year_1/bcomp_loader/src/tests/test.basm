@@ -1,0 +1,29 @@
+ORG 0x0
+DATA: WORD 0x31, 0x32, 0x33, 0x34
+PTR: WORD $DATA
+START: 
+  CLA
+  PUSH
+  PUSH
+
+  LD PTR
+  ST &0
+
+  LD (&0)+
+  OUT 9
+  LD (&0)+
+  OUT 9
+  LD (&0)+
+  OUT 9
+  LD (&0)
+  OUT 9
+  LD -(&0)
+  OUT 9
+  LD -(&0)
+  OUT 9
+  LD -(&0)
+  OUT 9
+  LD -(&0)
+  OUT 9
+
+  HLT

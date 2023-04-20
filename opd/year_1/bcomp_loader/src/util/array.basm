@@ -14,21 +14,19 @@
 ; stack:
 ; &: ret_addr
 ; &: id
-; begin globals
-ARRAY_GET__CUR_PTR: WORD ?
-; end globals
 ; begin func
 ARRAY_GET_FC:
+  APUSH
   ; array start in AC
   ADD &id
-  ST ARRAY_GET__CUR_PTR
-  LD (ARRAY_GET__CUR_PTR)
+  ST &id
 
 ; begin epilogue
   POP
   SWAP
-  LD (ARRAY_GET__CUR_PTR)
+  LD (&id)
 ; end epilogue
+  APOP
   RET
 ; end func ARRAY_GET_FC
 
@@ -43,16 +41,13 @@ ARRAY_GET_FC:
 ; &: ret_addr
 ; &: id
 ; &: val
-; begin globals
-ARRAY_SET__CUR_PTR: WORD ?
-; end globals
 ; begin func
 ARRAY_SET:
   ; array start in AC
   ADD &id
-  ST ARRAY_SET__CUR_PTR
+  ST &id ; id += src
   LD &val
-  ST (ARRAY_SET__CUR_PTR)
+  ST (&id)
 
   RET
 ; end func ARRAY_SET
@@ -65,12 +60,10 @@ ARRAY_SET:
 ;         STACK: val
 ; return: lower bound of element as array index
 ; stack:
+; &: cur_ptr
 ; &: pos
 ; &: ret_addr
 ; &: val
-; begin globals
-ALB__CUR_PTR: WORD ?
-; end globals
 ; begin func
 ARRAY_LOWER_BOUND:
 ; begin prologue
@@ -78,20 +71,20 @@ ARRAY_LOWER_BOUND:
 ; end prologue
 
   ; addr in AC
-  ST ALB__CUR_PTR
+  ST &cur_ptr
 
   ; get last element index  
   CALL $MSIZE
   ST &pos
 
   ; move pointer to the element after the last
-  ADD ALB__CUR_PTR
-  ST ALB__CUR_PTR
+  ADD &cur_ptr
+  ST &cur_ptr
 
   ; begin loop
   ALB__LOOP: 
     LD &val
-    CMP -(ALB__CUR_PTR)
+    CMP -(&cur_ptr)
     BHIS ALB__END
     LOOP &pos
     JUMP ALB__LOOP

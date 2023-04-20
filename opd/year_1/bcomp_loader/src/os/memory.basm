@@ -101,6 +101,7 @@ MALLOC__END:
 ;   otherwise any heap data could get overriten
 ; params: AC: 0 for OK, 1 invalid address or when this is not a heap top
 ; stack:
+; &: rw_ptr
 ; &: size
 ; &: ptr
 ; &: ret_addr
@@ -108,7 +109,6 @@ MALLOC__END:
 MFREE__HEAP_BEGIN_PTR: WORD $_SYS__HEAP_BEGIN
 MFREE__HEAP_END_PTR: WORD $_SYS__HEAP_END
 MFREE__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
-MFREE__RW_PTR: WORD ?
 ; end globals
 ; begin func
 MFREE:
@@ -119,10 +119,10 @@ MFREE:
   ; ptr in AC
   ST &ptr
   DEC
-  ST MFREE__RW_PTR
+  ST &rw_ptr
 
   ; read header
-  LD (MFREE__RW_PTR)
+  LD (&rw_ptr)
   ST &size    
 
   ; begin if
@@ -165,15 +165,14 @@ MFREE__END:
 ; params: AC: addr
 ; return: AC: length
 ; stack:
-; 
-; begin globals
-MSIZE__READ_PTR: WORD ?
-; end globals
+; &: ptr
 ; begin func
 MSIZE:
+  APUSH
   DEC
-  ST MSIZE__READ_PTR
-  LD (MSIZE__READ_PTR)
+  ST &ptr
+  LD (&ptr)
+  APOP
   RET
 ; end func MSIZE
 
@@ -185,37 +184,33 @@ MSIZE:
 ;         STACK: mem1
 ; return: 0 if equal, 1 if not equal
 ; stack:
+; &: cnt
 ; &: ret_addr
 ; &: mem1
 ; &: mem2
-; begin globals
-MEMCMP__PTR1: WORD 0x0
-MEMCMP__PTR2: WORD 0x0
-MEMCMP__CNT: WORD 0x0
-; end globals
 ; begin func
 MEMCMP:
-  ST MEMCMP__CNT
-
-  LD &mem1
-  ST MEMCMP__PTR1
-  LD &mem2
-  ST MEMCMP__PTR2
+  APUSH
+  ST &cnt
 
   MEMCMP__LOOP:
-    LD (MEMCMP__PTR1)+
-    CMP (MEMCMP__PTR2)+
+    LD (&mem1)+
+    CMP (&mem2)+
     BNE MEMCMP__NOT_EQUAL
 
-    LOOP MEMCMP__CNT
+    LOOP &cnt
     JUMP MEMCMP__LOOP
   
   CLA
-  RET
+  JUMP MEMCMP__END
 
   MEMCMP__NOT_EQUAL:
     LD #1
-    RET
+
+  MEMCMP__END:
+  APOP
+  RET
+
 ; end func MEMCMP
 
 
@@ -227,30 +222,31 @@ MEMCMP:
 ;         STACK: dst
 ; return: 0 if equal, 1 if not equal
 ; stack:
+; &: cnt
+; &: ptr1
+; &: ptr2
 ; &: ret_addr
 ; &: dst
 ; &: src
-; begin globals
-MEMCPY__PTR1: WORD 0x0
-MEMCPY__PTR2: WORD 0x0
-MEMCPY__CNT: WORD 0x0
-; end globals
 ; begin func
 MEMCPY:
-  ST MEMCPY__CNT
+  APUSH
+  
+  ST &cnt
 
   LD &src
-  ST MEMCPY__PTR1
+  ST &ptr1
   LD &dst
-  ST MEMCPY__PTR2
+  ST &ptr2
 
   MEMCPY__LOOP:
-    LD (MEMCPY__PTR1)+
-    ST (MEMCPY__PTR2)+
+    LD (&ptr1)+
+    ST (&ptr2)+
 
-    LOOP MEMCPY__CNT
+    LOOP &cnt
     JUMP MEMCPY__LOOP
 
+  APOP
   RET
 ; end func MEMCPY
 
@@ -262,27 +258,17 @@ MEMCPY:
 ;         STACK: dst
 ;         STACK: cnt
 ; stack:
-; &: value
 ; &: ret_addr
 ; &: dst
 ; &: cnt
-; begin globals
-MEMSET__PTR: WORD ?
-; end globals
 ; begin func
 MEMSET:
 ; begin prologue
   APUSH
 ; end prologue
 
-  ST &value
-
-  LD &dst
-  ST MEMSET__PTR
-
-  LD &value
   MEMSET__LOOP:
-    ST (MEMSET__PTR)+
+    ST (&dst)+
     LOOP &cnt
     JUMP MEMSET__LOOP
 

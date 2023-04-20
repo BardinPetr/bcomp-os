@@ -12,11 +12,9 @@ OSCSI__TEXT: WORD "switch"
 OS__CONTEXT_SWITCH_INT:
   ; here is PS on stack top an IP the next
   PUSH ; cur accumulator value
-; HLT
-  LD #0x0D
-  OUT 0x9
-  ; LD OSCSI__TEXT_PTR
-  ; CALL $PRINTLN
+  
+  LD OSCSI__TEXT_PTR
+  CALL $PRINT
 
   LD $_SYS_PROC__RUNNING_PROCESS_ID  
   CALL $PROC_SAVE_STATE

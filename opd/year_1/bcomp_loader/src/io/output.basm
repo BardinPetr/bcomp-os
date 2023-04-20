@@ -50,18 +50,20 @@ PRINT_CLEAR:
 ; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
 ; params: AC - pointer to first string data address
 ; return: none
-; stack:  &0 - ret addr
+; stack:  
+; &: ptr 
 ; begin globals:
-PRINT__CUR: WORD ? ; pointer/iterator to currect mem address
 MASK_LOW: WORD 0x00FF
 ; end globals
 ; begin func
 PRINT:
-  ST PRINT__CUR
+  APUSH
+
+  ST &ptr
 
 ; begin loop
 PRINT_LOOP:
-  LD (PRINT__CUR)+
+  LD (&ptr)+
 
   BZS PRINT_EXIT
   CALL PRINT_CHAR
@@ -75,6 +77,7 @@ PRINT_LOOP:
   JUMP PRINT_LOOP
 ; end loop
 PRINT_EXIT:
+  APOP
   RET
 ; end func PRINT
 

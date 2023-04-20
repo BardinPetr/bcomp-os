@@ -18,12 +18,10 @@ _SYS_INT__DEFAULT_HANDLER:
 ; params: AC: addr: handler addr 
 ; return: vector number if OK, 0xFFFF if no handlers left
 ; stack:
+; &: ptr
 ; &: target
 ; &: cur_id
 ; &: ret_addr
-; begin globals
-IRH__HANDLERS_PTR: WORD 0x0
-; end globals
 ; begin func
 INT__REGISTER_HANDLER:
 ; begin prologue
@@ -40,8 +38,8 @@ INT__REGISTER_HANDLER:
     BHIS IRH__NO_FREE
 
     ASL
-    ST IRH__HANDLERS_PTR
-    LD (IRH__HANDLERS_PTR)
+    ST &ptr
+    LD (&ptr)
     CMP $_SYS_INT__DEFAULT_HANDLER_PTR
     BEQ IRH__SET
 
@@ -58,10 +56,10 @@ IRH__NO_FREE:
 
 IRH__SET:  
   LD &target ; set vector
-  ST (IRH__HANDLERS_PTR)+
+  ST (&ptr)+
 
   LD $_SYS_INT__DEFAULT_PS
-  ST (IRH__HANDLERS_PTR)
+  ST (&ptr)
   
 IRH__EXIT:
 ; begin epilogue
@@ -76,19 +74,24 @@ IRH__EXIT:
 ; func INT__UNREGISTER_HANDLER: (id) unregister interrupt vector
 ; 
 ; params: AC: id: id of vector
-; begin globals
-IUH__HANDLERS_PTR: WORD ?
-; end globals
+; stack:
+; &: ptr
 ; begin func
 INT__UNREGISTER_HANDLER:
+; begin prologue
+  APUSH
+; end prologue
+
   ASL
-  ST IUH__HANDLERS_PTR
+  ST &ptr
 
   LD $_SYS_INT__DEFAULT_HANDLER_PTR
-  ST (IUH__HANDLERS_PTR)+
+  ST (&ptr)+
 
   LD $_SYS_INT__DEFAULT_PS
-  ST (IUH__HANDLERS_PTR)
+  ST (&ptr)
+
+  APOP
   RET
 ; end func INT__UNREGISTER_HANDLER
 

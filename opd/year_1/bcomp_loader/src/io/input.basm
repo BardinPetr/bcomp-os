@@ -7,33 +7,34 @@
 ; return:  AC: string length
 ;          MEM: string starting at mem addr "dst"
 ; affects: AC
-; stack:   &0 - current character id
-;          &1 - ret addr
+; stack:   
+; &: cur_id
+; &: ptr
+; &: ret_addr
 ; begin globals:
-RL__CUR_POINTER: WORD ?    ; contains address of memory cell being currently written in output. Initialized with &3.
 RL__PROMPT: WORD "> "
 ; end globals
 ; begin func
 READ_LINE:
 ; begin prologue
-  PUSH 
+  APUSH 
 ; end prologue
 
   ; set base output address from AC
-  ST RL__CUR_POINTER
+  ST &ptr
 
   ; set character id to zero 
   CLA
-  ST &0
+  ST &cur_id
 
   ; LD RL__PROMPT_PTR
   ; CALL $PRINT
 
   ; begin loop
   RL__LOOP: 
-    LD &0 ; cur id
+    LD &cur_id
     INC 
-    ST &0 ; i++
+    ST &cur_id
 
     ; begin if
     AND #1
@@ -50,11 +51,11 @@ READ_LINE:
       CMP #0x08 ; BS
       BNE RL__CONTINUE_L
       ; begin branch on backspace pressed
-        LD -(RL__CUR_POINTER)
+        LD -(&ptr)
         JUMP RL__HIGH_BYTE
 
       RL__CONTINUE_L:
-      ST (RL__CUR_POINTER)
+      ST (&ptr)
       JUMP RL__LOOP
     ; begin branch char_id % 2 == 1
     RL__HIGH_BYTE:
@@ -70,26 +71,27 @@ READ_LINE:
       BNE RL__CONTINUE_H
       ; begin branch on backspace pressed
         CLA
-        ST (RL__CUR_POINTER)
+        ST (&ptr)
         JUMP RL__LOW_BYTE
 
       RL__CONTINUE_H:
       SWAB
-      OR (RL__CUR_POINTER)
-      ST (RL__CUR_POINTER)+
+      OR (&ptr)
+      ST (&ptr)+
       JUMP RL__LOOP
     ; end if
   ; end loop
 
 RL__EOL_APPEND_NUL:
   CLA ; put EOS
-  ST (RL__CUR_POINTER)
+  ST (&ptr)
 RL__EOL:
   CALL $PRINT_ENDL
   
   ; begin epilogue
-    POP ; length as return in AC
-    RET
+  LD &cur_id
+  APOP 
+  RET
   ; end epilogue
 ; end func READ_LINE
 

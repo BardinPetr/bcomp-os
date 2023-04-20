@@ -7,3 +7,17 @@
 
 1011 XXXX XXXX XXXX (BXXX) SP -> BR; BR + DR -> SP : SPADD 
 1111 XXXX XXXX XXXX (FXXX) AC * M -> AC : MUL
+
+
+Addressed commands format
+M 0MMM $L
+8 1000 &N
+9 1001 (&N)
+A 1010 (&N)+
+B 1011 -(&N)
+C 1100 (L)
+D 1101 (L)+
+E 1110 L 
+F 1111 #N
+
+N - number, L - label

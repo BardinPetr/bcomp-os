@@ -4,12 +4,18 @@
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
 ; Remap of poiners created via "DATA $X" construction is supported only when they have 15 bit set.
-; Uses LB__NEXT_INPUT_WORD_PTR as streaming source of 2b words for binary.
+; Uses &read_word_ptr as streaming source of 2b words for binary.
 ; Program is loaded from PROCMEM__ALLOC(prog_size) up to _SYS__USERSPACE_END.
 ; 
 ; params: AC: read_func: function returning 1 word from binarry each time called
 ; return: AC: start address of program or 0x0 if failed
 ; stack:
+; &: read_word_ptr
+; &: target_memory_ptr
+; &: len_arr_ptr
+; &: org_arr_ptr
+; &: delta_arr_ptr
+; &: read_word
 ; &: org_array
 ; &: len_array
 ; &: delta_array
@@ -22,48 +28,40 @@
 ; &: start_addr
 ; &: section_cnt
 ; &: ret_addr
-; begin globals
-LB__NEXT_INPUT_WORD_PTR: WORD ?
-; LB__USERSPACE_END_PTR: WORD $_SYS__USERSPACE_END
-LB__LOAD_PTR: WORD ?
-LB__LEN_ARRAY_PTR: WORD ?
-LB__ORG_ARRAY_PTR: WORD ?
-LB__DELTA_ARRAY_PTR: WORD ?
-; end globals
 ; begin func
 LOAD_BIN:
   ; begin prologue
   APUSH
   ; end prologue
-  ST LB__NEXT_INPUT_WORD_PTR
+  ST &read_word_ptr
 
   LD $LB__STR_STARTED_PTR
   CALL $PRINTLN
 
-  CALL (LB__NEXT_INPUT_WORD_PTR)
+  CALL (&read_word_ptr)
   ST &section_cnt
   ST &cur_section_cnt
 
   ; allocate arrays
   CALL $MALLOC
   ST &len_array
-  ST LB__LEN_ARRAY_PTR
+  ST &len_arr_ptr
 
   LD &section_cnt
   CALL $MALLOC
   ST &delta_array
-  ST LB__DELTA_ARRAY_PTR
+  ST &delta_arr_ptr
 
   LD &section_cnt
   CALL $MALLOC
   ST &org_array
-  ST LB__ORG_ARRAY_PTR
+  ST &org_arr_ptr
   ; end alloc
 
-  CALL (LB__NEXT_INPUT_WORD_PTR)
+  CALL (&read_word_ptr)
   ST &start_addr
 
-  CALL (LB__NEXT_INPUT_WORD_PTR) ; command count
+  CALL (&read_word_ptr) ; command count
   CALL $PROCMEM__ALLOC
 
   ; begin if
@@ -77,26 +75,26 @@ LOAD_BIN:
   ; end if
 
   LB__START:
-  ST LB__LOAD_PTR
+  ST &target_memory_ptr
   ST &real_org
 
   ; begin loop over sections
   LB__LOAD_SECT_LOOP:    
-    CALL (LB__NEXT_INPUT_WORD_PTR)
+    CALL (&read_word_ptr)
     ; offset not used
 
-    CALL (LB__NEXT_INPUT_WORD_PTR)
-    ST (LB__LEN_ARRAY_PTR)+
+    CALL (&read_word_ptr)
+    ST (&len_arr_ptr)+
     ASL
     ASR
     ST &cur_section_len
 
-    CALL (LB__NEXT_INPUT_WORD_PTR)
-    ST (LB__ORG_ARRAY_PTR)+
+    CALL (&read_word_ptr)
+    ST (&org_arr_ptr)+
 
     ; calculate org delta (section_org - real_section_org)
     SUB &real_org
-    ST (LB__DELTA_ARRAY_PTR)+
+    ST (&delta_arr_ptr)+
 
     ; increase targer org counter
     LD &real_org
@@ -122,18 +120,18 @@ LOAD_BIN:
 
   ; restart len array iterator
   LD &len_array
-  ST LB__LEN_ARRAY_PTR
+  ST &len_arr_ptr
 
   ; restart org array iterator
   LD &org_array
-  ST LB__ORG_ARRAY_PTR
+  ST &org_arr_ptr
 
   ; begin loop over sections
   LB__SECT_LOOP:    
-    LD (LB__ORG_ARRAY_PTR)+
+    LD (&org_arr_ptr)+
     ST &cur_original_addr
     
-    LD (LB__LEN_ARRAY_PTR)+
+    LD (&len_arr_ptr)+
     ST &cur_section_len
 
     ; begin if cur_section_len[15]
@@ -148,8 +146,8 @@ LOAD_BIN:
 
       ; begin loop over data
       LB__DATA_CMD_LOOP:
-        CALL (LB__NEXT_INPUT_WORD_PTR)
-        ST (LB__LOAD_PTR)+
+        CALL (&read_word_ptr)
+        ST (&target_memory_ptr)+
 
         LOOP &cur_section_len
         JUMP LB__DATA_CMD_LOOP
@@ -165,16 +163,15 @@ LOAD_BIN:
       ASR
       ST &cur_section_len
       LB__CODE_CMD_LOOP:
-        CALL (LB__NEXT_INPUT_WORD_PTR) ; load command
+        CALL (&read_word_ptr) ; load command
         ST &cur_cmd
 
         LD &org_array
         PUSH 
         LD &delta_array+1
         PUSH 
-        LD LB__LOAD_PTR
+        LD &target_memory_ptr+2
         PUSH 
-      
         LD &cur_original_addr+3
         PUSH 
         INC
@@ -183,7 +180,7 @@ LOAD_BIN:
         LD &cur_cmd+4
         CALL $LOAD_BIN_FIX_CMD
 
-        ST (LB__LOAD_PTR)+ 
+        ST (&target_memory_ptr+4)+ 
 
         POP
         POP

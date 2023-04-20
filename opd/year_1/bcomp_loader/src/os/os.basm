@@ -31,7 +31,7 @@ OS__INIT:
 
   ; setup interrupts
   CALL $INT__INIT
-  LD #1 ; 10Hz
+  LD #5 ; 10Hz
   CALL $OS__SETUP_SWITCH_TIMER
   
   ; init end
@@ -39,16 +39,14 @@ OS__INIT:
   CALL $PRINTLN
   CALL $PRINT_ENDL
 
-
   LD PROC0_PTR
   CALL $PROC_INIT
 
-  LD PROC1_PTR
-  CALL $PROC_INIT
+  ; LD PROC1_PTR
+  ; CALL $PROC_INIT
 
   ; LD PROC2_PTR
   ; CALL $PROC_INIT
-
   JUMP (PROC0_PTR)
 
   CALL $SHELL_MAIN

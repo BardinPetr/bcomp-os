@@ -85,14 +85,14 @@ def preprocess_stack_names(data: str):
 
       if DEBUG: print(name, number)
       
-      for sub in re.finditer(f"&{name}(\+\d+)?(?=\s)", func_body):
+      for sub in re.finditer(f"&{name}(\+\d+)?(?=[\s\)])", func_body):
         shift, = sub.groups()
         txt = sub.group()
         num_delta = 0
         if shift is not None:
           num_delta = int(shift[1:])
         # print(sub, fr"{txt}(?=\s)", shift, f"&{number + num_delta}")
-        func_body = re.sub(f"{re.escape(txt)}(?=\s)", f"&{number + num_delta}", func_body)
+        func_body = re.sub(f"{re.escape(txt)}(?=[\s\)])", f"&{number + num_delta}", func_body)
       
       cur_stack_id += 1
 

@@ -12,13 +12,11 @@ _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 ;
 ; params: AC: sp_origin to set for all processes
 ; stack:
+; &: tcb_ptr
 ; &: stack_data_ptr
 ; &: sp_origin
 ; &: cur_id
 ; &: ret_addr
-; begin globals
-PIM__TCB_PTR: WORD ?
-; end globals
 ; begin func
 PROC__INIT_MANAGER:
 ; begin prologue
@@ -28,7 +26,7 @@ PROC__INIT_MANAGER:
   ST &sp_origin
 
   LD $_PROC__TCB_DESCR_BEGIN
-  ST PIM__TCB_PTR
+  ST &tcb_ptr
 
   LD $_SYS_PROC__PROCESSES_MAX
   ST &cur_id
@@ -38,21 +36,21 @@ PROC__INIT_MANAGER:
 
   PIM__LOOP:
     LD #0xFF ; free thread
-    ST (PIM__TCB_PTR)
+    ST (&tcb_ptr)
 
-    LD PIM__TCB_PTR
+    LD &tcb_ptr
     ADD #4
-    ST PIM__TCB_PTR
+    ST &tcb_ptr
 
     LD &sp_origin
-    ST (PIM__TCB_PTR)
+    ST (&tcb_ptr)
 
-    LD PIM__TCB_PTR
+    LD &tcb_ptr
     ADD #2
-    ST PIM__TCB_PTR
+    ST &tcb_ptr
 
     LD &stack_data_ptr
-    ST (PIM__TCB_PTR)+
+    ST (&tcb_ptr)+
 
     LD &stack_data_ptr
     ADD $_PROC__TCB_STACK_SIZE
@@ -75,11 +73,11 @@ PIM__END:
 ; params: AC: ip
 ; return: process id or 0xFFFF if could not be created
 ; stack:
+; &: tcb_ptr
 ; &: ip
 ; &: proc_id
 ; &: ret_addr
 ; begin globals
-PCRT__PTR: WORD ?
 PCRT__BASE_PS: WORD 0x1A0 ; P | W | EI
 ; end globals
 ; begin func
@@ -103,24 +101,24 @@ PROC_INIT:
   BMI PCRT__INVALID
   ST &proc_id+1
   CALL $PROC_GET_TCB_PTR
-  ST PCRT__PTR
+  ST &tcb_ptr+1
   POP
 
   CLA 
-  ST (PCRT__PTR)+ ; state
-  ST (PCRT__PTR)+ ; AC
+  ST (&tcb_ptr)+ ; state
+  ST (&tcb_ptr)+ ; AC
   LD PCRT__BASE_PS
-  ST (PCRT__PTR)+ ; PS
+  ST (&tcb_ptr)+ ; PS
   LD &ip
-  ST (PCRT__PTR)+ ; IP
-  LD (PCRT__PTR)+ ; skip SPO
+  ST (&tcb_ptr)+ ; IP
+  LD (&tcb_ptr)+ ; skip SPO
   CLA
-  ST (PCRT__PTR)+ ; stack size
+  ST (&tcb_ptr)+ ; stack size
 
   ; clear stack memory
   LD $_PROC__TCB_STACK_SIZE   
   PUSH
-  LD (PCRT__PTR)+ ; stack data ptr
+  LD (&tcb_ptr+1)+ ; stack data ptr
   PUSH
   CLA
   CALL $MEMSET
@@ -145,15 +143,16 @@ PCRT__END:
 ; Do not do any clear to make it lighter (PROC_CREATE would do it for us)
 ; 
 ; params: AC: proc_id
-; begin globals
-PKL__PTR: WORD ?
-; end globals
+; stack:
+; &: ptr
 ; begin func
 PROC_KILL:
+  APUSH
   CALL $PROC_GET_TCB_PTR
-  ST PKL__PTR
+  ST &ptr
   LD #0xFF
-  ST (PKL__PTR)
+  ST (&ptr)
+  APOP
   RET
 ; end func PROC_KILL
 

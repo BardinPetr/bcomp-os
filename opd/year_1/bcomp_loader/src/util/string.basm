@@ -8,6 +8,7 @@
 ;         STACK radix: number radix
 ; return: AC: unsigned 2byte integer
 ; stack:  
+; &: str_ptr
 ; &: cur_radix_pow
 ; &: index
 ; &: byte_cnt
@@ -16,7 +17,6 @@
 ; &: ret_addr
 ; &: radix
 ; begin globals
-ATOI__STR_PTR: WORD ?
 ATOI__LOW_MASK: WORD 0xFF
 ; end globals
 ; begin func
@@ -38,7 +38,7 @@ ATOI:
   ; start interation from last symbol (last byte) 
   ASR ; bytes to words
   ADD &src
-  ST ATOI__STR_PTR
+  ST &str_ptr
 
   CLA 
   ST &sum
@@ -60,14 +60,14 @@ ATOI:
     ROR
     BCC ATOI__ODD_ITER
     ; begin branch even iter -> high byte
-      LD -(ATOI__STR_PTR)
+      LD -(&str_ptr)
       SWAB
       AND ATOI__LOW_MASK
       BZS ATOI__LOOP
       JUMP ATOI__PROCESS_CHAR
     ; begin branch odd iter -> low byte
     ATOI__ODD_ITER:
-      LD (ATOI__STR_PTR)
+      LD (&str_ptr)
       AND ATOI__LOW_MASK
       BZS ATOI__LOOP
     ; end if
@@ -152,10 +152,10 @@ ITOA_CHAR__END:
 ; params: AC: ptr: ponter 
 ; return: AC: length in symbols
 ; stack:
+; &: ptr
 ; &: cnt
 ; &: ret_addr
 ; begin globals
-SLEN__CUR_PTR: WORD ?
 SLEN__HMASK: WORD 0xFF00
 SLEN__LMASK: WORD 0xFF
 ; end globals
@@ -165,17 +165,17 @@ STRLEN:
   APUSH
 ; end prologue
 
-  ST SLEN__CUR_PTR
+  ST &ptr
   CLA
   ST &cnt
 
   ; begin loop
   SLEN__LOOP:
-    LD (SLEN__CUR_PTR)
+    LD (&ptr)
     AND SLEN__LMASK
     BZS SLEN__END
 
-    LD (SLEN__CUR_PTR)+
+    LD (&ptr)+
     ; begin if 
     AND SLEN__HMASK
     BZS SLEN__ADD_ONE
@@ -212,11 +212,10 @@ STRLEN:
 ; stack:
 ; &: char2
 ; &: char1
+; &: str1
 ; &: ret_addr
 ; &: str2
 ; begin globals
-STRCMP__PTR1: WORD ?
-STRCMP__PTR2: WORD ?
 STRCMP__MASK: WORD 0xFF00
 ; end globals
 ; begin func
@@ -224,14 +223,12 @@ STRCMP:
 ; begin prologue
   APUSH
 ; end prologue
-  ST STRCMP__PTR1
-  LD &str2
-  ST STRCMP__PTR2
+  ST &str1
 
   STRCMP__LOOP:
-    LD (STRCMP__PTR1)+
+    LD (&str1)+
     ST &char1
-    LD (STRCMP__PTR2)+
+    LD (&str2)+
     ST &char2
 
     CMP &char1

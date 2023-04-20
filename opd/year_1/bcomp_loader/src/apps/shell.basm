@@ -18,13 +18,13 @@ _SHELL__CMD_LIST_CNT: WORD 0x3
 ; and _SHELL__CMD_NAME_PTR_LIST as list of CALL targets or 0xFFFF for exit
 ; 
 ; stack:
+; &: ptr
 ; &: input_ptr
 ; &: ret_addr
 ; begin globals
 SHELL__START_STR: WORD "Hello. You are in shell"
 SHELL__NOTFOUND_STR: WORD "No such command."
 SHELL__PROMPT_STR: WORD "$ "
-SHELL__EXEC_PTR: WORD ?
 ; end globals
 ; begin func
 SHELL_MAIN:
@@ -58,8 +58,8 @@ SHELL_MAIN:
     SHELL__LOOP_CONTINUE: 
       BMI SHELL__EXIT
 
-      ST SHELL__EXEC_PTR
-      CALL (SHELL__EXEC_PTR)
+      ST &ptr
+      CALL (&ptr)
     ; end if
 
     JUMP SHELL__LOOP
@@ -81,14 +81,12 @@ SHELL__EXIT:
 ; params: AC: cmd_str_ptr - command text pointer
 ; return: AC: cmd pointer to function to call or 0 if command not found
 ; stack:
+; &: addr_ptr
+; &: name_ptr
 ; &: cnt
 ; &: cmd_str_ptr
 ; &: cmd
 ; &: ret_addr
-; begin globals
-SSC__NAME_PTR: WORD ?
-SSC__ADDR_PTR: WORD ?
-; end globals
 ; begin func
 SHELL_SELECT_CMD:
 ; begin prologue
@@ -101,12 +99,12 @@ SHELL_SELECT_CMD:
   ST &cnt
 
   LD $_SHELL__CMD_ADDR_LIST_PTR
-  ST SSC__ADDR_PTR
+  ST &addr_ptr
   LD $_SHELL__CMD_NAME_PTR_LIST_PTR
-  ST SSC__NAME_PTR
+  ST &name_ptr
 
   SSC__LOOP:
-    LD (SSC__NAME_PTR)+
+    LD (&name_ptr)+
     PUSH 
     LD &cmd_str_ptr+1
     CALL $STRCMP
@@ -114,7 +112,7 @@ SHELL_SELECT_CMD:
     POP
 
     BZS SSC__FOUND
-    LD (SSC__ADDR_PTR)+
+    LD (&addr_ptr)+
 
     LOOP &cnt
     JUMP SSC__LOOP
@@ -123,7 +121,7 @@ SHELL_SELECT_CMD:
   JUMP SSC__END
 
   SSC__FOUND:
-    LD (SSC__ADDR_PTR)
+    LD (&addr_ptr)
 
   SSC__END:    
     ; ST &cmd no need now
@@ -138,10 +136,10 @@ SHELL_SELECT_CMD:
 
 ; func SHELL_CMD_HELP: () prints shell help
 ; stack:
+; &: ptr
 ; &: iter
 ; begin globals
 SCH__TEXT: WORD "Interactive shell.\r\nCommands are case-sensitive, non-letter symbols are prohibited.\r\nList: "
-SCH__ITER: WORD ?
 ; end globals
 ; begin func
 SHELL_CMD_HELP:
@@ -154,10 +152,10 @@ SHELL_CMD_HELP:
   ST &iter
 
   LD $_SHELL__CMD_NAME_PTR_LIST_PTR
-  ST SCH__ITER
+  ST &ptr
 
   SCH__LOOP:
-    LD (SCH__ITER)+
+    LD (&ptr)+
     CALL $PRINT
     
     LD #0x20

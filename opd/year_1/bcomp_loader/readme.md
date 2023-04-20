@@ -1,15 +1,18 @@
-# BComp dynamic programm loader
+# BComp OS
 
-## Binary format 
+
+## Dynamic prog loading
+### Binary format 
 ```
 sections_cnt@2b
 start_addr@2b
+prog_size@2b
 [section_desc@6b] * sections_cnt
 ; section_desc: (offset@2b, (is_code@1, 0000, len@11)@2b, org@2b)@6b
 [cmd@2b] * len
 ```
 
-### Limitations
+#### Limitations
 - working:
   - absolute direct addressing
   - relative direct addressing
@@ -25,5 +28,5 @@ start_addr@2b
 ```shell
 cd src
 ../preprocess.py main.basm 1> build.basm
-bcomp -c -C build.basm
+bcomp -c -r -C build.basm
 ```

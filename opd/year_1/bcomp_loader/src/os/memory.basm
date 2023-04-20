@@ -2,11 +2,11 @@
 
 ; memory allocation:
 ; 0x000 - 0x010: interrupt vectors
-; 0x010 - 0xXXX: OS (loader + libs)
+; 0x010 - 0xXXX: OS
 ; 0xXXX - 0x700: user code
-; 0x700 - 0x77F: TCB data 128w = (0x28=7 struct + 32 stack)words * 3proc = 0x78
+; 0x700 - 0x77F: TCB data 128w
 ; 0x780 - 0x7DF: heap 96w
-; 0x7DF - 0x7FF: stack 32w, 64B
+; 0x7DF - 0x7FF: stack 32w
 
 ; heap is allocated via stack allocator
 

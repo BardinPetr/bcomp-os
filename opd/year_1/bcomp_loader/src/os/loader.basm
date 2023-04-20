@@ -1,15 +1,15 @@
 ; ----------------------------- DYNAMIC PROGRAM LOADER -----------------------------
 
-; func LOAD_BIN: (read_func, target_addr) loads programm from binary to RAM and relocates sectors sequentially.
+; func LOAD_BIN: (read_func) loads programm from binary to RAM and relocates sectors sequentially.
 ; Changes all absolute address commands to point into relocated addresses.
 ; Indirect addressing should be used inside single sector only.
 ; Remap of poiners created via "DATA $X" construction is supported only when they have 15 bit set.
 ; Uses LB__NEXT_INPUT_WORD_PTR as streaming source of 2b words for binary.
-; Program is loaded from LB__LOAD_POINT up to LB__USERSPACE_END.
+; Program is loaded from PROCMEM__ALLOC(prog_size) up to _SYS__USERSPACE_END.
 ; 
 ; params: AC: read_func: function returning 1 word from binarry each time called
-;         STACK: target_addr: address to start loading to
 ; return: AC: start address of program or 0x0 if failed
+;         STACK: 
 ; stack:
 ; &: org_array
 ; &: len_array
@@ -23,16 +23,13 @@
 ; &: start_addr
 ; &: section_cnt
 ; &: ret_addr
-; &: target_addr
 ; begin globals
 LB__NEXT_INPUT_WORD_PTR: WORD ?
-LB__USERSPACE_BEGIN_PTR: WORD $_SYS__USERSPACE_BEGIN
-LB__USERSPACE_END_PTR: WORD $_SYS__USERSPACE_END
+; LB__USERSPACE_END_PTR: WORD $_SYS__USERSPACE_END
 LB__LOAD_PTR: WORD ?
 LB__LEN_ARRAY_PTR: WORD ?
 LB__ORG_ARRAY_PTR: WORD ?
 LB__DELTA_ARRAY_PTR: WORD ?
-LB__START_CMD_FIX: WORD 0x2000
 ; end globals
 ; begin func
 LOAD_BIN:
@@ -67,10 +64,11 @@ LOAD_BIN:
   CALL (LB__NEXT_INPUT_WORD_PTR)
   ST &start_addr
 
-  LD &target_addr
+  CALL (LB__NEXT_INPUT_WORD_PTR) ; command count
+  CALL $PROCMEM__ALLOC
+
   ; begin if
-  CMP (LB__USERSPACE_BEGIN_PTR)
-  BHIS LB__START
+  BZC LB__START
   ; begin branch if target addr not in valid range 
     LD $LB__STR_NO_SPACE_PTR
     CALL $PRINTLN
@@ -106,18 +104,6 @@ LOAD_BIN:
     ADD &cur_section_len
     ST &real_org
 
-    ; begin if check memory availability
-    CMP (LB__USERSPACE_END_PTR)
-    BLO LB__SECTION_VALID 
-    ; begin branch section out of space
-      LD $LB__STR_NO_SPACE_PTR
-      CALL $PRINTLN
-      CLA ; err return code
-      ST &section_cnt
-      JUMP LB__END
-    ; end if
-
-    LB__SECTION_VALID:
     LOOP &cur_section_cnt
     JUMP LB__LOAD_SECT_LOOP
   ; end loop over sections

@@ -1,6 +1,5 @@
 ORG 0x10
 
-; INCLUDE util/math.basm
 INCLUDE util/string.basm
 INCLUDE util/array.basm
 INCLUDE io/output.basm
@@ -9,6 +8,7 @@ INCLUDE io/int.basm
 INCLUDE io/dev.basm
 INCLUDE io/ansi.basm
 INCLUDE os/memory.basm
+INCLUDE os/proc_mem.basm
 INCLUDE os/loader_sources.basm
 INCLUDE os/loader.basm
 INCLUDE os/proc.basm

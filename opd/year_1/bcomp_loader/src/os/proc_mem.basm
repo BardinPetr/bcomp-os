@@ -1,0 +1,75 @@
+; ----------------------------- PROCESS MEMORY MANAGER -----------------------------
+
+; begin globals
+_SYS_PROC__FREE_MEM_START: WORD 0x0
+; end globals
+
+
+; func PROCMEM__INIT: () initialize memory manager for processes
+; begin func
+PROCMEM__INIT:
+  LD $_SYS__USERSPACE_BEGIN
+  ST $_SYS_PROC__FREE_MEM_START
+  RET
+; end func PROCMEM__INIT
+
+
+
+; func PROCMEM__ALLOC: () allocate memory for 
+; 
+; params: AC: program_size
+; return: AC: start pointer to sector or 0 if no memory available for reqest
+; stack:
+; &: size
+; begin globals
+; end globals
+; begin func
+PROCMEM__ALLOC:
+; begin prologue
+  APUSH
+; end prologue
+  ST &size
+  BMI PMA__ERR
+  BZS PMA__ERR
+
+  ADD $_SYS_PROC__FREE_MEM_START
+  CMP $_SYS__USERSPACE_END
+  BHIS PMA__ERR
+
+  ST $_SYS_PROC__FREE_MEM_START
+  SUB &size
+
+  JUMP PMA__END
+
+PMA__ERR:
+  CLA 
+  
+PMA__END:
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func PROCMEM__ALLOC
+
+
+
+
+; func PROCMEM__FREE: () deallocate memory from process
+; 
+; params: AC: segment start pointer 
+; stack: 
+; begin globals
+; end globals
+; begin func
+PROCMEM__FREE:
+; begin prologue
+  APUSH
+; end prologue
+
+  ; no deallocation now ;(
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func PROCMEM__FREE

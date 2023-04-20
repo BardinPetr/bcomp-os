@@ -3,7 +3,6 @@
 ; begin globals
 _SYS_PROC__PROCESSES_MAX: WORD 0x3
 _SYS_PROC__PROCESSES_LIST_PTR: WORD 0x0
-_SYS_PROC__FREE_MEM_START: WORD 0x0
 _SYS_PROC__RUNNING_PROCESS_ID: WORD 0x0
 _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 ; end globals
@@ -73,7 +72,7 @@ PIM__END:
 
 
 
-; func PROC_CREATE: (ip) create process TCB with entrypoint address ip
+; func PROC_INIT: (ip) create process TCB with entrypoint address ip
 ; 
 ; params: AC: ip
 ; return: process id or 0xFFFF if could not be created
@@ -86,7 +85,7 @@ PCRT__PTR: WORD ?
 PCRT__BASE_PS: WORD 0x1A0 ; P | W | EI
 ; end globals
 ; begin func
-PROC_CREATE:
+PROC_INIT:
 ; begin prologue
   APUSH
 ; end prologue
@@ -140,7 +139,7 @@ PCRT__END:
   APOP
   RET
 ; end epilogue
-; end func PROC_CREATE
+; end func PROC_INIT
 
 
 
@@ -189,3 +188,31 @@ LOAD_BIN_RUN__EXIT:
   RET
 ; end func LOAD_BIN_RUN
 
+
+
+
+; func PROC_START: () loads and starts new process
+; 
+; params: AC:
+; return: 
+; stack:
+; 
+; begin globals
+; end globals
+; begin func
+PROC_START:
+; begin prologue
+  APUSH
+; end prologue
+
+  LD LOAD_BIN_RUN__READER
+  CALL $LOAD_BIN
+  BZS LOAD_BIN_RUN__EXIT
+  ST LOAD_BIN_RUN__JUMP_TARGET
+  POP
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func PROC_START

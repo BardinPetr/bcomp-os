@@ -19,29 +19,19 @@ OS__INIT:
 ; end prologue
 
   CALL $PRINT_CLEAR
+
   LD OSI__INIT_STR_PTR
   CALL $PRINTLN
 
-  ; reserve processes array
-  LD $_SYS_PROC__PROCESSES_MAX
-  CALL $MALLOC
-  ST $_SYS_PROC__PROCESSES_LIST_PTR
-
-  ; set userspace begin
-  LD $_SYS__USERSPACE_BEGIN
-  ST $_SYS_PROC__FREE_MEM_START
-
-  ; begin block setup interrupts section
-  CALL $INT__INIT
-
-  LD #1 ; 10Hz
-  CALL $OS__SETUP_SWITCH_TIMER
-  ; EI
-  ; end block ints
-
   ; prepare process manager
+  CALL $PROCMEM__INIT
   CALL $PROC__INIT_MANAGER
 
+  ; setup interrupts
+  CALL $INT__INIT
+  LD #1 ; 10Hz
+  CALL $OS__SETUP_SWITCH_TIMER
+  
   ; init end
   LD OSI__START_STR_PTR
   CALL $PRINTLN
@@ -58,6 +48,21 @@ OS__INIT:
 ; end epilogue
 ; end func OS__INIT
 
+
+
+PROC1_PTR: WORD $PROC1
+PROC1_STR: WORD "proc"
+PROC1:
+  LD PROC1_STR_PTR
+  CALL $PRINTLN  
+  JUMP PROC1
+
+PROC2_PTR: WORD $PROC2
+PROC2_STR: WORD "PROC"
+PROC2:
+  LD PROC2_STR_PTR
+  CALL $PRINTLN  
+  JUMP PROC2
 
 
 ; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context.
@@ -123,6 +128,8 @@ OS__SETUP_SWITCH_TIMER:
   LD &period+1
   CALL $DEV__OUT
   POP
+
+  ; EI
 
 ; begin epilogue
   APOP

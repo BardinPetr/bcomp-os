@@ -2,15 +2,15 @@
 
 ; begin globals
 _SYS_PROC__PROCESSES_MAX: WORD 0x3
-_SYS_PROC__PROCESSES_LIST_PTR: WORD 0x0
 _SYS_PROC__RUNNING_PROCESS_ID: WORD 0x0
 _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 ; end globals
 
 
 
-; func PROC__INIT_MANAGER: () prepares structures to hold processes
+; func PROC__INIT_MANAGER: (sp_origin) prepares structures to hold processes
 ;
+; params: AC: sp_origin to set for all processes
 ; stack:
 ; &: stack_data_ptr
 ; &: sp_origin
@@ -25,8 +25,6 @@ PROC__INIT_MANAGER:
   APUSH
 ; end prologue
 
-  RSP
-  SUB #2
   ST &sp_origin
 
   LD $_PROC__TCB_DESCR_BEGIN
@@ -160,44 +158,16 @@ PROC_KILL:
 ; end func PROC_KILL
 
 
-
-; func LOAD_BIN_RUN: loads binary to ram and starts program
-; Loads program at _SYS_PROC__FREE_MEM_START
-; 
-; begin globals
-LOAD_BIN_RUN__STR_RUN: WORD "Starting program"
-LOAD_BIN_RUN__JUMP_TARGET: WORD ?
-; LOAD_BIN_RUN__READER: WORD $LOADER_CONSOLE_READER
-LOAD_BIN_RUN__READER: WORD $LOADER_RAM_READER
-; end globals
-; begin func
-LOAD_BIN_RUN:
-  LD $_SYS_PROC__FREE_MEM_START
-  PUSH
-  LD LOAD_BIN_RUN__READER
-  CALL $LOAD_BIN
-  BZS LOAD_BIN_RUN__EXIT
-  ST LOAD_BIN_RUN__JUMP_TARGET
-  POP
-
-  LD LOAD_BIN_RUN__STR_RUN_PTR
-  CALL $PRINTLN
-  
-  JUMP (LOAD_BIN_RUN__JUMP_TARGET)
-LOAD_BIN_RUN__EXIT:
-  RET
-; end func LOAD_BIN_RUN
-
-
-
-
 ; func PROC_START: () loads and starts new process
 ; 
-; params: AC:
-; return: 
+; return: AC: process id or 0xFFFF if could not create
 ; stack:
-; 
+; &: proc_id
+; &: ret_addr
 ; begin globals
+PSTRT__STR_RUN: WORD "Process created ID: "
+PSTRT__STR_FAIL: WORD "Process couldn't be created"
+PSTRT__READER: WORD $LOADER_RAM_READER
 ; end globals
 ; begin func
 PROC_START:
@@ -205,12 +175,38 @@ PROC_START:
   APUSH
 ; end prologue
 
-  LD LOAD_BIN_RUN__READER
-  CALL $LOAD_BIN
-  BZS LOAD_BIN_RUN__EXIT
-  ST LOAD_BIN_RUN__JUMP_TARGET
-  POP
+  LD $_SYS_PROC__CUR_PROCESSES_COUNT
+  INC
+  CMP $_SYS_PROC__PROCESSES_MAX
+  BHIS PSTRT__FAIL
 
+  LD PSTRT__READER
+  CALL $LOAD_BIN
+  BZS PSTRT__FAIL
+
+  ; ac=target ip
+  CALL $PROC_INIT
+  ST &proc_id
+  BMI PSTRT__FAIL
+
+  LD PSTRT__STR_RUN_PTR
+  CALL $PRINT
+  LD &proc_id
+  CALL $ITOA_CHAR
+  CALL $PRINT_CHAR
+  CALL $PRINT_ENDL
+
+  LD &proc_id
+  JUMP PSTRT__END
+
+PSTRT__FAIL:
+  LD &proc_id
+  CALL $PROC_KILL
+  LD PSTRT__STR_FAIL_PTR
+  CALL $PRINTLN
+  LD #0xFF
+
+PSTRT__END:  
 ; begin epilogue
   APOP
   RET

@@ -9,7 +9,6 @@
 ; 
 ; params: AC: read_func: function returning 1 word from binarry each time called
 ; return: AC: start address of program or 0x0 if failed
-;         STACK: 
 ; stack:
 ; &: org_array
 ; &: len_array

@@ -241,12 +241,13 @@ PROC_LOAD_STATE:
   NEG
   WSP
 
-  IN 0 ; reset context switch timer
-
   LD -(PLS__TCB_PTR) ; ip 
   PUSH
   LD -(PLS__TCB_PTR) ; ps
   PUSH
+
+  IN 0 ; reset context switch timer
+
   LD -(PLS__TCB_PTR) ; ac 
   IRET
 

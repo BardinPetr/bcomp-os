@@ -1,0 +1,80 @@
+; ----------------------------- CONTEXT SWITCH -----------------------------
+
+; func OS__CONTEXT_SWITCH_INT: () interrupt to swtich current execution context.
+; Stores current process state to TCB and restores next process state then jumps to it
+; Should be called with timer
+; 
+; begin globals
+OS__CONTEXT_SWITCH_INT_PTR: WORD $OS__CONTEXT_SWITCH_INT
+OSCSI__TEXT: WORD "switch"
+; end globals
+; begin func
+OS__CONTEXT_SWITCH_INT:
+  ; here is PS on stack top an IP the next
+  PUSH ; cur accumulator value
+; HLT
+  LD #0x0D
+  OUT 0x9
+  ; LD OSCSI__TEXT_PTR
+  ; CALL $PRINTLN
+
+  LD $_SYS_PROC__RUNNING_PROCESS_ID  
+  CALL $PROC_SAVE_STATE
+
+  ; search for active process
+  LD $_SYS_PROC__RUNNING_PROCESS_ID
+  PUSH
+  CLA ; 0=running
+  CALL $PROC_GET_NEXT_WITH_STATUS
+  SWAP
+  POP
+  BPL OSCSI__CONT
+  LD $_SYS_PROC__RUNNING_PROCESS_ID
+
+OSCSI__CONT:
+  ST $_SYS_PROC__RUNNING_PROCESS_ID
+  CALL $PROC_LOAD_STATE
+  ; HLT
+
+  ; this instruction should not be reached in normal process loading
+  IRET
+; end func OS__CONTEXT_SWITCH_INT
+
+
+
+; func OS__SETUP_SWITCH_TIMER: (period)
+; 
+; params: AC: period (real period = period * 100ms)
+; stack:
+; &: period
+; &: ret_addr
+; begin func
+OS__SETUP_SWITCH_TIMER:
+; begin prologue
+  APUSH
+; end prologue
+
+  ST &period
+
+  LD OS__CONTEXT_SWITCH_INT_PTR
+  CALL $INT__REGISTER_HANDLER
+
+  PUSH
+  CLA ; timer DEV#0
+  CALL $DEV__INT_ON
+  POP
+  
+  CLA ; DEV#0 DR = 0
+  PUSH
+  LD &period+1
+  CALL $DEV__OUT
+  POP
+
+  EI
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func OS__SETUP_SWITCH_TIMER
+

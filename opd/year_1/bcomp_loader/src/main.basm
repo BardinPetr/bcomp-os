@@ -9,6 +9,7 @@ INCLUDE io/dev.basm
 INCLUDE io/ansi.basm
 INCLUDE os/memory.basm
 INCLUDE os/proc_mem.basm
+INCLUDE os/proc_switch.basm
 INCLUDE os/loader_sources.basm
 INCLUDE os/loader.basm
 INCLUDE os/proc.basm

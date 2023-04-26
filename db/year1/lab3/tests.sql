@@ -22,12 +22,12 @@ SELECT obj.name       as object,
        dt.description as allowed_to,
        cs.name        as allowed_for
 FROM object obj
-         JOIN object parent on obj.parent_object_id = parent.id
+         FULL JOIN object parent on obj.parent_object_id = parent.id
          JOIN object_mystery om on obj.id = om.object_id
          JOIN mystery m on om.mystery_id = m.id
-         JOIN mystery_disclosure md on m.id = md.mystery_id
-         JOIN creature_species cs on md.creature_species_id = cs.id
-         JOIN disclosure_type dt on md.available_type_id = dt.id;
+         FULL JOIN mystery_disclosure md on m.id = md.mystery_id
+         FULL JOIN creature_species cs on md.creature_species_id = cs.id
+         FULL JOIN disclosure_type dt on md.available_type_id = dt.id;
 
 
 SELECT * from object;

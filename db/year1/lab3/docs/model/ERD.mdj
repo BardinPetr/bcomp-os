@@ -845,7 +845,7 @@
 											"font": "Arial;13;1",
 											"left": 720,
 											"top": 277,
-											"width": 103.6708984375,
+											"width": 126.0654296875,
 											"height": 13,
 											"text": "planet"
 										},
@@ -871,7 +871,7 @@
 													"font": "Arial;13;0",
 													"left": 725,
 													"top": 300,
-													"width": 93.6708984375,
+													"width": 116.0654296875,
 													"height": 13
 												},
 												{
@@ -883,10 +883,11 @@
 													"model": {
 														"$ref": "AAAAAAGGjbURJ1fmUWk="
 													},
+													"visible": false,
 													"font": "Arial;13;0",
 													"left": 725,
 													"top": 315,
-													"width": 93.6708984375,
+													"width": 116.0654296875,
 													"height": 13
 												},
 												{
@@ -900,23 +901,23 @@
 													},
 													"font": "Arial;13;0",
 													"left": 725,
-													"top": 330,
-													"width": 93.6708984375,
+													"top": 315,
+													"width": 116.0654296875,
 													"height": 13
 												}
 											],
 											"font": "Arial;13;0",
 											"left": 720,
 											"top": 295,
-											"width": 103.6708984375,
-											"height": 53
+											"width": 126.0654296875,
+											"height": 38
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 720,
 									"top": 272,
-									"width": 103.6708984375,
-									"height": 76,
+									"width": 126.0654296875,
+									"height": 65,
 									"nameLabel": {
 										"$ref": "AAAAAAGGjbQNiFe3psk="
 									},
@@ -996,6 +997,7 @@
 													"model": {
 														"$ref": "AAAAAAGGl1+ykcGE180="
 													},
+													"visible": false,
 													"font": "Arial;13;0",
 													"left": 629,
 													"top": 594,
@@ -1013,7 +1015,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 609,
+													"top": 594,
 													"width": 163.025390625,
 													"height": 13
 												},
@@ -1028,7 +1030,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 624,
+													"top": 609,
 													"width": 163.025390625,
 													"height": 13
 												},
@@ -1043,7 +1045,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 639,
+													"top": 624,
 													"width": 163.025390625,
 													"height": 13
 												},
@@ -1058,7 +1060,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 654,
+													"top": 639,
 													"width": 163.025390625,
 													"height": 13
 												}
@@ -1067,14 +1069,14 @@
 											"left": 624,
 											"top": 559,
 											"width": 173.025390625,
-											"height": 113
+											"height": 98
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 624,
 									"top": 536,
 									"width": 173.025390625,
-									"height": 136,
+									"height": 121,
 									"nameLabel": {
 										"$ref": "AAAAAAGGjbQfoVfEdSM="
 									},
@@ -1099,17 +1101,17 @@
 												"$ref": "AAAAAAGGjbZtI1g6AUk="
 											},
 											"font": "Arial;13;0",
-											"left": 768,
-											"top": 424,
+											"left": 752,
+											"top": 419,
 											"width": 99.0234375,
 											"height": 13,
-											"alpha": 1.7614350734857696,
-											"distance": 58.05170109479997,
+											"alpha": 1.8329160017539403,
+											"distance": 42.44997055358225,
 											"hostEdge": {
 												"$ref": "AAAAAAGGjbZtI1g6AUk="
 											},
 											"edgePosition": 1,
-											"text": "located on planet"
+											"text": "is an object"
 										},
 										{
 											"_type": "EdgeLabelView",
@@ -1119,7 +1121,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 775,
-											"top": 366,
+											"top": 355,
 											"height": 13,
 											"alpha": 0.5235987755982988,
 											"distance": 30,
@@ -1153,7 +1155,7 @@
 										"$ref": "AAAAAAGGjbQNh1e2ndE="
 									},
 									"lineStyle": 2,
-									"points": "760:347;760:536",
+									"points": "760:336;760:536",
 									"nameLabel": {
 										"$ref": "AAAAAAGGjbZtI1g7nYg="
 									},
@@ -2800,8 +2802,10 @@
 									"_parent": {
 										"$ref": "AAAAAAGGjbQNh1e0wFM="
 									},
-									"name": "location",
-									"length": 0
+									"name": "object_id",
+									"length": 0,
+									"primaryKey": true,
+									"foreignKey": true
 								}
 							]
 						},
@@ -2881,7 +2885,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGGjbQfoFfBBZw="
 									},
-									"name": "located on planet",
+									"name": "is an object",
 									"end1": {
 										"_type": "ERDRelationshipEnd",
 										"_id": "AAAAAAGGjbZtI1g3MU0=",
@@ -2890,7 +2894,8 @@
 										},
 										"reference": {
 											"$ref": "AAAAAAGGjbQNh1e0wFM="
-										}
+										},
+										"cardinality": "0..1"
 									},
 									"end2": {
 										"_type": "ERDRelationshipEnd",
@@ -2900,10 +2905,8 @@
 										},
 										"reference": {
 											"$ref": "AAAAAAGGjbQfoFfBBZw="
-										},
-										"cardinality": "0..*"
-									},
-									"identifying": false
+										}
+									}
 								},
 								{
 									"_type": "ERDRelationship",
@@ -4312,8 +4315,8 @@
 											},
 											"font": "Arial;13;1",
 											"left": 800,
-											"top": 261,
-											"width": 185.0478515625,
+											"top": 276,
+											"width": 153,
 											"height": 13,
 											"text": "planet"
 										},
@@ -4338,8 +4341,8 @@
 													},
 													"font": "Arial;13;0",
 													"left": 805,
-													"top": 284,
-													"width": 175.0478515625,
+													"top": 299,
+													"width": 143,
 													"height": 13
 												},
 												{
@@ -4351,10 +4354,11 @@
 													"model": {
 														"$ref": "AAAAAAGGnP29jDQmhb4="
 													},
+													"visible": false,
 													"font": "Arial;13;0",
 													"left": 805,
 													"top": 299,
-													"width": 175.0478515625,
+													"width": 182.27783203125,
 													"height": 13
 												},
 												{
@@ -4369,22 +4373,22 @@
 													"font": "Arial;13;0",
 													"left": 805,
 													"top": 314,
-													"width": 175.0478515625,
+													"width": 143,
 													"height": 13
 												}
 											],
 											"font": "Arial;13;0",
 											"left": 800,
-											"top": 279,
-											"width": 185.0478515625,
-											"height": 53
+											"top": 294,
+											"width": 153,
+											"height": 38
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 800,
-									"top": 256,
-									"width": 185.0478515625,
-									"height": 76,
+									"top": 271,
+									"width": 153,
+									"height": 61,
 									"nameLabel": {
 										"$ref": "AAAAAAGGnP29iDOZ5s4="
 									},
@@ -4464,6 +4468,7 @@
 													"model": {
 														"$ref": "AAAAAAGGnP29jTQ6rg0="
 													},
+													"visible": false,
 													"font": "Arial;13;0",
 													"left": 629,
 													"top": 610,
@@ -4481,7 +4486,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 625,
+													"top": 610,
 													"width": 241.5078125,
 													"height": 13
 												},
@@ -4496,7 +4501,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 640,
+													"top": 625,
 													"width": 241.5078125,
 													"height": 13
 												},
@@ -4511,7 +4516,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 655,
+													"top": 640,
 													"width": 241.5078125,
 													"height": 13
 												},
@@ -4526,7 +4531,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 629,
-													"top": 670,
+													"top": 655,
 													"width": 241.5078125,
 													"height": 13
 												}
@@ -4535,7 +4540,7 @@
 											"left": 624,
 											"top": 575,
 											"width": 251.5078125,
-											"height": 113
+											"height": 98
 										}
 									],
 									"font": "Arial;13;0",
@@ -4567,17 +4572,17 @@
 												"$ref": "AAAAAAGGnP29iDOoA/0="
 											},
 											"font": "Arial;13;0",
-											"left": 848,
-											"top": 416,
+											"left": 832,
+											"top": 424,
 											"width": 99.0234375,
 											"height": 13,
-											"alpha": 1.892546738469878,
-											"distance": 60.08327554319921,
+											"alpha": 1.832916016927008,
+											"distance": 42.44997055358225,
 											"hostEdge": {
 												"$ref": "AAAAAAGGnP29iDOoA/0="
 											},
 											"edgePosition": 1,
-											"text": "located on planet"
+											"text": "is an object"
 										},
 										{
 											"_type": "EdgeLabelView",
@@ -4595,8 +4600,7 @@
 											"hostEdge": {
 												"$ref": "AAAAAAGGnP29iDOoA/0="
 											},
-											"edgePosition": 2,
-											"text": "planet_id"
+											"edgePosition": 2
 										},
 										{
 											"_type": "EdgeLabelView",
@@ -6811,9 +6815,11 @@
 									"_parent": {
 										"$ref": "AAAAAAGGnP29jDQhtKU="
 									},
-									"name": "location",
-									"type": "d3_postition",
-									"length": 0
+									"name": "object_id",
+									"type": "INT",
+									"length": 0,
+									"primaryKey": true,
+									"foreignKey": true
 								}
 							]
 						},
@@ -6863,17 +6869,17 @@
 									"_parent": {
 										"$ref": "AAAAAAGGnP29jDQoEC0="
 									},
-									"name": "located on planet",
+									"name": "is an object",
 									"end1": {
 										"_type": "ERDRelationshipEnd",
 										"_id": "AAAAAAGGnP29jTQwZtg=",
 										"_parent": {
 											"$ref": "AAAAAAGGnP29jTQv0/I="
 										},
-										"name": "planet_id",
 										"reference": {
 											"$ref": "AAAAAAGGnP29jDQhtKU="
-										}
+										},
+										"cardinality": "0..1"
 									},
 									"end2": {
 										"_type": "ERDRelationshipEnd",
@@ -6883,10 +6889,8 @@
 										},
 										"reference": {
 											"$ref": "AAAAAAGGnP29jDQoEC0="
-										},
-										"cardinality": "0..*"
-									},
-									"identifying": false
+										}
+									}
 								},
 								{
 									"_type": "ERDRelationship",

@@ -35,24 +35,22 @@ CREATE TABLE s367079.object_type
     description text
 );
 
-CREATE TABLE s367079.planet
-(
-    id       int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name     varchar(50) NOT NULL UNIQUE,
-    location d3_position NOT NULL
-);
-
 CREATE TABLE s367079.object
 (
     id                int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     parent_object_id  int REFERENCES object (id),
-    planet_id         int REFERENCES planet (id),
     type_id           int REFERENCES object_type (id) NOT NULL,
     name              varchar(50)                     NOT NULL,
     relative_position d3_position UNIQUE              NOT NULL,
     area              float
 );
 
+
+CREATE TABLE s367079.planet
+(
+    id       int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    object_id int REFERENCES object (id) NOT NULL
+);
 
 -- Creatures
 CREATE TABLE s367079.creature_species

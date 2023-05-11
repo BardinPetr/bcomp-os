@@ -48,8 +48,7 @@ CREATE TABLE s367079.object
 
 CREATE TABLE s367079.planet
 (
-    id       int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    object_id int REFERENCES object (id) NOT NULL
+    id int REFERENCES object (id) PRIMARY KEY
 );
 
 -- Creatures

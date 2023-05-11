@@ -2451,8 +2451,7 @@
 										"$ref": "AAAAAAGGjRw+2VYNrIg="
 									},
 									"name": "name",
-									"length": 0,
-									"unique": true
+									"length": 0
 								},
 								{
 									"_type": "ERDColumn",
@@ -2790,8 +2789,7 @@
 										"$ref": "AAAAAAGGjbQNh1e0wFM="
 									},
 									"name": "name",
-									"length": 0,
-									"unique": true
+									"length": 0
 								},
 								{
 									"_type": "ERDColumn",
@@ -3104,8 +3102,7 @@
 										"$ref": "AAAAAAGGjbljLVjutNg="
 									},
 									"name": "name",
-									"length": 0,
-									"unique": true
+									"length": 0
 								},
 								{
 									"_type": "ERDColumn",
@@ -3143,8 +3140,7 @@
 										"$ref": "AAAAAAGGjb+m91liva4="
 									},
 									"name": "name",
-									"length": 0,
-									"unique": true
+									"length": 0
 								},
 								{
 									"_type": "ERDColumn",
@@ -3441,8 +3437,7 @@
 										"$ref": "AAAAAAGGnJAmBsIV7wU="
 									},
 									"name": "name",
-									"length": 0,
-									"unique": true
+									"length": 0
 								},
 								{
 									"_type": "ERDColumn",
@@ -6444,8 +6439,7 @@
 									},
 									"name": "name",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",
@@ -6803,8 +6797,7 @@
 									},
 									"name": "name",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",
@@ -7101,8 +7094,7 @@
 									},
 									"name": "name",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",
@@ -7143,8 +7135,7 @@
 									},
 									"name": "name",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",
@@ -7185,8 +7176,7 @@
 									},
 									"name": "description",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",
@@ -7457,8 +7447,7 @@
 									},
 									"name": "name",
 									"type": "VARCHAR",
-									"length": "50",
-									"unique": true
+									"length": "50"
 								},
 								{
 									"_type": "ERDColumn",

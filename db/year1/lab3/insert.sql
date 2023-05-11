@@ -58,8 +58,7 @@ WITH planet_ids as (SELECT id
                     FROM object
                     WHERE object.type_id = (SELECT id FROM object_type WHERE object_type.name = 'Planet')),
      ins_ids as
-         (INSERT INTO planet (object_id)
-                 (SELECT * FROM planet_ids)
+         (INSERT INTO planet (SELECT * FROM planet_ids)
              RETURNING id),
      ins_species as
          (INSERT INTO creature_species (name, base_planet_id)

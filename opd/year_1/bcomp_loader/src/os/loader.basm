@@ -29,31 +29,31 @@
 ; &: section_cnt
 ; &: ret_addr
 ; begin func
-LOAD_BIN:
+EXPORT LOAD_BIN:
   ; begin prologue
   APUSH
   ; end prologue
   ST &read_word_ptr
 
   LD $LB__STR_STARTED_PTR
-  CALL $PRINTLN
+  FCALL ($PRINTLN_PTR)
 
   CALL (&read_word_ptr)
   ST &section_cnt
   ST &cur_section_cnt
 
   ; allocate arrays
-  CALL $MALLOC
+  FCALL ($MALLOC_PTR)
   ST &len_array
   ST &len_arr_ptr
 
   LD &section_cnt
-  CALL $MALLOC
+  FCALL ($MALLOC_PTR)
   ST &delta_array
   ST &delta_arr_ptr
 
   LD &section_cnt
-  CALL $MALLOC
+  FCALL ($MALLOC_PTR)
   ST &org_array
   ST &org_arr_ptr
   ; end alloc
@@ -62,13 +62,13 @@ LOAD_BIN:
   ST &start_addr
 
   CALL (&read_word_ptr) ; command count
-  CALL $PROCMEM__ALLOC
+  FCALL ($PROCMEM__ALLOC_PTR)
 
   ; begin if
   BZC LB__START
   ; begin branch if target addr not in valid range 
     LD $LB__STR_NO_SPACE_PTR
-    CALL $PRINTLN
+    FCALL ($PRINTLN_PTR)
     CLA ; err return code
     ST &section_cnt
     JUMP LB__END
@@ -107,12 +107,12 @@ LOAD_BIN:
 
   ; inform
   LD $LB__STR_HEADER_OK_PTR
-  CALL $PRINT
+  FCALL ($PRINT_PTR)
 
   LD &section_cnt
-  CALL $ITOA_CHAR ; TODO ITOA
-  CALL $PRINT_CHAR
-  CALL $PRINT_ENDL
+  FCALL ($ITOA_CHAR_PTR) ; TODO ITOA
+  FCALL ($PRINT_CHAR_PTR)
+  FCALL ($PRINT_ENDL_PTR)
 
   ; restart sections iteration
   LD &section_cnt
@@ -178,7 +178,7 @@ LOAD_BIN:
         ST &cur_original_addr+4
         
         LD &cur_cmd+4
-        CALL $LOAD_BIN_FIX_CMD
+        CALL LOAD_BIN_FIX_CMD
 
         ST (&target_memory_ptr+4)+ 
 
@@ -196,17 +196,17 @@ LOAD_BIN:
 
     LD &section_cnt
     SUB &cur_section_cnt
-    CALL $ITOA_CHAR ; TODO: use ITOA
-    CALL $PRINT_CHAR
+    FCALL ($ITOA_CHAR_PTR) ; TODO: use ITOA
+    FCALL ($PRINT_CHAR_PTR)
     LD $LB__STR_SECTION_LOADED_PTR
-    CALL $PRINTLN
+    FCALL ($PRINTLN_PTR)
 
     LOOP &cur_section_cnt
     JUMP LB__SECT_LOOP
   ; end loop over sections
 
   LD $LB__STR_FULL_LOADED_PTR
-  CALL $PRINTLN
+  FCALL ($PRINTLN_PTR)
 
   ; calculate new start address and return in AC
   LD &org_array
@@ -214,7 +214,7 @@ LOAD_BIN:
   LD &delta_array+1
   PUSH 
   LD &start_addr+2
-  CALL $CALC_ADDR_SHIFT
+  CALL CALC_ADDR_SHIFT
 
   ST &section_cnt+2 ; org delta
   POP
@@ -227,11 +227,11 @@ LOAD_BIN:
 LB__END:
   ; deallocate arrays
   LD &org_array
-  CALL $MFREE
+  FCALL ($MFREE_PTR)
   LD &delta_array
-  CALL $MFREE
+  FCALL ($MFREE_PTR)
   LD &len_array
-  CALL $MFREE
+  FCALL ($MFREE_PTR)
 
 ; begin epilogue
   LD &section_cnt ; ret
@@ -403,14 +403,14 @@ CALC_ADDR_SHIFT:
 
   PUSH
   LD &org_array+1
-  CALL $ARRAY_LOWER_BOUND
+  FCALL ($ARRAY_LOWER_BOUND_PTR)
   ST &org_delta+1 ; index
   POP
 
   LD &org_delta
   PUSH 
   LD &delta_array+1
-  CALL $ARRAY_GET_FC
+  FCALL ($ARRAY_GET_FC_PTR)
 
   ; ret (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
 

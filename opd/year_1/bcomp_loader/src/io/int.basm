@@ -23,7 +23,7 @@ _SYS_INT__DEFAULT_HANDLER:
 ; &: cur_id
 ; &: ret_addr
 ; begin func
-INT__REGISTER_HANDLER:
+EXPORT INT__REGISTER_HANDLER:
 ; begin prologue
   APUSH
 ; end prologue
@@ -77,7 +77,7 @@ IRH__EXIT:
 ; stack:
 ; &: ptr
 ; begin func
-INT__UNREGISTER_HANDLER:
+EXPORT INT__UNREGISTER_HANDLER:
 ; begin prologue
   APUSH
 ; end prologue
@@ -101,7 +101,7 @@ INT__UNREGISTER_HANDLER:
 ; stack:
 ; &: cur_id
 ; begin func
-INT__INIT:
+EXPORT INT__INIT:
 ; begin prologue
   APUSH
 ; end prologue
@@ -112,7 +112,7 @@ INT__INIT:
   INTI__LOOP:
     LD &cur_id
     DEC
-    CALL $INT__UNREGISTER_HANDLER
+    FCALL ($INT__UNREGISTER_HANDLER_PTR)
     LOOP &cur_id
     JUMP INTI__LOOP
 

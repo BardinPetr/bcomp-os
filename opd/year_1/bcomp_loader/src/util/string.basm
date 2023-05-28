@@ -20,13 +20,13 @@
 ATOI__LOW_MASK: WORD 0xFF
 ; end globals
 ; begin func
-ATOI:
+EXPORT ATOI:
 ; begin prologue
   APUSH
 ; end prologue
 
   ST &src
-  CALL $STRLEN
+  FCALL ($STRLEN_PTR)
   ST &byte_cnt
 
   LD &byte_cnt ; symbol number
@@ -73,17 +73,24 @@ ATOI:
     ; end if
 
     ATOI__PROCESS_CHAR:
-    CALL $ATOI_CHAR
+    FCALL ($ATOI_CHAR_PTR)
 
     ; sum += cur_radix_pow * ATOI(char[i])
-    MUL &cur_radix_pow
+    PUSH
+    LD &cur_radix_pow+1
+    FCALL ($MUL_PTR)
+    POP
     ; save sum
     ADD &sum
     ST &sum
 
     ; cur_radix_pow *= radix
     LD &radix
-    MUL &cur_radix_pow
+    PUSH
+    LD &cur_radix_pow+1
+    FCALL ($MUL_PTR)
+    POP
+
     ST &cur_radix_pow
     JUMP ATOI__LOOP
   ; end loop
@@ -102,7 +109,7 @@ ATOI:
 ; params: AC char: input character
 ; return: AC: int value 
 ; begin func
-ATOI_CHAR:
+EXPORT ATOI_CHAR:
   ; begin if
   CMP #0x3A
   BLT ATOI_CHAR__ISNUM
@@ -130,7 +137,7 @@ ATOI_CHAR__END:
 ; params: AC val: integer input digit
 ; return: AC: char value 
 ; begin func
-ITOA_CHAR:
+EXPORT ITOA_CHAR:
   ; begin if
   CMP #0xA
   BLT ITOA_CHAR__ISNUM
@@ -160,7 +167,7 @@ SLEN__HMASK: WORD 0xFF00
 SLEN__LMASK: WORD 0xFF
 ; end globals
 ; begin func
-STRLEN:
+EXPORT STRLEN:
 ; begin prologue
   APUSH
 ; end prologue
@@ -219,7 +226,7 @@ STRLEN:
 STRCMP__MASK: WORD 0xFF00
 ; end globals
 ; begin func
-STRCMP:
+EXPORT STRCMP:
 ; begin prologue
   APUSH
 ; end prologue

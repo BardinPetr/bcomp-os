@@ -1,5 +1,8 @@
 ORG 0x10
 
+ORG 0x20
+FUNCTABLE
+
 INCLUDE util/string.basm
 INCLUDE util/array.basm
 INCLUDE io/output.basm
@@ -18,7 +21,7 @@ INCLUDE os/os.basm
 INCLUDE apps/shell.basm
 
 START:
-  CALL $OS__INIT
+  FCALL ($OS__INIT_PTR)
   HLT
 
 _SYS__CODE_END: WORD 0

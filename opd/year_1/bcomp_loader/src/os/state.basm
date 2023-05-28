@@ -41,7 +41,7 @@ _PROC__TCB_STACK_SIZE: WORD 0x20
 ; &: ret_addr
 ; &: start_proc_id
 ; begin func
-PROC_GET_NEXT_WITH_STATUS:
+EXPORT PROC_GET_NEXT_WITH_STATUS:
 ; begin prologue
   APUSH
 ; end prologue
@@ -58,17 +58,16 @@ PROC_GET_NEXT_WITH_STATUS:
     CLA
     ST &proc_id
   PGNWS__CONTINUE:
-
-    CMP &start_proc_id
-    BEQ PGNWS__INVALID
-
-    CALL $PROC_GET_TCB_PTR  
+    FCALL ($PROC_GET_TCB_PTR_PTR)  
     ST &ptr
     LD (&ptr)
     CMP &status
     BEQ PGNWS__FOUND
 
     LD &proc_id
+    CMP &start_proc_id
+    BEQ PGNWS__INVALID ; if loop returned to beginning
+
     INC
     ST &proc_id
 
@@ -93,8 +92,11 @@ PGNWS__END:
 ; 
 ; params: AC: id
 ; return: AC: address of the TCB of process
-PROC_GET_TCB_PTR:
-  MUL #7
+EXPORT PROC_GET_TCB_PTR:
+  PUSH
+  LD #7
+  CALL ($MUL_PTR)
+  POP
   ADD _PROC__TCB_DESCR_BEGIN
   RET
 ; end func PROC_GET_TCB_PTR
@@ -106,7 +108,10 @@ PROC_GET_TCB_PTR:
 ; params: AC: id
 ; return: AC: address of stack memory segment for process
 PROC_GET_STACK_PTR:
-  MUL $_PROC__TCB_STACK_SIZE
+  PUSH
+  LD $_PROC__TCB_STACK_SIZE
+  FCALL ($MUL) 
+  POP
   ADD _PROC__TCB_STACK_BEGIN
   RET
 ; end func PROC_GET_STACK_PTR
@@ -137,7 +142,7 @@ PROC_GET_STACK_PTR:
 PSS__RET: WORD ?
 ; end globals
 ; begin func
-PROC_SAVE_STATE:
+EXPORT PROC_SAVE_STATE:
   APUSH
 
   CALL PROC_GET_TCB_PTR
@@ -174,7 +179,7 @@ PROC_SAVE_STATE:
   
   LD -(&tcb_ptr+2) ; get stack size
   ; cnt
-  CALL $MEMCPY 
+  FCALL ($MEMCPY_PTR) 
 
   POP
   POP
@@ -209,7 +214,7 @@ PLS__CNT: WORD ?
 PLS__STACK_START_PTR: WORD ?
 ; end globals
 ; begin func
-PROC_LOAD_STATE:
+EXPORT PROC_LOAD_STATE:
   CALL PROC_GET_TCB_PTR
 
   ST PLS__BASE_TCB_PTR

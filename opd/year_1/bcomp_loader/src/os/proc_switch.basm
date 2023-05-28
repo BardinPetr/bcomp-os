@@ -14,24 +14,24 @@ OS__CONTEXT_SWITCH_INT:
   PUSH ; cur accumulator value
   
   LD OSCSI__TEXT_PTR
-  CALL $PRINT
+  FCALL ($PRINT_PTR)
 
   LD $_SYS_PROC__RUNNING_PROCESS_ID  
-  CALL $PROC_SAVE_STATE
+  FCALL ($PROC_SAVE_STATE_PTR)
 
   ; search for active process
   LD $_SYS_PROC__RUNNING_PROCESS_ID
   PUSH
   CLA ; 0=running
-  CALL $PROC_GET_NEXT_WITH_STATUS
+  FCALL ($PROC_GET_NEXT_WITH_STATUS_PTR)
   SWAP
   POP
   BPL OSCSI__CONT
-  LD $_SYS_PROC__RUNNING_PROCESS_ID
+  FCALL ($OS__PANIC_PTR)
 
 OSCSI__CONT:
   ST $_SYS_PROC__RUNNING_PROCESS_ID
-  CALL $PROC_LOAD_STATE
+  FCALL ($PROC_LOAD_STATE_PTR)
   ; HLT
 
   ; this instruction should not be reached in normal process loading
@@ -47,7 +47,7 @@ OSCSI__CONT:
 ; &: period
 ; &: ret_addr
 ; begin func
-OS__SETUP_SWITCH_TIMER:
+EXPORT OS__SETUP_SWITCH_TIMER:
 ; begin prologue
   APUSH
 ; end prologue
@@ -55,17 +55,17 @@ OS__SETUP_SWITCH_TIMER:
   ST &period
 
   LD OS__CONTEXT_SWITCH_INT_PTR
-  CALL $INT__REGISTER_HANDLER
+  FCALL ($INT__REGISTER_HANDLER_PTR)
 
   PUSH
   CLA ; timer DEV#0
-  CALL $DEV__INT_ON
+  FCALL ($DEV__INT_ON_PTR)
   POP
   
   CLA ; DEV#0 DR = 0
   PUSH
   LD &period+1
-  CALL $DEV__OUT
+  FCALL ($DEV__OUT_PTR)
   POP
 
   EI

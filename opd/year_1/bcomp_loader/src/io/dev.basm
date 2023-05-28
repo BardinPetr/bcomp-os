@@ -12,17 +12,17 @@
 ; begin globals
 ; end globals
 ; begin func
-DEV__INT_ON:
+EXPORT DEV__INT_ON:
 ; begin prologue
   APUSH
 ; end prologue
 
-  CALL $DEV__GET_MR
+  CALL DEV__GET_MR
 
   PUSH
   LD &int_vect_id+1
   OR #0x8 ; int enable 
-  CALL $DEV__OUT
+  CALL DEV__OUT
   POP
 
 ; begin epilogue
@@ -36,12 +36,12 @@ DEV__INT_ON:
 ; 
 ; params: AC: dev_num
 ; begin func
-DEV__INT_OFF:
-  CALL $DEV__GET_MR
+EXPORT DEV__INT_OFF:
+  CALL DEV__GET_MR
 
   PUSH
   CLA
-  CALL $DEV__OUT
+  CALL DEV__OUT
   POP
 
   RET
@@ -53,7 +53,7 @@ DEV__INT_OFF:
 ; params: AC: value
 ;         STACK: io_reg_num
 ; affects: os code (rewrites its own OUT instrunction with value supplied)
-; stack:
+; stack:S
 ; &: value
 ; &: ret_addr
 ; &: io_reg_num
@@ -61,7 +61,7 @@ DEV__INT_OFF:
 DEV__OUT__MASK: WORD 0xFF00
 ; end globals
 ; begin func
-DEV__OUT:
+EXPORT DEV__OUT:
 ; begin prologue
   APUSH
 ; end prologue

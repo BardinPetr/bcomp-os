@@ -7,6 +7,15 @@ _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 ; end globals
 
 
+; func PROC_EXIT: () kill current process
+; begin func
+EXPORT PROC_EXIT:
+  LD _SYS_PROC__RUNNING_PROCESS_ID
+  CALL PROC_KILL
+  RET
+; end func PROC_EXIT
+
+
 
 ; func PROC__INIT_MANAGER: (sp_origin) prepares structures to hold processes
 ;
@@ -18,7 +27,7 @@ _SYS_PROC__CUR_PROCESSES_COUNT: WORD 0x0
 ; &: cur_id
 ; &: ret_addr
 ; begin func
-PROC__INIT_MANAGER:
+EXPORT PROC__INIT_MANAGER:
 ; begin prologue
   APUSH
 ; end prologue
@@ -81,7 +90,7 @@ PIM__END:
 PCRT__BASE_PS: WORD 0x1A0 ; P | W | EI
 ; end globals
 ; begin func
-PROC_INIT:
+EXPORT PROC_INIT:
 ; begin prologue
   APUSH
 ; end prologue
@@ -97,10 +106,10 @@ PROC_INIT:
   LD $_SYS_PROC__PROCESSES_MAX
   PUSH 
   LD #0xFF
-  CALL $PROC_GET_NEXT_WITH_STATUS
+  FCALL ($PROC_GET_NEXT_WITH_STATUS_PTR)
   BMI PCRT__INVALID
   ST &proc_id+1
-  CALL $PROC_GET_TCB_PTR
+  FCALL ($PROC_GET_TCB_PTR_PTR)
   ST &tcb_ptr+1
   POP
 
@@ -121,7 +130,7 @@ PROC_INIT:
   LD (&tcb_ptr+1)+ ; stack data ptr
   PUSH
   CLA
-  CALL $MEMSET
+  FCALL ($MEMSET_PTR)
   POP
   POP
 
@@ -146,9 +155,9 @@ PCRT__END:
 ; stack:
 ; &: ptr
 ; begin func
-PROC_KILL:
+EXPORT PROC_KILL:
   APUSH
-  CALL $PROC_GET_TCB_PTR
+  FCALL ($PROC_GET_TCB_PTR_PTR)
   ST &ptr
   LD #0xFF
   ST (&ptr)
@@ -180,29 +189,29 @@ PROC_START:
   BHIS PSTRT__FAIL
 
   LD PSTRT__READER
-  CALL $LOAD_BIN
+  FCALL ($LOAD_BIN_PTR)
   BZS PSTRT__FAIL
 
   ; ac=target ip
-  CALL $PROC_INIT
+  FCALL ($PROC_INIT_PTR)
   ST &proc_id
   BMI PSTRT__FAIL
 
   LD PSTRT__STR_RUN_PTR
-  CALL $PRINT
+  FCALL ($PRINT_PTR)
   LD &proc_id
-  CALL $ITOA_CHAR
-  CALL $PRINT_CHAR
-  CALL $PRINT_ENDL
+  FCALL ($ITOA_CHAR_PTR)
+  FCALL ($PRINT_CHAR_PTR)
+  FCALL ($PRINT_ENDL_PTR)
 
   LD &proc_id
   JUMP PSTRT__END
 
 PSTRT__FAIL:
   LD &proc_id
-  CALL $PROC_KILL
+  FCALL ($PROC_KILL_PTR)
   LD PSTRT__STR_FAIL_PTR
-  CALL $PRINTLN
+  FCALL ($PRINTLN_PTR)
   LD #0xFF
 
 PSTRT__END:  

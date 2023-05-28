@@ -11,11 +11,8 @@
 ; &: cur_id
 ; &: ptr
 ; &: ret_addr
-; begin globals:
-RL__PROMPT: WORD "> "
-; end globals
 ; begin func
-READ_LINE:
+EXPORT READ_LINE:
 ; begin prologue
   APUSH 
 ; end prologue
@@ -26,9 +23,6 @@ READ_LINE:
   ; set character id to zero 
   CLA
   ST &cur_id
-
-  ; LD RL__PROMPT_PTR
-  ; CALL $PRINT
 
   ; begin loop
   RL__LOOP: 
@@ -41,8 +35,8 @@ READ_LINE:
     BZS RL__HIGH_BYTE
     ; begin branch char_id % 2 == 0
     RL__LOW_BYTE:
-      CALL $READ_CHAR
-      CALL $PRINT_CHAR
+      FCALL ($READ_CHAR_PTR)
+      FCALL ($PRINT_CHAR_PTR)
 
       CMP #0x0A ; LF (NUL is full next word)
       BEQ RL__EOL_APPEND_NUL
@@ -59,8 +53,8 @@ READ_LINE:
       JUMP RL__LOOP
     ; begin branch char_id % 2 == 1
     RL__HIGH_BYTE:
-      CALL $READ_CHAR
-      CALL $PRINT_CHAR
+      FCALL ($READ_CHAR_PTR)
+      FCALL ($PRINT_CHAR_PTR)
 
       CMP #0x0A ; LF, NUL is this word high byte
       ; no need to set NUL as it is automatically set when writing low byte
@@ -86,7 +80,7 @@ RL__EOL_APPEND_NUL:
   CLA ; put EOS
   ST (&ptr)
 RL__EOL:
-  CALL $PRINT_ENDL
+  FCALL ($PRINT_ENDL_PTR)
   
   ; begin epilogue
   LD &cur_id
@@ -103,7 +97,7 @@ RL__EOL:
 ; return: AC: data read from dev in low byte
 ; affects: AC higher byte is cleared
 ; begin func
-READ_CHAR:
+EXPORT READ_CHAR:
 RCH__LOOP:
   CLA
   ; IN 0x19

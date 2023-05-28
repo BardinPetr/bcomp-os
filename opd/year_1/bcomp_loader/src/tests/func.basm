@@ -16,6 +16,8 @@
 
 ; begin epilogue
   APOP
+  SPADD -(1 + args + locals)
+  
   RET
 ; end epilogue
 ; end func 

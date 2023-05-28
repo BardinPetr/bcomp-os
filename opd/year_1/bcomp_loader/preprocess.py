@@ -5,9 +5,9 @@ import re
 
 DEBUG = '--debug' in sys.argv
 
-ESCAPE_TABLE = {
-  repr(i)[1:-1]: i for i in ['\\', '\n', '\t', '\b', '\f', '\r', '\v', '\'', '\"']
-}
+CODE_BEGIN = 0x30
+
+ESCAPE_TABLE = { repr(i)[1:-1]: i for i in ['\\', '\n', '\t', '\b', '\f', '\r', '\v', '\'', '\"'] }
 def encode_string(text: str, encoding="koi8-r", little_endian=True):
   for txt, escape in ESCAPE_TABLE.items():
     text = text.replace(txt, escape)
@@ -36,7 +36,7 @@ def preprocess_includes(data: str):
     with open(path, "r") as included_file:
       text = included_file.read()
 
-      if len(re.findall(r"ORG\s+0x", text)):
+      if len(re.findall(r"(?:ORG|INCLUDE)\s+0x", text)):
         sys.stderr.write("Use of ORG in includes is prohibited!")
         exit(1)
       
@@ -113,12 +113,27 @@ def preprocess_stack_names(data: str):
   return data
 
 
+def generate_headers(code: str) -> tuple[str, str]:
+  clean_code = re.sub("EXPORT ", "", code)
+  export_funcs = map(lambda x: x.group(1), re.finditer(r"EXPORT (\w+):", code))
+  table = [f"{i}_PTR: WORD ${i}" for i in export_funcs]  
+  table = '\n'.join(table)
+
+  return clean_code, table
+
+
+
 def main():
   path = sys.argv[1]
 
   with open(path, "r") as file:
     data = file.read()
+
     data = preprocess_includes(data)
+
+    data, func_table = generate_headers(data)
+    data = data.replace('FUNCTABLE', func_table)
+
     data = preprocess_strings(data)
     data = preprocess_stack_names(data)
 

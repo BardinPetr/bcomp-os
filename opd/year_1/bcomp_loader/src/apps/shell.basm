@@ -13,6 +13,19 @@ _SHELL__CMD_LIST_CNT: WORD 0x3
 
 
 
+
+; func SHELL_PROC: ()
+; begin globals
+SHELL_PROC_PTR: WORD $SHELL_PROC
+; end globals
+; begin func
+SHELL_PROC:
+  CALL SHELL_MAIN
+  FCALL ($PROC_EXIT_PTR)
+; end func SHELL_PROC
+
+
+
 ; func SHELL_MAIN: () simple shell for execution of predefined commands.
 ; Uses _SHELL__CMD_NAME_PTR_LIST as list of known command name strings, 
 ; and _SHELL__CMD_NAME_PTR_LIST as list of CALL targets or 0xFFFF for exit
@@ -33,18 +46,18 @@ SHELL_MAIN:
 ; end prologue
 
   LD SHELL__START_STR_PTR
-  CALL $PRINTLN
+  FCALL ($PRINTLN_PTR)
 
   LD #30
-  CALL $MALLOC
+  FCALL ($MALLOC_PTR)
   ST &input_ptr
 
   SHELL__LOOP:
     LD SHELL__PROMPT_STR_PTR
-    CALL $PRINT
+    FCALL ($PRINT_PTR)
 
     LD &input_ptr
-    CALL $READ_LINE
+    FCALL ($READ_LINE_PTR)
 
     LD &input_ptr
     CALL SHELL_SELECT_CMD
@@ -52,7 +65,7 @@ SHELL_MAIN:
     ; begin if command not found
     BZC SHELL__LOOP_CONTINUE
       LD SHELL__NOTFOUND_STR_PTR
-      CALL $PRINTLN 
+      FCALL ($PRINTLN_PTR) 
       JUMP SHELL__LOOP
     ; begin branch command found
     SHELL__LOOP_CONTINUE: 
@@ -66,7 +79,7 @@ SHELL_MAIN:
 
 SHELL__EXIT:
   LD &input_ptr
-  CALL $MFREE
+  FCALL ($MFREE_PTR)
 
 ; begin epilogue
   APOP
@@ -107,7 +120,7 @@ SHELL_SELECT_CMD:
     LD (&name_ptr)+
     PUSH 
     LD &cmd_str_ptr+1
-    CALL $STRCMP
+    FCALL ($STRCMP_PTR)
     SWAP
     POP
 
@@ -146,7 +159,7 @@ SHELL_CMD_HELP:
   APUSH
 
   LD SCH__TEXT_PTR
-  CALL $PRINT
+  FCALL ($PRINT_PTR)
 
   LD $_SHELL__CMD_LIST_CNT
   ST &iter
@@ -156,15 +169,15 @@ SHELL_CMD_HELP:
 
   SCH__LOOP:
     LD (&ptr)+
-    CALL $PRINT
+    FCALL ($PRINT_PTR)
     
     LD #0x20
-    CALL $PRINT_CHAR
+    FCALL ($PRINT_CHAR_PTR)
 
     LOOP &iter
     JUMP SCH__LOOP
 
-  CALL $PRINT_ENDL
+  FCALL ($PRINT_ENDL_PTR)
 
   APOP
   RET

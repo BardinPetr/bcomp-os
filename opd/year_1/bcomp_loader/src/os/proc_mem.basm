@@ -7,7 +7,7 @@ _SYS_PROC__FREE_MEM_START: WORD 0x0
 
 ; func PROCMEM__INIT: () initialize memory manager for processes
 ; begin func
-PROCMEM__INIT:
+EXPORT PROCMEM__INIT:
   LD $_SYS__USERSPACE_BEGIN
   ST $_SYS_PROC__FREE_MEM_START
   RET
@@ -24,7 +24,7 @@ PROCMEM__INIT:
 ; begin globals
 ; end globals
 ; begin func
-PROCMEM__ALLOC:
+EXPORT PROCMEM__ALLOC:
 ; begin prologue
   APUSH
 ; end prologue

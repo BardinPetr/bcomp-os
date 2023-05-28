@@ -15,7 +15,7 @@
 ; &: ret_addr
 ; &: id
 ; begin func
-ARRAY_GET_FC:
+EXPORT ARRAY_GET_FC:
   APUSH
   ; array start in AC
   ADD &id
@@ -65,7 +65,7 @@ ARRAY_SET:
 ; &: ret_addr
 ; &: val
 ; begin func
-ARRAY_LOWER_BOUND:
+EXPORT ARRAY_LOWER_BOUND:
 ; begin prologue
   APUSH
 ; end prologue
@@ -74,7 +74,7 @@ ARRAY_LOWER_BOUND:
   ST &cur_ptr
 
   ; get last element index  
-  CALL $MSIZE
+  FCALL ($MSIZE_PTR)
   ST &pos
 
   ; move pointer to the element after the last

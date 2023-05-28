@@ -1,40 +1,48 @@
 ORG 0x10
 
-INCLUDE util/math.basm
-INCLUDE util/string.basm
-INCLUDE util/array.basm
-INCLUDE io/output.basm
-INCLUDE io/input.basm
-INCLUDE os/memory.basm
-
-A: WORD "abcd"
-B: WORD 10 DUP (0x11)
-B_PTR: WORD $B
-;17e 182
+STR1: WORD "abcd"
+STR2: WORD "abcde"
+STR3: WORD 0x1, 0x2, 0x3
 START:
-  LD A_PTR  
-  PUSH
-  LD B_PTR
-  PUSH
-  LD #3
-  CALL $MEMCPY
-  POP
-  POP
   HLT
-  ; CALL $READ_LINE
 
-  ; CALL $PRINT_ENDL
-  ; LD B_PTR
-  ; CALL $PRINTLN
+; ORG 0x10
+
+; INCLUDE util/math.basm
+; INCLUDE util/string.basm
+; INCLUDE util/array.basm
+; INCLUDE io/output.basm
+; INCLUDE io/input.basm
+; INCLUDE os/memory.basm
+
+; A: WORD "abcd"
+; B: WORD 10 DUP (0x11)
+; B_PTR: WORD $B
+; ;17e 182
+; START:
+;   LD A_PTR  
+;   PUSH
+;   LD B_PTR
+;   PUSH
+;   LD #3
+;   CALL $MEMCPY
+;   POP
+;   POP
+;   HLT
+;   ; CALL $READ_LINE
+
+;   ; CALL $PRINT_ENDL
+;   ; LD B_PTR
+;   ; CALL $PRINTLN
   
-  ; LD A_PTR
-  ; PUSH
-  ; LD B_PTR
-  ; CALL $STRCMP
-  ; ADD #0x30
-  ; CALL $PRINT_CHAR
+;   ; LD A_PTR
+;   ; PUSH
+;   ; LD B_PTR
+;   ; CALL $STRCMP
+;   ; ADD #0x30
+;   ; CALL $PRINT_CHAR
 
-  ; POP
-  ; JUMP START
+;   ; POP
+;   ; JUMP START
 
-_SYS__CODE_END: WORD ?
+; _SYS__CODE_END: WORD ?

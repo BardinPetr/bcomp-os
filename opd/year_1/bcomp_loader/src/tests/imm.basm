@@ -1,0 +1,3 @@
+ORG 0x523
+L: HLT
+FCALL ($L)

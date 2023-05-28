@@ -6,7 +6,7 @@
 ; params: AC - 1b character in low byte
 ; return: none
 ; begin func
-PRINT_CHAR:
+EXPORT PRINT_CHAR:
   PUSH ; store target char
 
   PCH__LOOP:
@@ -26,11 +26,11 @@ PRINT_CHAR:
 ; func PRINT_ENDL: prints CR+LF
 ; 
 ; begin func
-PRINT_ENDL:
+EXPORT PRINT_ENDL:
   LD #0xD
-  CALL $PRINT_CHAR
+  FCALL ($PRINT_CHAR_PTR)
   LD #0xA
-  CALL $PRINT_CHAR
+  FCALL ($PRINT_CHAR_PTR)
   RET
 ; end func PRINT_ENDL
 
@@ -38,9 +38,9 @@ PRINT_ENDL:
 ; func PRINT_CLEAR: clears screen (Form Feed)
 ; 
 ; begin func
-PRINT_CLEAR:
+EXPORT PRINT_CLEAR:
   LD #0x0C
-  CALL $PRINT_CHAR
+  FCALL ($PRINT_CHAR_PTR)
   RET
 ; end func PRINT_CLEAR
 
@@ -56,7 +56,7 @@ PRINT_CLEAR:
 MASK_LOW: WORD 0x00FF
 ; end globals
 ; begin func
-PRINT:
+EXPORT PRINT:
   APUSH
 
   ST &ptr
@@ -88,11 +88,11 @@ PRINT_EXIT:
 ; requires: string encoding should be aggreed between output device and input string. 1b encoding allowed only
 ; params: AC - pointer to first string data address
 ; begin func
-PRINTLN:
-  CALL $PRINT
+EXPORT PRINTLN:
+  FCALL ($PRINT_PTR)
   LD #0xD
-  CALL $PRINT_CHAR
+  FCALL ($PRINT_CHAR_PTR)
   LD #0xA
-  CALL $PRINT_CHAR
+  FCALL ($PRINT_CHAR_PTR)
   RET
 ; end func PRINTLN

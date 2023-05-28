@@ -41,7 +41,7 @@ MALLOC__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
 MALLOC__WRITE_PTR: WORD ?
 ; end globals
 ; begin func
-MALLOC:
+EXPORT MALLOC:
 ; begin prologue
   APUSH
 ; end prologue
@@ -111,7 +111,7 @@ MFREE__HEAP_END_PTR: WORD $_SYS__HEAP_END
 MFREE__CUR_POINTER_PTR: WORD $_SYS__HEAP_POINTER
 ; end globals
 ; begin func
-MFREE:
+EXPORT MFREE:
 ; begin prologue
   APUSH
 ; end prologue
@@ -167,7 +167,7 @@ MFREE__END:
 ; stack:
 ; &: ptr
 ; begin func
-MSIZE:
+EXPORT MSIZE:
   APUSH
   DEC
   ST &ptr
@@ -229,7 +229,7 @@ MEMCMP:
 ; &: dst
 ; &: src
 ; begin func
-MEMCPY:
+EXPORT MEMCPY:
   APUSH
   
   ST &cnt
@@ -262,7 +262,7 @@ MEMCPY:
 ; &: dst
 ; &: cnt
 ; begin func
-MEMSET:
+EXPORT MEMSET:
 ; begin prologue
   APUSH
 ; end prologue

@@ -4,12 +4,12 @@ CHR: WORD 0x20
 MX: WORD 0xFF
 START:
   OUTWAIT: 
-    IN 0xA
-    AND #0x20
+    IN 0xD
+    AND #0x40
     BZS OUTWAIT
   
   LD CHR
-  OUT 0x9 
+  OUT 0xC
   INC
   ST CHR
 

@@ -1,61 +1,27 @@
 ; ----------------------------- ANSI TERMINAL ESCAPE CODES SUPPORT LIBRARY -----------------------------
 
-; begin globals
-; _ANSI__CSI: WORD "\u001b[31m"
-_ANSI__CSI: WORD 0x5B
-; end globals
 
-
-; func ANSI_CSI: ()
-; 
+; func ANSI__CSI: ()
 ; begin globals
+ANSICSI_START: WORD 0x5B1B, 0x3133, 0x396D, 0x0000
+ANSICSI_START_PTR: WORD $ANSICSI_START 
 ; end globals
 ; begin func
-ANSI_CSI:
-  LD #0x1B
-  FCALL ($PRINT_CHAR_PTR)
-
-  LD _ANSI__CSI
-  FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x4
-  ; FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x31
-  ; FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x6d
-  ; FCALL ($PRINT_CHAR_PTR)
+EXPORT ANSI__CSI:
+  LD ANSICSI_START_PTR
+  FCALL ($PRINT_PTR)
 
   RET
-; end func ANSI_CSI
+; end func ANSI__CSI
 
 
 
-; func ANSI_SGR: ()
-; 
+; func ANSI__SGR: ()
 ; begin globals
 ; end globals
 ; begin func
-ANSI_SGR:
-  LD #0x1B
-  FCALL ($PRINT_CHAR_PTR)
-
-  LD _ANSI__CSI
-  FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x4
-  ; FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x31
-  ; FCALL ($PRINT_CHAR_PTR)
-
-  ; LD #0x6d
-  ; FCALL ($PRINT_CHAR_PTR)
-
-  ; LD TEST_STR_PTR
-  ; FCALL ($PRINT_PTR)
+ANSI__SGR:
 
   RET
 ; end epilogue
-; end func ANSI_SGR
+; end func ANSI__SGR

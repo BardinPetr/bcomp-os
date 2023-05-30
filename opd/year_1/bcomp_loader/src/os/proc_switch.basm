@@ -6,16 +6,12 @@
 ; 
 ; begin globals
 OS__CONTEXT_SWITCH_INT_PTR: WORD $OS__CONTEXT_SWITCH_INT
-OSCSI__TEXT: WORD "s"
 ; end globals
 ; begin func
 OS__CONTEXT_SWITCH_INT:
   ; here is PS on stack top an IP the next
   PUSH ; cur accumulator value
   
-  LD OSCSI__TEXT_PTR
-  FCALL ($PRINT_PTR)
-
   LD $_SYS_PROC__RUNNING_PROCESS_ID  
   FCALL ($PROC_SAVE_STATE_PTR)
 
@@ -31,12 +27,6 @@ OS__CONTEXT_SWITCH_INT:
 
 OSCSI__CONT:
   ST $_SYS_PROC__RUNNING_PROCESS_ID
-  ; HLT
-  FCALL ($ITOA_CHAR_PTR)
-  FCALL ($PRINT_CHAR_PTR)
-  FCALL ($PRINT_ENDL_PTR)
-
-  LD $_SYS_PROC__RUNNING_PROCESS_ID
   FCALL ($PROC_LOAD_STATE_PTR)
 
   ; this instruction should not be reached in normal process loading

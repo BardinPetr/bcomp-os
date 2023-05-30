@@ -79,19 +79,19 @@ EXPORT ATOI:
     PUSH
     LD &cur_radix_pow+1
     FCALL ($MUL_PTR)
-    POP
     ; save sum
-    ADD &sum
-    ST &sum
+    ADD &sum+1
+    ST &sum+1
+    POP
 
     ; cur_radix_pow *= radix
     LD &radix
     PUSH
     LD &cur_radix_pow+1
     FCALL ($MUL_PTR)
+    ST &cur_radix_pow+1
     POP
 
-    ST &cur_radix_pow
     JUMP ATOI__LOOP
   ; end loop
 

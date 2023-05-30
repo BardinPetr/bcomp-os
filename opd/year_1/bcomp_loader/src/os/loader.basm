@@ -28,6 +28,13 @@
 ; &: start_addr
 ; &: section_cnt
 ; &: ret_addr
+; begin globals
+LB__STR_STARTED: WORD "Started loading program"
+LB__STR_NO_SPACE: WORD "Not enough RAM to load program"
+LB__STR_HEADER_OK: WORD "Header parsed and valid. Sections count: "
+LB__STR_SECTION_LOADED: WORD " section loaded"
+LB__STR_FULL_LOADED: WORD "Loading successful"
+; end globals
 ; begin func
 EXPORT LOAD_BIN:
   ; begin prologue
@@ -238,14 +245,6 @@ LB__END:
   APOP
   RET
 ; end epilogue
-
-; begin globals strings 
-LB__STR_STARTED: WORD "Started loading program"
-LB__STR_NO_SPACE: WORD "Not enough RAM to load program"
-LB__STR_HEADER_OK: WORD "Header parsed and valid. Sections count: "
-LB__STR_SECTION_LOADED: WORD " section loaded"
-LB__STR_FULL_LOADED: WORD "Loading successful"
-; end globals
 ; end func LOAD_BIN
 
 
@@ -404,13 +403,14 @@ CALC_ADDR_SHIFT:
   PUSH
   LD &org_array+1
   FCALL ($ARRAY_LOWER_BOUND_PTR)
-  ST &org_delta+1 ; index
-  POP
 
-  LD &org_delta
-  PUSH 
-  LD &delta_array+1
-  FCALL ($ARRAY_GET_FC_PTR)
+  ; index in AC
+  ADD &delta_array+1
+  ST &delta_array+1
+  LD (&delta_array+1)
+
+  SWAP
+  POP
 
   ; ret (cur_cmd - org_delta) = (cmd_id + section_org) - (section_org - real_section_org) = cmd_id + real_section_org
 

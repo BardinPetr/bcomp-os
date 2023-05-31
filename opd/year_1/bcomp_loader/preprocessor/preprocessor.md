@@ -8,6 +8,10 @@ python3 ../preprocessor/main.py main.basm build/main.build.basm -t build/abi.bui
 bcomp -c -r -C build/main.build.basm
 ```
 
+- first argument - path to the root code file, all include directive should be relative to the directory of that file
+- second argument - output file, in which will all included files be built
+- -t argument - if present, table of global functions with all addresses substituted would be written to that file, it could be later inserted as header file to applications to provide them with OS ABI. 
+
 ### Constructions available
 #### String encoding 
 To encode strings to memory, the following format could be used:

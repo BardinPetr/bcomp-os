@@ -13,8 +13,6 @@ EXPORT OS__INIT:
   
   FCALL ($PRINT_CLEAR_PTR)
 
-  FCALL ($ANSI__CSI_PTR)
-
   LD OSI__INIT_STR_PTR
   FCALL ($PRINTLN_PTR)
 
@@ -25,7 +23,7 @@ EXPORT OS__INIT:
 
   ; setup interrupts
   FCALL ($INT__INIT_PTR)
-  LD #1 ; 10Hz
+  LD #4 ; 10 * 4 ms -> 25Hz
   FCALL ($OS__SETUP_SWITCH_TIMER_PTR)
   
   ; init end

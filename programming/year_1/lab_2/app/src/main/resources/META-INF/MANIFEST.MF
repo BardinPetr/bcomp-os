@@ -1,2 +1,0 @@
-Main-Class: ru.bardinpetr.itmo.lab_2.App
-Class-Path: libs/pokemon.jar

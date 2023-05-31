@@ -4,8 +4,6 @@ INCLUDE build/abi.build.basm
 CHR: WORD 0x20
 MAX: WORD 0xFF
 START:
-  FCALL ($ANSI__CSI_PTR)
-
   OUTWAIT: 
     IN 0xD
     AND #0x40

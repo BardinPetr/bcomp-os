@@ -3,7 +3,7 @@
 
 ; func ANSI__CSI: ()
 ; begin globals
-ANSICSI_START: WORD 0x5B1B, 0x3133, 0x396D, 0x0000
+ANSICSI_START: WORD 0x5B1B, 0x3133, 0x006D
 ANSICSI_START_PTR: WORD $ANSICSI_START 
 ; end globals
 ; begin func

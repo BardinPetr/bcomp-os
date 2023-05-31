@@ -1,0 +1,50 @@
+ORG 0x20
+INCLUDE build/abi.build.basm
+
+; func DRAW_PICTURE: draw picture on IO dev 6
+; stack:
+; &: cnt
+; &: ptr
+; &: ret_addr 
+; begin globals
+DP__PICTURE: WORD 0x0004, 0x002E, 0x007E, 0x007F, 0x000F, 0x000E, 0x000E, 0x0018
+DP__PICTURE_SIZE: WORD 8
+DP__PICTURE_PTR: WORD $DP__PICTURE
+; end globals
+; begin func
+DRAW_PICTURE:
+; begin prologue
+  APUSH
+; end prologue
+
+  LD DP__PICTURE_SIZE
+  ST &cnt
+
+  LD DP__PICTURE_PTR
+  ST &ptr
+
+  DP__LINE_LOOP:
+    OUTWAIT: 
+      IN 0x11
+      AND #0x40
+      BZS OUTWAIT
+    
+    LD (&ptr)+
+    OUT 0x10
+
+  LOOP &cnt
+  JUMP DP__LINE_LOOP
+
+; begin epilogue
+  APOP
+  RET
+; end epilogue
+; end func DRAW_PICTURE
+
+
+; func START: () draw ducks
+; begin func
+START:
+  CALL DRAW_PICTURE
+  JUMP START
+; end func START
